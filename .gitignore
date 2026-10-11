@@ -65,3 +65,6 @@ tiled-extensions/
 
 # Music test downloads stay local; tracks the game uses live in assets/soundtrack/.
 assets/music/
+
+# Python
+__pycache__/
