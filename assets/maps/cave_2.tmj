@@ -11,7 +11,7 @@
  "tileheight": 32,
  "backgroundcolor": "#0c0a10",
  "nextlayerid": 5,
- "nextobjectid": 23,
+ "nextobjectid": 25,
  "properties": [
   {
    "name": "display_name",
@@ -682,10 +682,10 @@
     6,
     6,
     6,
-    6,
-    6,
-    6,
-    6,
+    0,
+    0,
+    0,
+    0,
     6,
     6,
     6,
@@ -1496,10 +1496,10 @@
     0,
     0,
     0,
-    0,
-    0,
-    0,
-    0,
+    12,
+    12,
+    12,
+    12,
     0,
     0,
     0,
@@ -1673,13 +1673,13 @@
     0,
     0,
     0,
-    12,
-    12,
-    12,
-    12,
-    12,
-    12,
-    12,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
     0,
     0,
     0,
@@ -2942,6 +2942,11 @@
        "value": 1
       },
       {
+       "name": "gated_by",
+       "type": "string",
+       "value": "break"
+      },
+      {
        "name": "unique_id",
        "type": "string",
        "value": "cave2_charm"
@@ -2964,11 +2969,84 @@
        "name": "shrine_id",
        "type": "string",
        "value": "vigor"
+      },
+      {
+       "name": "gated_by",
+       "type": "string",
+       "value": "break"
       }
      ]
     },
     {
      "id": 10,
+     "name": "breath_amulet",
+     "type": "pickup",
+     "x": 144.0,
+     "y": 352,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "item",
+       "type": "string",
+       "value": "breath_amulet"
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "gated_by",
+       "type": "string",
+       "value": "highjump"
+      },
+      {
+       "name": "unique_id",
+       "type": "string",
+       "value": "hollow_amulet"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "light",
+     "type": "light",
+     "x": 144.0,
+     "y": 336.0,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "radius",
+       "type": "int",
+       "value": 40
+      },
+      {
+       "name": "color",
+       "type": "string",
+       "value": "#a0e0ff"
+      },
+      {
+       "name": "flicker",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "intensity",
+       "type": "string",
+       "value": 0.6
+      }
+     ]
+    },
+    {
+     "id": 12,
      "name": "ward",
      "type": "shrine",
      "x": 144.0,
@@ -2987,7 +3065,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 13,
      "name": "shadow",
      "type": "shrine",
      "x": 304.0,
@@ -3006,7 +3084,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 14,
      "name": "might",
      "type": "shrine",
      "x": 1008.0,
@@ -3025,7 +3103,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 15,
      "name": "crystal",
      "type": "pickup",
      "x": 1136.0,
@@ -3045,11 +3123,16 @@
        "name": "count",
        "type": "int",
        "value": 2
+      },
+      {
+       "name": "gated_by",
+       "type": "string",
+       "value": "break"
       }
      ]
     },
     {
-     "id": 14,
+     "id": 16,
      "name": "crystal",
      "type": "pickup",
      "x": 944.0,
@@ -3073,7 +3156,7 @@
      ]
     },
     {
-     "id": 15,
+     "id": 17,
      "name": "bone",
      "type": "pickup",
      "x": 560.0,
@@ -3097,7 +3180,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 18,
      "name": "coins",
      "type": "pickup",
      "x": 752.0,
@@ -3121,7 +3204,7 @@
      ]
     },
     {
-     "id": 17,
+     "id": 19,
      "name": "bat",
      "type": "enemy",
      "x": 400.0,
@@ -3140,7 +3223,7 @@
      ]
     },
     {
-     "id": 18,
+     "id": 20,
      "name": "bat",
      "type": "enemy",
      "x": 976.0,
@@ -3164,7 +3247,7 @@
      ]
     },
     {
-     "id": 19,
+     "id": 21,
      "name": "beetle",
      "type": "enemy",
      "x": 752.0,
@@ -3188,7 +3271,7 @@
      ]
     },
     {
-     "id": 20,
+     "id": 22,
      "name": "rat",
      "type": "enemy",
      "x": 208.0,
@@ -3207,7 +3290,7 @@
      ]
     },
     {
-     "id": 21,
+     "id": 23,
      "name": "from_cave_1",
      "type": "spawn",
      "x": 80.0,
@@ -3219,7 +3302,7 @@
      "point": true
     },
     {
-     "id": 22,
+     "id": 24,
      "name": "to_cave_1",
      "type": "door",
      "x": 0,

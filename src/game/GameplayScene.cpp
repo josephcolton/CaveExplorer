@@ -1216,7 +1216,7 @@ void GameplayScene::updateSurvival(float dt) {
     if (player_.headUnderwater() && !player_.dead()) {
         air_ = std::max(0.0f, air_ - dt);
         if (air_ <= 0.0f) {
-            player_.health = std::max(0.0f, player_.health - 10.0f * dt);
+            player_.health = std::max(0.0f, player_.health - 25.0f * dt);
             regenDelay_ = kRegenDelay;
             drownTick_ -= dt;
             if (drownTick_ <= 0.0f) {

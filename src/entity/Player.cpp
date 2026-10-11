@@ -104,7 +104,11 @@ void Player::update(float dt, const Input& input, const Tilemap& map) {
         } else if (control && input.down(Action::Up) && headUnder_) {
             velocity.y = approach(velocity.y, -130.0f, 500.0f * dt);
         } else if (nearSurface && !headUnder_ && sdir != 0.0f &&
-                   ((sdir > 0.0f && contact.hitWallRight) || (sdir < 0.0f && contact.hitWallLeft))) {
+                   ((sdir > 0.0f && contact.hitWallRight) || (sdir < 0.0f && contact.hitWallLeft)) &&
+                   map.collisionAt(static_cast<int>(std::floor((sdir > 0.0f ? box.right() + 1.0f : box.left() - 1.0f) /
+                                                                Tilemap::kTileSize)),
+                                   static_cast<int>(std::floor((box.top() - 4.0f) / Tilemap::kTileSize))) ==
+                       TileCollision::None) {
             velocity.y = -stats.jumpVelocity * 0.7f;  // swimming into a low shore climbs out
         } else if (headUnder_) {
             velocity.y = approach(velocity.y, -55.0f, 400.0f * dt);  // you float back up

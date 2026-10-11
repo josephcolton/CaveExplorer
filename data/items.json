@@ -29,6 +29,7 @@
   {"id": "crystal", "name": "Cave Crystal", "icon": "crystal", "category": "valuable", "stack": 5, "value": 30, "description": "Worth good money at the shop.", "glow": [110, 190, 255]},
   {"id": "bone", "name": "Old Bone", "icon": "bone", "category": "valuable", "stack": 10, "value": 4, "description": "Someone collects these."},
   {"id": "horn", "name": "Beast Horn", "icon": "horn", "category": "valuable", "stack": 5, "value": 15, "description": "A trophy from a cave creature."},
-  {"id": "feather_charm", "name": "Feather Charm", "icon": "feather_charm", "category": "charm", "value": 80, "unique": true, "tags": ["carried_jump"], "description": "While carried anywhere on you, you feel lighter.", "carried": {"jump": 1.15}}
+  {"id": "feather_charm", "name": "Feather Charm", "icon": "feather_charm", "category": "charm", "value": 80, "unique": true, "tags": ["carried_jump"], "description": "While carried, you feel lighter - high enough to reach ledges you couldn't before.", "carried": {"jump": 1.35}},
+  {"id": "breath_amulet", "name": "Amulet of Deep Breathing", "icon": "breath_amulet", "category": "charm", "value": 150, "unique": true, "carried": {"air": 3.0}, "description": "While carried, you can hold your breath three times as long."}
  ]
 }

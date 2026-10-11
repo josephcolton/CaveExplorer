@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""Level sanity check: can the explorer actually get everywhere?
+"""Level sanity check: can the explorer get everywhere they should - and nowhere they shouldn't?
 
-For every map in assets/maps/, starting from every spawn point, works out which tiles a
-basic explorer can stand on (walking, falling, jumping, dropping through ledges, climbing
-ladders) with no gear or shrine blessings. Reports:
-  - objects (pickups, shrines, people, doors, chests, shops) that can't be reached, and
-  - spawn points you can't get back to the area's exits from (you'd be stuck).
+For every map in assets/maps/ this works out which tiles an explorer can reach (walking, falling,
+jumping, dropping through ledges, climbing ladders, swimming while their air lasts) and checks:
+
+1. With every ability, everything is reachable and no spawn point is a trap (each can reach a door).
+2. Gates hold: map objects marked `gated_by` (e.g. "highjump", "breath", "cut", "break") must be
+   unreachable when the explorer lacks that ability - judged generously, so a lucky explorer with
+   the best rolled stats still can't sneak in.
+
+Abilities:
+  cut       can clear bushes (machete, hand axe)          -> bush obstacles open
+  break     can clear boulders (pickaxe)                   -> rock obstacles open
+  highjump  Feather Charm / Leaping shrine                 -> jumps 4 tiles high instead of 2-3
+  breath    Amulet of Deep Breathing / Deep Breath shrine  -> much longer underwater
 
     python tools/check_reach.py            # all maps
     python tools/check_reach.py cave_1     # one map
-
-The movement model is a conservative, tile-based approximation of the game's physics:
-jumps up to MAX_UP tiles high and MAX_ACROSS tiles across. Obstacles count as passable,
-since they can always be cleared or pushed through.
 """
 import json
 import sys
@@ -22,17 +26,32 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MAPS = ROOT / "assets" / "maps"
 T = 32
-MAX_UP = 2       # the explorer jumps ~2.8 tiles; 2 is a comfortable margin
-MAX_ACROSS = 4   # tiles covered by a running jump
+ABILITIES = ("cut", "break", "highjump", "breath")
+
+
+class Model:
+    """How far the explorer can jump / swim. 'generous' = the best a lucky explorer could do."""
+
+    def __init__(self, abilities, generous):
+        self.abilities = set(abilities)
+        if "highjump" in abilities:
+            self.max_up = 5 if generous else 4
+        else:
+            self.max_up = 3 if generous else 2  # the best natural jump just clears 3 tiles
+        self.max_across = 5 if generous else 4
+        # Underwater tile moves before the explorer drowns (air plus the time drowning takes).
+        if "breath" in abilities:
+            self.air = 999 if generous else 75
+        else:
+            self.air = 50 if generous else 20
 
 
 class Level:
-    def __init__(self, path):
+    def __init__(self, path, obstacle_defs):
         doc = json.loads(path.read_text())
         self.name = path.stem
         self.w, self.h = doc["width"], doc["height"]
-        coll = {}
-        liquid = set()
+        coll, liquid = {}, set()
         for ts in doc["tilesets"]:
             for tile in ts.get("tiles", []):
                 for p in tile.get("properties", []):
@@ -40,32 +59,42 @@ class Level:
                         coll[ts["firstgid"] + tile["id"]] = p["value"]
                     if p["name"] == "liquid":
                         liquid.add(ts["firstgid"] + tile["id"])
-        self.grid = [["none"] * self.w for _ in range(self.h)]
+        self.base = [["none"] * self.w for _ in range(self.h)]
         self.water = set()
         self.objects = []
         for layer in doc["layers"]:
-            if layer["type"] == "tilelayer" and any(
-                    p["name"] == "collides" and p["value"] for p in layer.get("properties", [])):
-                for i, gid in enumerate(layer["data"]):
-                    c = coll.get(gid & 0x0FFFFFFF)
-                    if c:
-                        self.grid[i // self.w][i % self.w] = c
             if layer["type"] == "tilelayer":
+                collides = any(p["name"] == "collides" and p["value"] for p in layer.get("properties", []))
                 for i, gid in enumerate(layer["data"]):
-                    if (gid & 0x0FFFFFFF) in liquid:
+                    gid &= 0x0FFFFFFF
+                    if collides and gid in coll:
+                        self.base[i // self.w][i % self.w] = coll[gid]
+                    if gid in liquid:
                         self.water.add((i % self.w, i // self.w))
-            if layer["type"] == "objectgroup":
+            elif layer["type"] == "objectgroup":
                 self.objects = layer["objects"]
         self.ladders = set()
+        self.obstacles = []  # (cells, required ability)
         for o in self.objects:
             if o.get("type") == "ladder":
                 x = int(o["x"] // T)
-                for y in range(int(o["y"] // T), int((o["y"] + o["height"]) // T)):
-                    self.ladders.add((x, y))
-                # The top of a ladder can be stood on.
                 top = int(o["y"] // T)
-                if self.grid[top][x] == "none":
-                    self.grid[top][x] = "oneway"
+                for y in range(top, int((o["y"] + o["height"]) // T)):
+                    self.ladders.add((x, y))
+                if self.base[top][x] == "none":
+                    self.base[top][x] = "oneway"  # the top of a ladder can be stood on
+            elif o.get("type") == "obstacle":
+                kind = prop(o, "obstacle", o.get("name"))
+                need = obstacle_defs.get(kind, {}).get("requires", "")
+                self.obstacles.append((object_cells(o, point_area=False), need))
+
+    def use(self, model):
+        self.model = model
+        self.grid = [row[:] for row in self.base]
+        for cells, need in self.obstacles:
+            if need not in model.abilities:
+                for x, y in cells:
+                    self.grid[y][x] = "solid"
 
     def at(self, x, y):
         if x < 0 or x >= self.w or y >= self.h:
@@ -77,11 +106,11 @@ class Level:
     def open(self, x, y):
         return self.at(x, y) != "solid"
 
-    def standable(self, x, y):
-        return self.open(x, y) and ((x, y) in self.water or self.at(x, y + 1) in ("solid", "oneway") or (x, y) in self.ladders)
+    def submerged(self, x, y):
+        """Head underwater: water here, and water or rock just above."""
+        return (x, y) in self.water and ((x, y - 1) in self.water or self.at(x, y - 1) == "solid")
 
     def fall(self, x, y, through_oneway=False):
-        """Drop from (x, y) until landing. Returns the landing cell or None."""
         first = True
         while y < self.h:
             below = self.at(x, y + 1)
@@ -94,41 +123,40 @@ class Level:
         return None
 
     def neighbours(self, x, y):
+        m = self.model
         out = []
-        # Walk sideways (and fall off edges).
+        if (x, y) in self.water:
+            # Swim in any direction; surface swimmers can also jump out (handled below).
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nx, ny = x + dx, y + dy
+                if self.open(nx, ny):
+                    land = (nx, ny) if (nx, ny) in self.water else self.fall(nx, ny)
+                    if land:
+                        out.append(land)
+            if self.submerged(x, y):
+                return out
         for dx in (-1, 1):
             if self.open(x + dx, y):
                 land = self.fall(x + dx, y)
                 if land:
                     out.append(land)
-        # Drop through a one-way ledge.
         if self.at(x, y + 1) == "oneway":
-            land = self.fall(x, y + 1, through_oneway=False)
+            land = self.fall(x, y + 1)
             if land:
                 out.append(land)
-        # Swim in any direction through water (and climb out at the surface with a jump).
-        if (x, y) in self.water:
-            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                if self.open(x + dx, y + dy):
-                    out.append((x + dx, y + dy) if (x + dx, y + dy) in self.water else (self.fall(x + dx, y + dy) or (x, y)))
-        # Climb ladders.
         if (x, y) in self.ladders or (x, y + 1) in self.ladders:
             for dy in (-1, 1):
                 if (x, y + dy) in self.ladders and self.open(x, y + dy):
                     out.append((x, y + dy))
-            if (x, y + 1) in self.ladders and self.open(x, y + 1):
-                out.append((x, y + 1))
-        # Jumps: rise straight up (one-way ledges don't stop you), then drift sideways.
-        for up in range(0, MAX_UP + 1):
+        for up in range(0, m.max_up + 1):
             if any(self.at(x, y - k) == "solid" for k in range(1, up + 1)):
                 break
             top = y - up
-            for dx in range(-MAX_ACROSS, MAX_ACROSS + 1):
+            for dx in range(-m.max_across, m.max_across + 1):
                 if dx == 0 and up == 0:
                     continue
                 step = 1 if dx > 0 else -1
-                path_clear = all(self.open(x + step * k, top) for k in range(1, abs(dx) + 1))
-                if not path_clear:
+                if not all(self.open(x + step * k, top) for k in range(1, abs(dx) + 1)):
                     continue
                 land = self.fall(x + dx, top)
                 if land:
@@ -136,61 +164,97 @@ class Level:
         return out
 
     def reachable(self, start):
-        seen = {start}
-        queue = deque([start])
+        """Cells reachable from start. Underwater moves use up air; surfacing refills it."""
+        air0 = self.model.air
+        best = {start: air0}
+        queue = deque([(start, air0)])
         while queue:
-            for n in self.neighbours(*queue.popleft()):
-                if n not in seen:
-                    seen.add(n)
-                    queue.append(n)
-        return seen
+            (x, y), air = queue.popleft()
+            if best.get((x, y), -1) > air:
+                continue
+            for n in self.neighbours(x, y):
+                a = air - 1 if self.submerged(*n) else air0
+                if a < 0:
+                    continue
+                if best.get(n, -1) < a:
+                    best[n] = a
+                    queue.append((n, a))
+        return set(best)
 
 
-def object_cells(o):
-    """Cells where standing counts as reaching the object."""
+def prop(o, name, default=""):
+    return next((p["value"] for p in o.get("properties", []) if p["name"] == name), default)
+
+
+def object_cells(o, point_area=True):
     x0, y0 = o["x"], o["y"]
     w, h = o.get("width", 0), o.get("height", 0)
     if o.get("point") or (w == 0 and h == 0):
         tx, ty = int(x0 // T), int((y0 - 1) // T)
-        return {(tx + dx, ty + dy) for dx in (-1, 0, 1) for dy in (0, -1)}
+        return {(tx + dx, ty + dy) for dx in (-1, 0, 1) for dy in (0, -1)} if point_area else {(tx, ty)}
     return {(x, y) for x in range(int(x0 // T), int((x0 + w - 1) // T) + 1)
             for y in range(int(y0 // T), int((y0 + h - 1) // T) + 1)}
 
 
-def check(path):
-    lvl = Level(path)
+def spawn_start(lvl, sp):
+    return lvl.fall(int(sp["x"] // T), int((sp["y"] - 1) // T))
+
+
+def describe(o):
+    return f"{o.get('type')} '{o.get('name')}' at tile ({int(o['x'] // T)}, {int(o['y'] // T)})"
+
+
+def check(path, obstacle_defs):
+    lvl = Level(path, obstacle_defs)
     problems = []
     spawns = [o for o in lvl.objects if o.get("type") == "spawn"]
-    exits = [o for o in lvl.objects if o.get("type") == "door"]
+    doors = [o for o in lvl.objects if o.get("type") == "door"]
+    targets = [o for o in lvl.objects if o.get("type") in ("pickup", "shrine", "npc", "chest", "shop", "door")]
+
+    # 1. Everything reachable with every ability; no spawn is a trap.
+    lvl.use(Model(ABILITIES, generous=False))
     reach_all = set()
     for sp in spawns:
-        start = lvl.fall(int(sp["x"] // T), int((sp["y"] - 1) // T))
+        start = spawn_start(lvl, sp)
         if not start:
             problems.append(f"spawn '{sp['name']}' isn't on solid ground")
             continue
         reach = lvl.reachable(start)
         reach_all |= reach
-        if exits and not any(object_cells(d) & reach for d in exits):
+        if doors and not any(object_cells(d) & reach for d in doors):
             problems.append(f"STUCK: from spawn '{sp['name']}' no door can be reached")
-        for d in exits:
-            if not object_cells(d) & reach:
-                problems.append(f"from spawn '{sp['name']}': can't reach the door to "
-                                f"{next((p['value'] for p in d.get('properties', []) if p['name'] == 'target_area'), '?')}")
-    for o in lvl.objects:
-        if o.get("type") in ("pickup", "shrine", "npc", "chest", "shop") and not object_cells(o) & reach_all:
-            problems.append(f"unreachable {o['type']} '{o.get('name')}' at tile "
-                            f"({int(o['x'] // T)}, {int(o['y'] // T)})")
+    for o in targets:
+        if not object_cells(o) & reach_all:
+            problems.append(f"unreachable even with every ability: {describe(o)}")
+
+    # 2. Each gate holds: without that ability (but with all others), gated things stay out of reach.
+    main = next((s for s in spawns if s["name"] == prop_map(path, "restart_spawn")), spawns[0] if spawns else None)
+    for gate in ABILITIES:
+        lvl.use(Model([a for a in ABILITIES if a != gate], generous=True))
+        start = spawn_start(lvl, main) if main else None
+        reach = lvl.reachable(start) if start else set()
+        for o in targets:
+            gates = [g.strip() for g in str(prop(o, "gated_by")).split(",") if g.strip()]
+            if gate in gates and object_cells(o) & reach:
+                problems.append(f"GATE LEAK: {describe(o)} is reachable without '{gate}'")
     return lvl.name, problems
 
 
+def prop_map(path, name):
+    doc = json.loads(path.read_text())
+    return next((p["value"] for p in doc.get("properties", []) if p["name"] == name), "")
+
+
 def main():
+    obstacle_defs = json.loads((ROOT / "data" / "obstacles.json").read_text()).get("obstacles", {})
     names = sys.argv[1:]
     paths = [MAPS / f"{n}.tmj" for n in names] if names else sorted(MAPS.glob("*.tmj"))
     bad = 0
     for p in paths:
-        name, problems = check(p)
-        status = "ok" if not problems else f"{len(problems)} problem(s)"
-        print(f"{name}: {status}")
+        name, problems = check(p, obstacle_defs)
+        gated = sum(1 for o in Level(p, obstacle_defs).objects if prop(o, "gated_by"))
+        print(f"{name}: {'ok' if not problems else f'{len(problems)} problem(s)'}"
+              + (f"  ({gated} gated object(s) checked)" if gated else ""))
         for msg in problems:
             print(f"   - {msg}")
         bad += len(problems)

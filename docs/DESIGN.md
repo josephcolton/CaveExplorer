@@ -37,6 +37,10 @@ covers the design decisions so far and how to build the first playable version.
        moss, crystals, Hob's lamp), lantern + lamp oil fuel, Cave brightness setting
 - [x] Water: swimming (buoyant, dive with Down), 10 s of air then drowning, air bar, Shrine of
        Deep Breath (air x2 for 3 min); beach sea lowered into a two-tile-deep pool with seabed coins
+- [x] Hub expansion: Upper Caves now has four gated exits - Mossy Hollow (cut), Drowned Tunnel /
+       Sunken Grotto (breath: Amulet of Deep Breathing), Bat Roost (high jump: Feather Charm +35%),
+       Crystal Mine (break: pickaxe). Gates verified by tools/check_reach.py. Forest has more trees.
+- [ ] Map editing: Tiled is the editor; consider custom Tiled object types / a project file
 - [x] Restart area returns to each area's surface-side entrance (map property restart_spawn)
 
 ## Art sources

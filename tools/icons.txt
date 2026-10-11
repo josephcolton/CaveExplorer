@@ -51,3 +51,4 @@ shrine_shadow   dc-dngn/altars/dngn_altar_sif_muna.png
 shrine_vigor    dc-dngn/altars/dngn_altar_zin.png
 lamp_oil        item/misc/misc_bottle.png
 shrine_breath   dc-dngn/altars/dngn_altar_nemelex_xobeh.png
+breath_amulet   item/amulet/cameo_blue.png

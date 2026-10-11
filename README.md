@@ -74,6 +74,37 @@ button per action). Pause (Esc / Start) and the menu keys are fixed.
 | Fullscreen         | F11 / Alt+Enter            |                    |
 | Debug overlay      | F3                         |                    |
 
+## The world so far
+
+```
+Beach (shop) -> Forest (chest) -> Upper Caves (Old Hob) - the hub
+                                   |- east, past a thorny bush [machete / hand axe] -> Mossy Hollow
+                                   |- west, open -> Drowned Tunnel: a long flooded swim [Amulet of
+                                   |                 Deep Breathing / Deep Breath shrine] -> Sunken Grotto
+                                   |- a ledge high on the east wall [Feather Charm / Leaping shrine]
+                                   |                 -> Bat Roost
+                                   '- the top tunnel, past a boulder [pickaxe] -> Crystal Mine
+```
+In Mossy Hollow, a boulder [pickaxe] hides the Feather Charm, and a high ledge [high jump] holds
+the Amulet of Deep Breathing (its temporary home until deeper areas exist).
+
+## Editing maps with Tiled
+
+1. Install Tiled (free): https://www.mapeditor.org
+2. Open any `assets/maps/*.tmj`. Each map has a `background` layer (decoration), a `ground` layer
+   (anything that collides), a see-through `water` layer, and an `objects` layer for spawns,
+   doors, pickups, creatures, shrines, people, ladders, lights and obstacles (the kinds and their
+   properties are listed below).
+3. Paint tiles from the `placeholder` tileset; select objects to see and edit their properties in
+   the Properties panel. Map-wide settings (name, music, darkness...) are under *Map → Map
+   Properties*.
+4. Save, rebuild (`cmake --build build`, which copies the maps), and play. Then run
+   `python tools/check_reach.py` to make sure nothing became unreachable, no spawn is a trap,
+   and no gate leaks.
+
+**Important:** `tools/make_maps.py` generated the starting maps. Once you edit a map in Tiled,
+don't run `make_maps.py --force`, or it will overwrite your changes.
+
 ## Maps
 
 Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 32x32 tiles.
@@ -93,8 +124,10 @@ Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 3
     or `interact` (press Up). Interactive doors show a ↑ marker; optional `label` (prompt text)
     and `glow` (`#rrggbb` light spilling through, e.g. daylight at a cave exit).
 
-`tools/check_reach.py` checks every map for places the explorer can't reach (or can't leave)
-using the game's jump limits. Run it after editing maps.
+`tools/check_reach.py` checks every map using the game's jump, climb and swim limits: everything
+must be reachable with every ability, no spawn may be a trap, and anything marked `gated_by`
+(`cut`, `break`, `highjump`, `breath`) must stay out of reach without that ability. Run it after
+editing maps (CI runs it on every push).
 
 `tools/make_maps.py` generated the starting maps and placeholder tileset; it will not overwrite
 existing maps unless run with `--force`. Edit the maps in Tiled from here on.
