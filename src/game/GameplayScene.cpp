@@ -45,6 +45,7 @@ GameplayScene::GameplayScene(App& app, int slot, bool newGame)
         world_ = save.world;
         character_ = save.character;
         inventory_ = save.inventory;
+        takenPickups_ = save.takenPickups;
         playSeconds_ = save.playSeconds;
         player_.applyCharacter(character_);
         enterArea(save.area, kStartSpawn);
@@ -102,6 +103,7 @@ void GameplayScene::newExplorer() {
     character_ = Character::roll(data_.characterConfig, rng_, world_.explorersLost + 1);
     inventory_ = Inventory();
     inventory_.coins = character_.startingCoins;
+    takenPickups_.clear();  // freebies return for the new explorer
     player_.applyCharacter(character_);
     player_.health = player_.maxHealth;
 }
@@ -112,6 +114,7 @@ void GameplayScene::saveGame() {
     s.world = world_;
     s.character = character_;
     s.inventory = inventory_;
+    s.takenPickups = takenPickups_;
     s.health = player_.dead() ? player_.maxHealth : player_.health;
     s.area = area_.id;
     s.areaName = area_.displayName;
@@ -172,7 +175,11 @@ void GameplayScene::enterArea(const std::string& areaId, const std::string& spaw
     }
     const MapObject* sp = area_.findObject("spawn", spawn);
     if (!sp) sp = area_.findObject("spawn", kStartSpawn);
-    if (!sp) {
+    int tileX = 0, tileY = 0;
+    if (std::sscanf(spawn.c_str(), "%d,%d", &tileX, &tileY) == 2) {
+        // Debug: "--spawn tx,ty" stands the player on top of tile row ty in column tx.
+        player_.placeAt({(static_cast<float>(tileX) + 0.5f) * T, static_cast<float>(tileY) * T});
+    } else if (!sp) {
         SDL_Log("Area '%s' has no spawn '%s'", areaId.c_str(), spawn.c_str());
         player_.placeAt({area_.map.pixelWidth() * 0.5f, 0.0f});
     } else {
@@ -190,6 +197,8 @@ void GameplayScene::spawnAreaObjects() {
     pickups_.clear();
     enemies_.clear();
     projectiles_.clear();
+    obstacles_.clear();
+    particles_.clear();
     const Difficulty diff = app_.settings().difficulty;
 
     for (const MapObject& o : area_.objects) {
@@ -197,6 +206,8 @@ void GameplayScene::spawnAreaObjects() {
             Pickup p;
             p.uniqueId = o.getString("unique_id");
             if (!p.uniqueId.empty() && world_.takenUniques.count(p.uniqueId)) continue;
+            p.placedKey = area_.id + "#" + std::to_string(o.id);
+            if (takenPickups_.count(p.placedKey)) continue;
             const std::string item = o.getString("item");
             if (item == "coins") {
                 p.coins = static_cast<int>(o.getFloat("count", 1));
@@ -210,6 +221,21 @@ void GameplayScene::spawnAreaObjects() {
             // Point objects mark the bottom-centre; rectangles use their bottom edge.
             p.placeAt({o.rect.x + o.rect.w * 0.5f, o.rect.y + o.rect.h});
             pickups_.push_back(std::move(p));
+        } else if (o.type == "obstacle") {
+            auto it = data_.obstacles.find(o.getString("obstacle", o.name));
+            if (it == data_.obstacles.end()) {
+                SDL_Log("%s: obstacle %d has unknown type '%s'", area_.id.c_str(), o.id, o.name.c_str());
+                continue;
+            }
+            Obstacle ob;
+            ob.def = &it->second;
+            ob.tx = static_cast<int>(std::round(o.rect.x / T));
+            ob.ty = static_cast<int>(std::round(o.rect.y / T));
+            ob.tw = std::max(1, static_cast<int>(std::round(o.rect.w / T)));
+            ob.th = std::max(1, static_cast<int>(std::round(o.rect.h / T)));
+            ob.hitsLeft = ob.def->hits;
+            ob.block(area_.map, true);
+            obstacles_.push_back(ob);
         } else if (o.type == "enemy") {
             // Per-difficulty overrides: a different creature, or "none" to leave it out.
             std::string type = o.getString("enemy", o.name);
@@ -307,6 +333,13 @@ void GameplayScene::updatePlay(float dt) {
     updateProjectiles(dt);
     updateEnemies(dt);
     updatePickups(dt);
+    for (Obstacle& ob : obstacles_) ob.update(dt);
+    for (Particle& p : particles_) {
+        p.vel.y += 600.0f * dt;
+        p.pos += p.vel * dt;
+        p.life -= dt;
+    }
+    std::erase_if(particles_, [](const Particle& p) { return p.life <= 0.0f; });
     camera_.update(dt, player_.box.center(), area_.map.pixelWidth(), area_.map.pixelHeight(), App::kViewWidth,
                    App::kViewHeight);
     areaTitleTimer_ = std::max(0.0f, areaTitleTimer_ - dt);
@@ -358,9 +391,11 @@ void GameplayScene::updateAttacks() {
             projectiles_.push_back(p);
             player_.startAttack(0.0f, 0.0f, def->cooldown);
         } else if (def && def->isMelee()) {
+            swingItem_ = held.id;
             player_.startAttack(def->reach, static_cast<float>(def->damage) * character_.strength, def->cooldown);
         } else {
             // Bare hands (or a lantern/shield/food): a weak shove.
+            swingItem_ = held.empty() ? "" : held.id;
             player_.startAttack(16.0f, 1.0f * character_.strength, 0.4f);
         }
     }
@@ -370,7 +405,56 @@ void GameplayScene::updateAttacks() {
         for (Enemy& e : enemies_) {
             if (e.box.overlaps(swing)) e.hit(player_.swingDamage(), player_.box.center().x, player_.attackId());
         }
+        hitObstacles();
     }
+}
+
+void GameplayScene::hitObstacles() {
+    Rect swing;
+    if (!player_.swingHitbox(swing)) return;
+    for (Obstacle& ob : obstacles_) {
+        if (ob.cleared || ob.lastAttackId == player_.attackId() || !ob.rect().overlaps(swing)) continue;
+        ob.lastAttackId = player_.attackId();
+        ob.shake = 0.25f;
+        const Rect r = ob.rect();
+        const Vec2 contact{player_.facing > 0 ? r.left() : r.right(), player_.box.center().y};
+        const ItemDef* tool = swingItem_.empty() ? nullptr : data_.items.find(swingItem_);
+        if (!tool || !tool->hasTag(ob.def->requiredTag)) {
+            burst(contact, {200, 200, 200, 255}, 3);
+            if (messageCooldown_ <= 0.0f) {
+                toast(ob.def->hint);
+                messageCooldown_ = 2.0f;
+            }
+            continue;
+        }
+        burst(contact, ob.def->debris, 6);
+        if (--ob.hitsLeft <= 0) {
+            ob.cleared = true;
+            ob.block(area_.map, false);
+            for (int i = 0; i < ob.tw * ob.th; ++i) {
+                burst({r.x + T * (0.5f + static_cast<float>(i % ob.tw)), r.y + T * (0.5f + static_cast<float>(i / ob.tw))},
+                      ob.def->debris, 10);
+            }
+            toast(ob.def->cleared);
+        }
+    }
+}
+
+void GameplayScene::burst(Vec2 at, SDL_Color color, int count) {
+    std::uniform_real_distribution<float> u(-1.0f, 1.0f);
+    for (int i = 0; i < count; ++i) {
+        particles_.push_back({at, {u(rng_) * 140.0f, -60.0f + u(rng_) * 140.0f}, 0.5f + 0.3f * u(rng_), color});
+    }
+}
+
+const Obstacle* GameplayScene::obstacleNearPlayer() const {
+    Rect reach = player_.box;
+    reach.x -= 10.0f;
+    reach.w += 20.0f;
+    for (const Obstacle& ob : obstacles_) {
+        if (!ob.cleared && ob.rect().overlaps(reach)) return &ob;
+    }
+    return nullptr;
 }
 
 void GameplayScene::updateProjectiles(float dt) {
@@ -442,6 +526,7 @@ void GameplayScene::updatePickups(float dt) {
                 messageCooldown_ = 2.0f;
             }
         }
+        if (p.removed && !p.placedKey.empty()) takenPickups_.insert(p.placedKey);
         if (p.removed && !p.uniqueId.empty()) {
             world_.takenUniques.insert(p.uniqueId);
             saveGame();
@@ -702,9 +787,16 @@ void GameplayScene::render(SDL_Renderer* renderer, float alpha) {
     for (const Pickup& p : pickups_) {
         p.render(renderer, data_.sprites, p.coins > 0 ? "coins" : data_.items.get(p.stack.id).icon, cam, alpha);
     }
+    for (const Obstacle& ob : obstacles_) ob.render(renderer, data_.sprites, cam);
     for (const Enemy& e : enemies_) e.render(renderer, data_.sprites, cam, alpha);
     player_.render(renderer, cam, alpha, app_.debugDraw);
     for (const Projectile& p : projectiles_) p.render(renderer, data_.sprites, cam, alpha);
+    for (const Particle& p : particles_) {
+        const SDL_FRect d{std::round(p.pos.x - cam.x), std::round(p.pos.y - cam.y), 3, 3};
+        const auto a = static_cast<Uint8>(255 * std::clamp(p.life * 2.0f, 0.0f, 1.0f));
+        SDL_SetRenderDrawColor(renderer, p.color.r, p.color.g, p.color.b, a);
+        SDL_RenderFillRect(renderer, &d);
+    }
     area_.map.render(renderer, cam, true);
     renderWorldObjects(renderer, cam, true);
 
@@ -716,6 +808,21 @@ void GameplayScene::render(SDL_Renderer* renderer, float alpha) {
         else if (it.kind == K::Shop) prompt = "[E] Shop";
         else if (it.kind == K::Door) prompt = "[Up] Enter";
         else if (it.kind == K::Corpse) prompt = "[E] Search " + world_.corpses[static_cast<std::size_t>(it.corpse)].explorer;
+        if (prompt.empty()) {
+            if (const Obstacle* ob = obstacleNearPlayer()) {
+                // Suggest the hand holding a suitable tool, or just name the obstacle.
+                prompt = ob->def->name;
+                const std::pair<std::size_t, const char*> hands[] = {{Inventory::RightHand, "[J] "},
+                                                                     {Inventory::LeftHand, "[K] "}};
+                for (const auto& [slot, key] : hands) {
+                    const ItemStack& held = inventory_.equipment.at(slot);
+                    if (!held.empty() && data_.items.get(held.id).hasTag(ob->def->requiredTag)) {
+                        prompt = key + ob->def->verb + " the " + ob->def->name;
+                        break;
+                    }
+                }
+            }
+        }
         if (!prompt.empty()) {
             ui::textCentered(renderer, player_.box.center().x - cam.x, player_.box.y - cam.y - 22, prompt);
         }
@@ -726,6 +833,12 @@ void GameplayScene::render(SDL_Renderer* renderer, float alpha) {
         for (const MapObject& o : area_.objects) {
             const SDL_FRect rc{o.rect.x - cam.x, o.rect.y - cam.y, std::max(o.rect.w, 4.0f), std::max(o.rect.h, 4.0f)};
             SDL_RenderRect(renderer, &rc);
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 200, 255, 255);
+        for (const Obstacle& ob : obstacles_) {
+            const Rect r = ob.rect();
+            const SDL_FRect rc{r.x - cam.x, r.y - cam.y, r.w, r.h};
+            if (!ob.cleared) SDL_RenderRect(renderer, &rc);
         }
         SDL_SetRenderDrawColor(renderer, 255, 200, 0, 255);
         for (const Enemy& e : enemies_) {

@@ -40,3 +40,4 @@ prop_shop       dc-dngn/shops/shop_general.png
 mon_rat         dc-mon/animals/rat.png
 mon_beetle      dc-mon/animals/giant_beetle.png
 remains         item/armour/animal_skin1.png
+obstacle_bush   dc-mon/fungi_plants/plant.png

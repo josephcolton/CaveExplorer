@@ -11,7 +11,7 @@
  "tileheight": 32,
  "backgroundcolor": "#0c0a10",
  "nextlayerid": 4,
- "nextobjectid": 14,
+ "nextobjectid": 16,
  "properties": [
   {
    "name": "display_name",
@@ -2735,6 +2735,53 @@
     },
     {
      "id": 5,
+     "name": "machete",
+     "type": "pickup",
+     "x": 560.0,
+     "y": 704,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "item",
+       "type": "string",
+       "value": "machete"
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "unique_id",
+       "type": "string",
+       "value": "cave1_machete"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "bush",
+     "type": "obstacle",
+     "x": 1184,
+     "y": 736,
+     "width": 32,
+     "height": 128,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "obstacle",
+       "type": "string",
+       "value": "bush"
+      }
+     ]
+    },
+    {
+     "id": 7,
      "name": "bat",
      "type": "enemy",
      "x": 752.0,
@@ -2758,7 +2805,7 @@
      ]
     },
     {
-     "id": 6,
+     "id": 8,
      "name": "bat",
      "type": "enemy",
      "x": 592.0,
@@ -2777,7 +2824,7 @@
      ]
     },
     {
-     "id": 7,
+     "id": 9,
      "name": "rat",
      "type": "enemy",
      "x": 496.0,
@@ -2796,7 +2843,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 10,
      "name": "rat",
      "type": "enemy",
      "x": 848.0,
@@ -2820,7 +2867,7 @@
      ]
     },
     {
-     "id": 9,
+     "id": 11,
      "name": "none",
      "type": "enemy",
      "x": 1072.0,
@@ -2844,7 +2891,7 @@
      ]
     },
     {
-     "id": 10,
+     "id": 12,
      "name": "from_forest",
      "type": "spawn",
      "x": 144.0,
@@ -2856,7 +2903,7 @@
      "point": true
     },
     {
-     "id": 11,
+     "id": 13,
      "name": "from_cave_2",
      "type": "spawn",
      "x": 1168.0,
@@ -2868,7 +2915,7 @@
      "point": true
     },
     {
-     "id": 12,
+     "id": 14,
      "name": "to_forest",
      "type": "door",
      "x": 64,
@@ -2896,7 +2943,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 15,
      "name": "to_cave_2",
      "type": "door",
      "x": 1248,

@@ -38,6 +38,7 @@
   "prop_shop": 33,
   "mon_rat": 34,
   "mon_beetle": 35,
-  "remains": 36
+  "remains": 36,
+  "obstacle_bush": 37
  }
 }

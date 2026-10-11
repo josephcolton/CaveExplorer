@@ -1,0 +1,15 @@
+{
+ "_comment": "Things that block the way until the right tool clears them. Place in Tiled as 'obstacle' objects covering whole tiles (property 'obstacle' = id). They come back every time the area reloads. 'requires' is an item tag (see items.json); 'hits' is how many swings it takes.",
+ "obstacles": {
+  "bush": {
+   "name": "Thorny Bush", "requires": "cut", "hits": 2, "icon": "obstacle_bush",
+   "hint": "Thick thorny growth. Something sharp could cut through it.",
+   "verb": "Cut", "cleared": "You hack the bush away.", "debris": [70, 150, 60]
+  },
+  "rock": {
+   "name": "Boulder", "requires": "break", "hits": 3, "sprite": "boulder",
+   "hint": "A heavy boulder. A pickaxe could break it.",
+   "verb": "Break", "cleared": "The boulder crumbles.", "debris": [130, 126, 120]
+  }
+ }
+}

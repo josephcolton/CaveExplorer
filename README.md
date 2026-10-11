@@ -63,7 +63,8 @@ Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 3
 `tools/make_maps.py` generated the starting maps and placeholder tileset; it will not overwrite
 existing maps unless run with `--force`. Edit the maps in Tiled from here on.
 
-Objects also include `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
+Objects also include `obstacle` (a rectangle covering whole tiles; `obstacle` type from
+`data/obstacles.json`, e.g. `bush` needs a tool tagged `cut`, `rock` needs `break`), `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
 from `data/enemies.json`, optional `enemy_easy` / `enemy_hard` overrides where `none` removes it,
 and `hp_scale`), `pickup` (point; `item` id or `coins`, `count`, optional `unique_id` so it
 never respawns once taken), `chest` (the persistent storage chest), `shop` (`shop_id` from
@@ -84,6 +85,7 @@ scratch area for auditioning downloads. Current tracks: `forest.ogg` (The Forest
 - `data/animations.json` — animated sprite sheets (the knight, the bat) and their clips.
 - `data/enemies.json` — creatures: behaviour (walker/flyer), health, damage, speed, drops.
 - `data/characters.json` — names and stat ranges for newly rolled explorers.
+- `data/obstacles.json` — bushes, boulders and other blockers: required tool tag, hits, art, hint.
 - `data/credits.txt` — the in-game credits page.
 - Item icons are packed by `tools/pack_icons.py` from the list in `tools/icons.txt`.
 
@@ -95,7 +97,7 @@ See [CREDITS.md](CREDITS.md) for art and library credits.
 ## Debug command-line options
 
 ```
---area <id> --spawn <name>   start in a given area
+--area <id> --spawn <name>   start in a given area (spawn may also be tile coords "tx,ty")
 --debug                      start with the debug overlay on
 --shot <file.bmp> --ticks N  run N simulation ticks (60/s), save a screenshot, and exit
 --script "Right:0-120,UseRight:130"
@@ -115,6 +117,10 @@ See [CREDITS.md](CREDITS.md) for art and library credits.
   whenever you leave through the pause menu (Esc). "Save game" in the pause menu saves on demand.
 - Hold weapons in your hands (inventory, Tab): the right hand attacks with J, the left with K.
   Slings fire stones from your backpack.
+- Creatures and obstacles come back every time an area loads. Coins and items lying in the world
+  do not: once an explorer takes them they stay gone until the next explorer arrives (after a
+  death). Unique items never come back.
+- Bushes need something sharp (machete, hand axe); boulders need a pickaxe. Swing at them.
 - When an explorer dies, everything they carried stays where they fell (search it with E), and a
   new explorer with different stats arrives at the beach.
 ```

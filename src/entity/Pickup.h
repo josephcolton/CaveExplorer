@@ -20,6 +20,7 @@ struct Pickup {
     ItemStack stack;           // empty when this is a coin pickup
     int coins = 0;
     std::string uniqueId;      // non-empty: remembered in the world save once taken
+    std::string placedKey;     // "area#objectId" for pickups placed in the map (not drops)
     float age = 0.0f;
     float pickupDelay = 0.0f;  // seconds before it can be collected (after dropping)
     bool removed = false;

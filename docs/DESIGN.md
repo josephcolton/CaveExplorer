@@ -19,7 +19,10 @@ covers the design decisions so far and how to build the first playable version.
 - [x] 6. Death loop: corpse piles (searchable, persistent), new explorer with rolled stats
 - [x] 9 (part). Title screen, 3 save slots, pause menu (save, settings, credits, about, quit),
        settings (music/sound volume, fullscreen, difficulty, controls list), autosaves
-- [ ] 7. Gated obstacle  ·  7b. Item abilities, NPCs/quests  ·  8. Shrine buff, hunger
+- [x] 7. Obstacles: thorny bush (cut: machete/hand axe) gates Mossy Hollow; boulder (break:
+       pickaxe) guards a treasure alcove. Machete moved to the Upper Caves; shop sells hand axe
+       and pickaxe as fallbacks. Fixed the forest cave mouth (it was walled off).
+- [ ] 7b. Item abilities, NPCs/quests  ·  8. Shrine buff, hunger
 - [ ] 9 (rest). Control rebinding, sound effects  ·  10. Packaging
 
 ## Art sources
@@ -167,6 +170,9 @@ Key mechanisms:
   are reserved for the first two bosses.
 - **Underground city:** a deep, inhabited area (traders, quest givers). Music: `underground_city.mp3`
   ("Hero Within", Ove Melaa).
+- **Freebies don't respawn:** placed coins/items, once taken, stay gone for the rest of that
+  explorer's life (tracked per explorer in the save); they return for the next explorer. Creatures,
+  obstacles and enemy drops still refresh whenever an area loads. This stops beach/forest farming.
 - **Save slots:** three slots, each a separate world (chest, corpse piles, unique items taken,
   explorers lost) plus the current explorer and their position. Starting a new game in a slot
   wipes it. Autosaves on area change, chest/corpse close, unique pickup, death and quitting.

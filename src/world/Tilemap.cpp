@@ -17,6 +17,7 @@ const Tileset* Tilemap::tilesetFor(std::uint32_t gid) const {
 
 void Tilemap::buildCollision() {
     collision_.assign(static_cast<std::size_t>(width * height), TileCollision::None);
+    blocked_.assign(static_cast<std::size_t>(width * height), false);
     for (const TileLayer& layer : layers) {
         if (!layer.collides) continue;
         for (std::size_t i = 0; i < layer.gids.size() && i < collision_.size(); ++i) {
@@ -36,7 +37,13 @@ void Tilemap::buildCollision() {
 TileCollision Tilemap::collisionAt(int tx, int ty) const {
     if (tx < 0 || tx >= width || ty >= height) return TileCollision::Solid;
     if (ty < 0) return TileCollision::None;
-    return collision_[static_cast<std::size_t>(ty * width + tx)];
+    const auto i = static_cast<std::size_t>(ty * width + tx);
+    return blocked_[i] ? TileCollision::Solid : collision_[i];
+}
+
+void Tilemap::setBlocked(int tx, int ty, bool blocked) {
+    if (tx < 0 || ty < 0 || tx >= width || ty >= height) return;
+    blocked_[static_cast<std::size_t>(ty * width + tx)] = blocked;
 }
 
 void Tilemap::render(SDL_Renderer* renderer, Vec2 camera, bool foreground) const {

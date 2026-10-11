@@ -7,6 +7,7 @@ json SaveGame::toJson() const {
             {"world", world.toJson()},
             {"character", character.toJson()},
             {"inventory", inventory.toJson()},
+            {"taken_pickups", takenPickups},
             {"health", health},
             {"area", area},
             {"area_name", areaName},
@@ -20,6 +21,7 @@ bool SaveGame::fromJson(const json& j) {
     world.fromJson(j.value("world", json::object()));
     character.fromJson(j.value("character", json::object()));
     inventory.fromJson(j.value("inventory", json::object()));
+    takenPickups = j.value("taken_pickups", std::set<std::string>{});
     health = j.value("health", character.maxHealth);
     area = j.value("area", "beach");
     areaName = j.value("area_name", area);

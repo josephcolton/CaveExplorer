@@ -53,6 +53,7 @@ TEST_CASE("a save slot round-trips the world, explorer, and position") {
     pile.coins = 12;
     pile.items = {{"sword", 1}, {"apple", 3}};
     s.world.corpses.push_back(pile);
+    s.takenPickups = {"beach#7", "forest#12"};
     s.health = 40;
     s.area = "cave_1";
     s.areaName = "Upper Caves";
@@ -75,6 +76,7 @@ TEST_CASE("a save slot round-trips the world, explorer, and position") {
     CHECK(t.world.corpses[0].explorer == "Bram Pike");
     CHECK(t.world.corpses[0].coins == 12);
     CHECK(t.world.corpses[0].items.size() == 2);
+    CHECK(t.takenPickups.count("forest#12") == 1);
     CHECK(t.health == doctest::Approx(40));
     CHECK(t.area == "cave_1");
     CHECK(t.hasPosition);

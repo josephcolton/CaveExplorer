@@ -52,7 +52,11 @@ public:
     // Rebuild the merged collision grid after layers/tilesets change.
     void buildCollision();
 
+    // Runtime blockers (obstacles such as bushes and boulders) make tiles solid until cleared.
+    void setBlocked(int tx, int ty, bool blocked);
+
 private:
     const Tileset* tilesetFor(std::uint32_t gid) const;
     std::vector<TileCollision> collision_;
+    std::vector<bool> blocked_;
 };

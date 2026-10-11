@@ -2,6 +2,7 @@
 
 #include "core/Scene.h"
 #include "entity/Enemy.h"
+#include "entity/Obstacle.h"
 #include "entity/Pickup.h"
 #include "entity/Player.h"
 #include "entity/Projectile.h"
@@ -15,6 +16,7 @@
 #include "world/Camera.h"
 
 #include <random>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -58,6 +60,9 @@ private:
     void updateProjectiles(float dt);
     void updatePickups(float dt);
     void spawnDrops(const Enemy& e);
+    void hitObstacles();
+    void burst(Vec2 at, SDL_Color color, int count);
+    const Obstacle* obstacleNearPlayer() const;
     void handleInteraction();
     Interactable findInteractable() const;
     Rect corpseRect(const CorpsePile& c) const;
@@ -85,6 +90,7 @@ private:
     WorldSave world_;
     Character character_;
     Inventory inventory_;
+    std::set<std::string> takenPickups_;  // this explorer's collected freebies
     double playSeconds_ = 0.0;
 
     // Current area
@@ -94,6 +100,15 @@ private:
     std::vector<Pickup> pickups_;
     std::vector<Enemy> enemies_;
     std::vector<Projectile> projectiles_;
+    std::vector<Obstacle> obstacles_;
+    struct Particle {
+        Vec2 pos;
+        Vec2 vel;
+        float life;
+        SDL_Color color;
+    };
+    std::vector<Particle> particles_;
+    std::string swingItem_;  // item used for the current melee swing ("" = bare hands)
     int nextProjectileId_ = 1'000'000;  // separate id space from melee swings
 
     // UI

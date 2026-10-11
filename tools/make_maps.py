@@ -146,6 +146,9 @@ class Map:
         self.obj("pickup", tx * T + T / 2, ground_row * T, 0, 0, name=item, **props)
         self.objects[-1]["point"] = True
 
+    def obstacle(self, kind, x0, y0, x1, y1):
+        self.obj("obstacle", x0 * T, y0 * T, (x1 - x0 + 1) * T, (y1 - y0 + 1) * T, name=kind, obstacle=kind)
+
     def enemy(self, kind, tx, row, flying=False, **props):
         # Walkers: point = feet on top of tile row `row`. Flyers: point = centre of that tile.
         y = row * T + (T / 2 if flying else 0)
@@ -230,9 +233,8 @@ def forest():
     m.obj("chest", 38 * T, 10 * T, T, T, name="chest")
     m.pickup("apple", 24, 9)
     # Cliff with the cave mouth.
-    m.fill(42, 0, 47, 13, "#")
-    m.fill(43, 9, 44, 10, "C")
-    m.fill(42, 11, 47, 11, "#")
+    m.fill(43, 0, 47, 13, "#")
+    m.fill(43, 9, 44, 10, "C")  # cave mouth, open on its left side
     m.spawn("from_beach", 2, 11)
     m.spawn("from_cave", 41, 11)
     m.door(0, 8, 0, 10, "beach", "from_forest", trigger="touch")
@@ -257,6 +259,8 @@ def cave_1():
     m.pickup("bone", 12, 24)
     m.pickup("coins", 20, 27, count=8)
     m.pickup("crystal", 30, 22)
+    m.pickup("machete", 17, 22, unique_id="cave1_machete")
+    m.obstacle("bush", 37, 23, 37, 26)  # blocks the way to Mossy Hollow
     m.enemy("bat", 23, 11, flying=True, enemy_easy="none")
     m.enemy("bat", 18, 20, flying=True)
     m.enemy("rat", 15, 27)
@@ -276,7 +280,11 @@ def cave_2():
     m.fill(14, 12, 17, 12, "=")
     m.fill(20, 13, 26, 16, "r")
     m.fill(28, 10, 31, 10, "=")
-    m.pickup("machete", 35, 17, unique_id="cave2_machete")
+    # Treasure alcove behind a boulder (needs a pickaxe).
+    m.fill(33, 3, 33, 14, "#")
+    m.obstacle("rock", 33, 15, 33, 16)
+    m.pickup("feather_charm", 36, 17, unique_id="cave2_charm")
+    m.pickup("crystal", 35, 17, count=2)
     m.pickup("crystal", 29, 10)
     m.pickup("coins", 23, 13, count=12)
     m.enemy("bat", 12, 7, flying=True)

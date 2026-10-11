@@ -3,8 +3,23 @@
   "beach_shop": {
    "name": "Beach Outfitters",
    "greeting": "Heading into the cave? Stock up.",
-   "stock": ["apple", "bread", "jerky", "dagger", "club", "sling", "stones", "lantern",
-             "leather_boots", "leather_jacket", "leather_cap", "buckler", "healing_potion"]
+   "stock": [
+    "apple",
+    "bread",
+    "jerky",
+    "dagger",
+    "club",
+    "hand_axe",
+    "pickaxe",
+    "sling",
+    "stones",
+    "lantern",
+    "leather_boots",
+    "leather_jacket",
+    "leather_cap",
+    "buckler",
+    "healing_potion"
+   ]
   }
  }
 }

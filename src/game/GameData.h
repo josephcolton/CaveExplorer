@@ -3,6 +3,7 @@
 #include "core/Animation.h"
 #include "core/Sprites.h"
 #include "entity/Enemy.h"
+#include "entity/Obstacle.h"
 #include "game/Items.h"
 #include "ui/ShopScreen.h"
 
@@ -18,6 +19,7 @@ struct GameData {
     ItemDb items;
     std::unordered_map<std::string, ShopDef> shops;
     std::unordered_map<std::string, EnemyDef> enemies;
+    std::unordered_map<std::string, ObstacleDef> obstacles;
     nlohmann::json characterConfig;
     SpriteDb sprites;
     AnimDb anims;

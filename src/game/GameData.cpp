@@ -38,6 +38,10 @@ void GameData::load(Assets& assets) {
     const json enemyList = enemyDoc.value("enemies", json::object());
     for (auto& [id, e] : enemyList.items()) enemies[id] = EnemyDef::fromJson(id, e);
 
+    const json obstacleDoc = loadJson("obstacles.json");
+    const json obstacleList = obstacleDoc.value("obstacles", json::object());
+    for (auto& [id, o] : obstacleList.items()) obstacles[id] = ObstacleDef::fromJson(id, o);
+
     characterConfig = loadJson("characters.json");
     sprites.load(assets);
     anims.load(assets);
