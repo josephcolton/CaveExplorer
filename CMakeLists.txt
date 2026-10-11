@@ -114,6 +114,8 @@ add_custom_target(copy_content ALL
   COMMAND ${CMAKE_COMMAND} -E copy_directory
           ${CMAKE_SOURCE_DIR}/assets/soundtrack $<TARGET_FILE_DIR:cave_explorer>/assets/soundtrack
   COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_SOURCE_DIR}/assets/sounds $<TARGET_FILE_DIR:cave_explorer>/assets/sounds
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
           ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:cave_explorer>/data
   COMMENT "Copying game content")
 add_dependencies(cave_explorer copy_content)

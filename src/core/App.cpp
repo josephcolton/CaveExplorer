@@ -2,6 +2,7 @@
 
 #include "game/GameplayScene.h"
 #include "game/TitleScene.h"
+#include "ui/Ui.h"
 
 #include <algorithm>
 #include <sstream>
@@ -29,6 +30,8 @@ bool App::init(const Options& options) {
     input_.init();
     assets_.init(renderer_);
     audio_.init();
+    audio_.loadSounds();
+    ui::setSoundHook([this](const char* name) { audio_.play(name); });
     settings_.load();
     applySettings();
     data_.load(assets_);
@@ -55,6 +58,7 @@ void App::shutdown() {
 
 void App::applySettings() {
     audio_.setMusicVolume(static_cast<float>(settings_.musicVolume) / 10.0f);
+    audio_.setSoundVolume(static_cast<float>(settings_.soundVolume) / 10.0f);
     if (settings_.bindings.is_object()) input_.bindingsFromJson(settings_.bindings);
     if (window_) SDL_SetWindowFullscreen(window_, settings_.fullscreen);
 }
@@ -88,7 +92,7 @@ void App::parseScript() {
         {"Down", Action::Down},         {"Jump", Action::Jump},         {"UseRight", Action::UseRight},
         {"UseLeft", Action::UseLeft},   {"Interact", Action::Interact}, {"Inventory", Action::Inventory},
         {"Pause", Action::Pause},       {"Confirm", Action::Confirm},   {"Cancel", Action::Cancel},
-        {"Drop", Action::Drop}};
+        {"Drop", Action::Drop},         {"QuickMove", Action::QuickMove}};
     std::stringstream ss(options_.script);
     for (std::string step; std::getline(ss, step, ',');) {
         const auto colon = step.find(':');

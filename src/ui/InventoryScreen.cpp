@@ -81,8 +81,10 @@ InventoryRequest InventoryScreen::update(const Input& input) {
             } else if (transferStack(*db_, *from.container, from.index, *cur.container, cur.index)) {
                 selected_ = -1;
                 message_.clear();
+                ui::sound("item_move");
             } else {
                 setMessage("That doesn't fit there.", true);
+                ui::sound("error");
             }
         }
         return req;
@@ -90,6 +92,21 @@ InventoryRequest InventoryScreen::update(const Input& input) {
 
     const ItemStack& stack = stackAt(cursor_);
     if (stack.empty()) return req;
+
+    if (input.pressed(Action::QuickMove)) {
+        // Chest -> backpack, backpack -> chest (or onto you if no chest is open), worn -> backpack.
+        Container* target = nullptr;
+        if (cur.container == chest_) target = &inv_->backpack;
+        else if (cur.container == &inv_->backpack) target = chest_ ? chest_ : &inv_->equipment;
+        else target = &inv_->backpack;
+        const std::string name = db_->get(stack.id).name;
+        const int moved = moveStackInto(*db_, *cur.container, cur.index, *target);
+        selected_ = -1;
+        ui::sound(moved == 0 ? "error" : "item_move");
+        if (moved == 0) setMessage(target == &inv_->equipment ? "You can't wear or hold that." : "No room there.", true);
+        else setMessage(name + (target == &inv_->equipment ? " equipped." : " moved."));
+        return req;
+    }
 
     if (input.pressed(Action::Drop)) {
         req.kind = InventoryRequest::Kind::Drop;

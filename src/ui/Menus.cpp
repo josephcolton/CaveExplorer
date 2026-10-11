@@ -16,10 +16,10 @@ void Menu::setItems(std::vector<std::string> items, int cursor) {
 int Menu::update(const Input& input) {
     const int n = static_cast<int>(items_.size());
     if (n == 0) return kNone;
-    if (input.pressed(Action::Up)) cursor_ = (cursor_ + n - 1) % n;
-    if (input.pressed(Action::Down)) cursor_ = (cursor_ + 1) % n;
-    if (input.pressed(Action::Confirm)) return cursor_;
-    if (input.pressed(Action::Cancel)) return kCancelled;
+    if (input.pressed(Action::Up)) { cursor_ = (cursor_ + n - 1) % n; ui::sound("menu_move"); }
+    if (input.pressed(Action::Down)) { cursor_ = (cursor_ + 1) % n; ui::sound("menu_move"); }
+    if (input.pressed(Action::Confirm)) { ui::sound("menu_select"); return cursor_; }
+    if (input.pressed(Action::Cancel)) { ui::sound("menu_back"); return kCancelled; }
     return kNone;
 }
 
@@ -59,8 +59,8 @@ SettingsScreen::Result SettingsScreen::update() {
     const Input& in = app_->input();
 
     Settings& s = app_->settings();
-    if (in.pressed(Action::Up)) cursor_ = (cursor_ + RowCount - 1) % RowCount;
-    if (in.pressed(Action::Down)) cursor_ = (cursor_ + 1) % RowCount;
+    if (in.pressed(Action::Up)) { cursor_ = (cursor_ + RowCount - 1) % RowCount; ui::sound("menu_move"); }
+    if (in.pressed(Action::Down)) { cursor_ = (cursor_ + 1) % RowCount; ui::sound("menu_move"); }
     const int delta = (in.pressed(Action::Right) ? 1 : 0) - (in.pressed(Action::Left) ? 1 : 0);
     const bool confirm = in.pressed(Action::Confirm);
 
@@ -97,7 +97,10 @@ SettingsScreen::Result SettingsScreen::update() {
         }
         break;
     }
-    if (changed) app_->applySettings();
+    if (changed) {
+        app_->applySettings();
+        ui::sound("menu_move");  // also previews the new sound volume
+    }
     if (in.pressed(Action::Cancel)) {
         s.save();
         return Result::Close;
@@ -181,7 +184,7 @@ namespace {
 // Actions players may rebind. Pause (Esc / Start) and the menu keys stay fixed so menus always work.
 constexpr Action kRebindable[] = {Action::Left,     Action::Right,   Action::Up,       Action::Down,
                                   Action::Jump,     Action::UseRight, Action::UseLeft, Action::Interact,
-                                  Action::Inventory, Action::Drop};
+                                  Action::Inventory, Action::Drop, Action::QuickMove};
 constexpr int kRebindCount = static_cast<int>(std::size(kRebindable));
 constexpr int kResetRow = kRebindCount;
 constexpr int kBackRow = kRebindCount + 1;

@@ -58,10 +58,13 @@ public:
 
     // Runtime blockers (obstacles such as bushes and boulders) make tiles solid until cleared.
     void setBlocked(int tx, int ty, bool blocked);
+    // Runtime one-way tiles: the tops of ladders can be stood on.
+    void setOneWay(int tx, int ty);
 
 private:
     const Tileset* tilesetFor(std::uint32_t gid) const;
     std::vector<TileCollision> collision_;
     std::vector<bool> blocked_;
     std::vector<bool> slippery_;
+    std::vector<bool> extraOneWay_;
 };

@@ -45,6 +45,8 @@ button per action). Pause (Esc / Start) and the menu keys are fixed.
 | Interact (talk, open, search) | E               | Y (north)          |
 | Inventory          | Tab or I                   | Back / View        |
 | Drop item (in inventory) | Q                    | Right stick click  |
+| Quick move (inventory/chest) | Shift            | X (west)           |
+| Climb ladder       | W/↑ and S/↓ (Jump to let go) | D-pad          |
 | Pause menu         | Esc                        | Start              |
 | Fullscreen         | F11 / Alt+Enter            |                    |
 | Debug overlay      | F3                         |                    |
@@ -64,13 +66,17 @@ Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 3
     or `interact` (press Up). Interactive doors show a ↑ marker; optional `label` (prompt text)
     and `glow` (`#rrggbb` light spilling through, e.g. daylight at a cave exit).
 
+`tools/check_reach.py` checks every map for places the explorer can't reach (or can't leave)
+using the game's jump limits. Run it after editing maps.
+
 `tools/make_maps.py` generated the starting maps and placeholder tileset; it will not overwrite
 existing maps unless run with `--force`. Edit the maps in Tiled from here on.
 
 Objects also include `obstacle` (a rectangle covering whole tiles; `obstacle` type from
 `data/obstacles.json`, e.g. `bush` needs a tool tagged `cut`, `rock` needs `break`;
 `passable_from` = `left`/`right` lets players push through from that side), `npc` (point at the
-feet; `npc_id` from `data/npcs.json`), `shrine` (point at the feet; `shrine_id`), `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
+feet; `npc_id` from `data/npcs.json`), `shrine` (point at the feet; `shrine_id`), `ladder` (a one-tile-wide rectangle; its top can be
+stood on), `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
 from `data/enemies.json`, optional `enemy_easy` / `enemy_hard` overrides where `none` removes it,
 and `hp_scale`), `pickup` (point; `item` id or `coins`, `count`, optional `unique_id` so it
 never respawns once taken), `chest` (the persistent storage chest), `shop` (`shop_id` from
@@ -93,6 +99,7 @@ scratch area for auditioning downloads. Current tracks: `beach.ogg` (The Beach),
 - `data/enemies.json` — creatures: behaviour (walker/flyer), health, damage, speed, drops.
 - `data/characters.json` — names and stat ranges for newly rolled explorers.
 - `data/obstacles.json` — bushes, boulders and other blockers: required tool tag, hits, art, hint.
+- `data/sounds.json` — which sound file(s) play for each game event, and how loud.
 - `data/shrines.json` — shrines: which ability they grant and for how long (0 = until death).
 - `data/npcs.json`, `data/quests.json`, `data/abilities.json` — people, their jobs, and the lasting
   abilities jobs can teach. Items get effects through `carried` / `equipped` in `items.json`.

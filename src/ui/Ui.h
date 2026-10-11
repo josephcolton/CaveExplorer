@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -36,6 +37,10 @@ void dimScreen(SDL_Renderer* r, Uint8 alpha = 140);
 // Draws an item slot with its icon and stack count. ghostIcon is drawn faintly when empty.
 void slot(SDL_Renderer* r, const SpriteDb& sprites, const ItemDb& db, const SDL_FRect& rect, const ItemStack& stack,
           bool cursor, bool selected, const char* emptyLabel = nullptr);
+
+// Menu sounds: the app installs a hook; screens call ui::sound("menu_move") etc.
+void setSoundHook(std::function<void(const char*)> hook);
+void sound(const char* name);
 
 // Moves a cursor between arbitrary rectangles: picks the nearest rect in the pressed direction.
 int navigate(const std::vector<SDL_FRect>& rects, int current, const Input& input);

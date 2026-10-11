@@ -110,6 +110,15 @@ bool transferStack(const ItemDb& db, Container& from, std::size_t i, Container& 
     return true;
 }
 
+int moveStackInto(const ItemDb& db, Container& from, std::size_t i, Container& to) {
+    ItemStack& s = from.at(i);
+    if (s.empty() || &from == &to) return 0;
+    const int left = to.add(db, s.id, s.count);
+    const int moved = s.count - left;
+    from.takeFrom(i, moved);
+    return moved;
+}
+
 Inventory::Inventory()
     : backpack(kBackpackSlots),
       equipment(std::vector<EquipSlot>{EquipSlot::Hand, EquipSlot::Hand, EquipSlot::Feet, EquipSlot::Body,

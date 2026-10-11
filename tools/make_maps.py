@@ -167,6 +167,10 @@ class Map:
         self.obj("npc", tx * T + T / 2, row * T, 0, 0, name=npc_id, npc_id=npc_id)
         self.objects[-1]["point"] = True
 
+    def ladder(self, tx, top_row, bottom_row):
+        # Climbable from top_row down to bottom_row; the top can be stood on.
+        self.obj("ladder", tx * T, top_row * T, T, (bottom_row - top_row + 1) * T, name="ladder")
+
     def shrine(self, shrine_id, tx, row):
         self.obj("shrine", tx * T + T / 2, row * T, 0, 0, name=shrine_id, shrine_id=shrine_id)
         self.objects[-1]["point"] = True
@@ -224,13 +228,13 @@ def beach():
     m.fill(0, 11, 47, 13, "S")
     m.fill(14, 10, 18, 10, "S")
     m.fill(16, 9, 17, 9, "S")
-    m.fill(24, 7, 27, 7, "=")
+    m.fill(24, 9, 27, 9, "=")
     m.fill(30, 7, 35, 10, "H")  # shop hut (placeholder tiles)
     m.obj("shop", 30 * T, 7 * T, 6 * T, 4 * T, name="shop", shop_id="beach_shop")
     m.decor("lamp_post", 28, 11, 32, 64)
     m.decor("signpost", 43, 11, 32, 64)
     m.pickup("coins", 12, 11, count=5)
-    m.pickup("coins", 25, 7, count=10)
+    m.pickup("coins", 25, 9, count=10)
     m.pickup("banana", 16, 9)
     m.spawn("start", 10, 11)
     m.spawn("from_forest", 44, 11)
@@ -273,18 +277,19 @@ def cave_1():
         x = 22 if i % 2 == 0 else 24
         m.fill(x, y, x + 1, y, "=")
     m.fill(5, 18, 36, 26, "b")   # big chamber
-    m.fill(10, 24, 13, 26, "r")  # step
-    m.fill(16, 22, 18, 22, "=")
-    m.fill(29, 22, 32, 22, "=")
+    m.fill(10, 25, 13, 26, "r")  # step (2 tiles: jumpable)
+    m.fill(15, 23, 17, 23, "=")  # machete ledge, reached from the step
+    m.fill(29, 25, 32, 25, "=")
+    m.ladder(22, 5, 26)          # from the chamber floor up the shaft to the tunnel
     m.fill(36, 23, 39, 26, "b")  # passage east
     m.pickup("stones", 6, 5, count=6)
     m.npc("hob", 7, 5)  # Old Hob, trader and quest giver
     m.shrine("swift", 15, 5)   # in the tunnel east
     m.shrine("leap", 7, 27)    # big chamber floor
-    m.pickup("bone", 12, 24)
+    m.pickup("bone", 12, 25)
     m.pickup("coins", 20, 27, count=8)
-    m.pickup("crystal", 30, 22)
-    m.pickup("machete", 17, 22, unique_id="cave1_machete")
+    m.pickup("crystal", 30, 25)
+    m.pickup("machete", 16, 23, unique_id="cave1_machete")
     m.obstacle("bush", 37, 23, 37, 26, passable_from="right")  # blocks the way to Mossy Hollow
     m.enemy("bat", 23, 11, flying=True, enemy_easy="none")
     m.enemy("bat", 18, 20, flying=True)
@@ -301,27 +306,27 @@ def cave_1():
 def cave_2():
     m = Map("cave_2", 40, 20, "Mossy Hollow", "#0c0a10", fill="#", backdrop="b")
     m.fill(0, 3, 38, 16, "b")
-    m.fill(8, 14, 11, 16, "r")
+    m.fill(8, 15, 11, 16, "r")
     m.fill(12, 17, 31, 17, "m")  # slick moss floor
-    m.fill(20, 13, 26, 13, "m")
-    m.fill(14, 12, 17, 12, "=")
-    m.fill(20, 13, 26, 16, "r")
-    m.fill(28, 10, 31, 10, "=")
+    m.fill(20, 15, 26, 15, "m")
+    m.fill(14, 13, 17, 13, "=")
+    m.fill(20, 15, 26, 16, "r")
+    m.fill(28, 13, 31, 13, "=")
     # Treasure alcove behind a boulder (needs a pickaxe).
     m.fill(33, 3, 33, 14, "#")
     m.obstacle("rock", 33, 15, 33, 16, passable_from="right")
     m.pickup("feather_charm", 36, 17, unique_id="cave2_charm")
     m.shrine("vigor", 37, 17)  # lasting blessing, behind the boulder
     m.shrine("ward", 4, 17)
-    m.shrine("shadow", 9, 14)  # on the rock step
-    m.shrine("might", 31, 10)  # on the high ledge
+    m.shrine("shadow", 9, 15)  # on the rock step
+    m.shrine("might", 31, 13)  # on the high ledge
     m.pickup("crystal", 35, 17, count=2)
-    m.pickup("crystal", 29, 10)
+    m.pickup("crystal", 29, 13)
     m.pickup("bone", 17, 17)
-    m.pickup("coins", 23, 13, count=12)
+    m.pickup("coins", 23, 15, count=12)
     m.enemy("bat", 12, 7, flying=True)
     m.enemy("bat", 30, 6, flying=True, enemy_hard="giant_bat")
-    m.enemy("beetle", 23, 13, enemy_easy="rat")
+    m.enemy("beetle", 23, 15, enemy_easy="rat")
     m.enemy("rat", 6, 17)
     m.spawn("from_cave_1", 2, 17)
     m.door(0, 14, 0, 16, "cave_1", "from_cave_2", trigger="touch")

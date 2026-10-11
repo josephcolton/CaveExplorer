@@ -229,6 +229,8 @@ void GameplayScene::spawnAreaObjects() {
     projectiles_.clear();
     obstacles_.clear();
     shrines_.clear();
+    ladders_.clear();
+    player_.ladders = &ladders_;
     particles_.clear();
     const Difficulty diff = app_.settings().difficulty;
 
@@ -252,6 +254,10 @@ void GameplayScene::spawnAreaObjects() {
             // Point objects mark the bottom-centre; rectangles use their bottom edge.
             p.placeAt({o.rect.x + o.rect.w * 0.5f, o.rect.y + o.rect.h});
             pickups_.push_back(std::move(p));
+        } else if (o.type == "ladder") {
+            ladders_.push_back(o.rect);
+            // You can stand on top of a ladder.
+            area_.map.setOneWay(static_cast<int>(o.rect.x / T), static_cast<int>(o.rect.y / T));
         } else if (o.type == "shrine") {
             auto it = data_.shrines.find(o.getString("shrine_id"));
             if (it == data_.shrines.end()) {
@@ -375,6 +381,9 @@ void GameplayScene::updatePlay(float dt) {
 
     const float healthBefore = player_.health;
     player_.update(dt, in, area_.map);
+    if (player_.events & Player::Jumped) app_.audio().play("jump");
+    if (player_.events & Player::Landed) app_.audio().play("land");
+    if (player_.events & Player::ClimbStep) app_.audio().play("ladder");
     updateAttacks();
     updateProjectiles(dt);
     updateEnemies(dt);
@@ -406,6 +415,7 @@ void GameplayScene::updatePlay(float dt) {
 
     if (player_.dead()) {
         mode_ = Mode::Dead;
+        app_.audio().play("death");
         deathTimer_ = kDeathTime;
         return;
     }
@@ -442,15 +452,18 @@ void GameplayScene::updateAttacks() {
             const float f = static_cast<float>(player_.facing);
             p.launch(player_.box.center() + Vec2{f * 10.0f, -6.0f}, {f * def->projectileSpeed, -140.0f});
             projectiles_.push_back(p);
+            app_.audio().play("sling");
             player_.startAttack(0.0f, 0.0f, def->cooldown);
         } else if (def && def->isMelee()) {
             swingItem_ = held.id;
+            app_.audio().play("swing");
             player_.startAttack(def->reach,
                                 static_cast<float>(def->damage) * character_.strength * currentModifiers().damage,
                                 def->cooldown);
         } else {
             // Bare hands (or a lantern/shield/food): a weak shove.
             swingItem_ = held.empty() ? "" : held.id;
+            app_.audio().play("swing", 0.6f);
             player_.startAttack(16.0f, 1.0f * character_.strength, 0.4f);
         }
     }
@@ -458,7 +471,9 @@ void GameplayScene::updateAttacks() {
     Rect swing;
     if (player_.swingHitbox(swing)) {
         for (Enemy& e : enemies_) {
-            if (e.box.overlaps(swing)) e.hit(player_.swingDamage(), player_.box.center().x, player_.attackId());
+            if (e.box.overlaps(swing) && e.hit(player_.swingDamage(), player_.box.center().x, player_.attackId())) {
+                app_.audio().play("enemy_hit");
+            }
         }
         hitObstacles();
     }
@@ -476,6 +491,7 @@ void GameplayScene::hitObstacles() {
         const ItemDef* tool = swingItem_.empty() ? nullptr : data_.items.find(swingItem_);
         if (!tool || !tool->hasTag(ob.def->requiredTag)) {
             burst(contact, {200, 200, 200, 255}, 3);
+            app_.audio().play("clang");
             if (messageCooldown_ <= 0.0f) {
                 toast(obstacleHint(ob));
                 messageCooldown_ = 2.0f;
@@ -483,6 +499,7 @@ void GameplayScene::hitObstacles() {
             continue;
         }
         burst(contact, ob.def->debris, 6);
+        app_.audio().play(ob.def->hitSound);
         if (--ob.hitsLeft <= 0) {
             ob.cleared = true;
             ob.block(area_.map, false);
@@ -491,6 +508,7 @@ void GameplayScene::hitObstacles() {
                       ob.def->debris, 10);
             }
             toast(ob.def->cleared);
+            app_.audio().play(ob.def->clearSound);
         }
     }
 }
@@ -518,6 +536,7 @@ void GameplayScene::updateProjectiles(float dt) {
         if (p.dead) continue;
         for (Enemy& e : enemies_) {
             if (!e.dead && e.box.overlaps(p.box) && e.hit(p.damage, p.box.center().x, p.attackId)) {
+                app_.audio().play("enemy_hit");
                 p.dead = true;
                 break;
             }
@@ -536,6 +555,7 @@ void GameplayScene::updateEnemies(float dt) {
         if (!e.dead && !invincible && e.touchCooldown <= 0.0f && e.box.overlaps(player_.box) && mode_ == Mode::Play) {
             if (player_.hurt(e.def->damage * damageScale, e.box.center().x)) {
                 e.touchedPlayer();
+                app_.audio().play("hurt");
                 if (app_.debugDraw) SDL_Log("%s hit the explorer: health %.0f", e.def->name.c_str(), player_.health);
             }
         }
@@ -548,6 +568,7 @@ void GameplayScene::updateEnemies(float dt) {
                       (n >= q.count ? " - done! Go back and tell them." : ""));
             }
             spawnDrops(e);
+            app_.audio().play("enemy_die");
         }
     }
     std::erase_if(enemies_, [](const Enemy& e) { return e.dead; });
@@ -576,17 +597,20 @@ void GameplayScene::updatePickups(float dt) {
         if (p.coins > 0) {
             inventory_.coins += p.coins;
             toast("+" + std::to_string(p.coins) + " coins");
+            app_.audio().play("coin");
             p.removed = true;
         } else {
             const ItemDef& def = data_.items.get(p.stack.id);
             const int left = inventory_.add(data_.items, p.stack.id, p.stack.count);
             const int taken = p.stack.count - left;
+            if (taken > 0) app_.audio().play("pickup");
             if (taken > 0) toast(taken > 1 ? def.name + " x" + std::to_string(taken) : def.name);
             p.stack.count = left;
             if (left == 0) {
                 p.removed = true;
             } else if (messageCooldown_ <= 0.0f) {
                 toast("Backpack full");
+                app_.audio().play("error");
                 messageCooldown_ = 2.0f;
             }
         }
@@ -653,10 +677,16 @@ void GameplayScene::handleInteraction() {
         requestTransition(it.object->getString("target_area"), it.object->getString("target_spawn"));
         break;
     case K::Door:
-        if (pressed) requestTransition(it.object->getString("target_area"), it.object->getString("target_spawn"));
+        if (pressed) {
+            app_.audio().play("door");
+            requestTransition(it.object->getString("target_area"), it.object->getString("target_spawn"));
+        }
         break;
     case K::Chest:
-        if (pressed) openInventory(&world_.chest);
+        if (pressed) {
+            app_.audio().play("chest");
+            openInventory(&world_.chest);
+        }
         break;
     case K::Shop:
         if (pressed) openShop(it.object->getString("shop_id"));
@@ -739,6 +769,7 @@ const QuestDef* GameplayScene::nextQuestFor(const NpcDef& npc) const {
 
 void GameplayScene::talkTo(const NpcDef& npc) {
     talkingTo_ = &npc;
+    app_.audio().play("talk");
     dialogue_.open(data_.sprites, npc.name, npc.icon);
     showDialogueRoot(npc.greeting);
     mode_ = Mode::Dialogue;
@@ -791,6 +822,7 @@ void GameplayScene::updateDialogue() {
     case K::Accept:
         quests_.start(q->id);
         toast("New task: " + q->title);
+        app_.audio().play("quest_new");
         showDialogueRoot(q->accepted);
         break;
     case K::Decline:
@@ -819,6 +851,7 @@ void GameplayScene::updateDialogue() {
         }
         refreshStats();
         toast("Task complete: " + q->title);
+        app_.audio().play("quest_done");
         showDialogueRoot(text);
         saveGame();
         break;
@@ -861,6 +894,7 @@ void GameplayScene::updateObstaclePushing(float dt) {
                     regenDelay_ = kRegenDelay;
                 }
                 toast(ob.def->pushMessage);
+                app_.audio().play("push");
             }
         } else {
             ob.pushTime = 0.0f;
@@ -946,8 +980,8 @@ void GameplayScene::openInventory(Container* chest, const std::string& title) {
     inventoryScreen_.open(data_.items, data_.sprites, inventory_, chest, title);
     inventoryScreen_.setSummaryProvider([this] { return statsSummary(); });
     const Input& in = app_.input();
-    inventoryScreen_.setKeyHints("Enter: move   " + in.keyName(Action::Interact) + ": use   " +
-                                     in.keyName(Action::Drop) + ": drop   " + in.keyName(Action::Inventory) + ": close",
+    inventoryScreen_.setKeyHints("Enter: move  " + in.keyName(Action::QuickMove) + ": quick  " +
+                                     in.keyName(Action::Interact) + ": use  " + in.keyName(Action::Drop) + ": drop",
                                  "Enter: place here   Esc: cancel");
     mode_ = Mode::Inventory;
 }
@@ -962,6 +996,7 @@ void GameplayScene::openCorpse(int index) {
     corpseContainer_ = Container(std::max<std::size_t>(1, pile.items.size()));
     for (std::size_t i = 0; i < pile.items.size(); ++i) corpseContainer_.at(i) = pile.items[i];
     openCorpse_ = index;
+    app_.audio().play("pickup");
     openInventory(&corpseContainer_, "Remains of " + pile.explorer);
 }
 
@@ -1014,6 +1049,7 @@ bool GameplayScene::useItem(const ItemStack& stack) {
         }
         const int before = static_cast<int>(hunger_);
         hunger_ = std::min(hunger::kMax, hunger_ + def.food);
+        app_.audio().play("eat");
         inventoryScreen_.setMessage("You eat the " + def.name + ". Hunger " + std::to_string(before) + " -> " +
                                     std::to_string(static_cast<int>(hunger_)) + ".");
     }
@@ -1023,6 +1059,7 @@ bool GameplayScene::useItem(const ItemStack& stack) {
             return false;
         }
         player_.health = std::min(player_.maxHealth, player_.health + def.heal);
+        if (def.food <= 0.0f) app_.audio().play("drink");
         if (def.food <= 0.0f) inventoryScreen_.setMessage("You drink the " + def.name + ".");
     }
     return true;
@@ -1034,6 +1071,7 @@ void GameplayScene::updateSurvival(float dt) {
     hunger_ = std::max(0.0f, hunger_ - hunger::kDrainPerSecond * dt);
     const hunger::Level after = hunger::level(hunger_);
     if (after != before) {
+        app_.audio().play("warning");
         if (after == hunger::Level::Hungry) toast("You're getting hungry. Wounds won't heal until you eat.");
         if (after == hunger::Level::Starving) toast("You're starving! You feel weak and slow.");
     }
@@ -1075,6 +1113,7 @@ void GameplayScene::useShrine(std::size_t index) {
         toast(ability.description + " (" + ability.name + ", " + std::to_string(static_cast<int>(sh.def->duration)) + "s)");
     }
     sh.used = true;
+    app_.audio().play("shrine");
     burst({sh.feet.x, sh.feet.y - 18.0f}, sh.def->glow, 24);
     refreshStats();
 }
@@ -1122,6 +1161,9 @@ void GameplayScene::renderWorldObjects(SDL_Renderer* r, Vec2 cam, bool foregroun
         data_.sprites.draw(r, sprite, o.rect.x - cam.x, o.rect.y + o.rect.h - size.y - cam.y, o.getBool("flip"));
     }
     if (foreground) return;
+    for (const Rect& l : ladders_) {
+        for (float y = l.y; y < l.bottom(); y += T) data_.sprites.draw(r, "ladder_segment", l.x - cam.x, y - cam.y);
+    }
     const float pulse = 0.5f + 0.5f * std::sin(static_cast<float>(SDL_GetTicks()) * 0.004f);
     for (const Shrine& sh : shrines_) {
         const float cx = sh.feet.x - cam.x, cy = sh.feet.y - 16.0f - cam.y;
@@ -1270,6 +1312,10 @@ void GameplayScene::render(SDL_Renderer* renderer, float alpha) {
         else if (it.kind == K::Shrine) {
             const Shrine& sh = shrines_[static_cast<std::size_t>(it.corpse)];
             prompt = sh.used ? sh.def->name + " (dormant)" : use + "Pray at the " + sh.def->name;
+        }
+        if (prompt.empty() && player_.ladderHint() != 0) {
+            prompt = player_.ladderHint() > 0 ? "[" + keys.keyName(Action::Up) + "] Climb"
+                                              : "[" + keys.keyName(Action::Down) + "] Climb down";
         }
         if (prompt.empty()) {
             if (const Obstacle* ob = obstacleNearPlayer()) {

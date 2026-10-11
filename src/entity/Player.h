@@ -6,6 +6,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <vector>
+
 class Input;
 class Tilemap;
 struct Character;
@@ -62,6 +64,14 @@ public:
     float maxHealth = 100.0f;
     float invulnerable = 0.0f;
     bool nonSlip = false;  // grip on slippery ground
+    const std::vector<Rect>* ladders = nullptr;  // climbable areas in the current area
+    bool climbing() const { return climbing_; }
+    // For prompts: -1 = can climb down here, +1 = can climb up here, 0 = no ladder.
+    int ladderHint() const { return ladderHint_; }
+
+    // Things that happened this tick, for sound effects.
+    enum Event : unsigned { Jumped = 1, Landed = 2, ClimbStep = 4 };
+    unsigned events = 0;
 
 private:
     void chooseAnimation();
@@ -78,4 +88,10 @@ private:
     float swingDamage_ = 0.0f;
     float attackAnimTime_ = 0.0f;
     int attackId_ = 0;
+    bool climbing_ = false;
+    float climbDistance_ = 0.0f;
+    int ladderHint_ = 0;
+
+    const Rect* ladderAt() const;
+    bool updateClimbing(float dt, const Input& input, const Tilemap& map, bool control);
 };

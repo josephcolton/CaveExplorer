@@ -38,12 +38,15 @@ void ShopScreen::buy(const std::string& id) {
     if (inv_->coins < def.value) {
         message_ = "You can't afford the " + def.name + ".";
         messageBad_ = true;
+        ui::sound("error");
     } else if (inv_->backpack.roomFor(*db_, id) <= 0) {
         message_ = "Your backpack is full.";
         messageBad_ = true;
+        ui::sound("error");
     } else {
         inv_->backpack.add(*db_, id, 1);
         inv_->coins -= def.value;
+        ui::sound("buy");
         message_ = "Bought " + def.name + " for " + std::to_string(def.value) + ".";
         messageBad_ = false;
     }
@@ -58,6 +61,7 @@ void ShopScreen::sell(std::size_t backpackIndex) {
         messageBad_ = true;
         return;
     }
+    ui::sound("buy");
     inv_->coins += def.sellPrice();
     inv_->backpack.takeFrom(backpackIndex, 1);
     message_ = "Sold " + def.name + " for " + std::to_string(def.sellPrice()) + ".";

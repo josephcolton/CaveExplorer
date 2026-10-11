@@ -21,6 +21,7 @@ enum class Action {
     Interact,
     Inventory,
     Drop,
+    QuickMove,  // inventory: send a stack straight to the other side
     Pause,
     Confirm,
     Cancel,

@@ -15,7 +15,7 @@ constexpr ActionInfo kActions[kActionCount] = {
     {"Left", "Move left"},           {"Right", "Move right"},       {"Up", "Up / enter door"},
     {"Down", "Down"},                {"Jump", "Jump"},              {"UseRight", "Use right hand"},
     {"UseLeft", "Use left hand"},    {"Interact", "Interact"},      {"Inventory", "Inventory"},
-    {"Drop", "Drop item"},           {"Pause", "Pause menu"},       {"Confirm", "Menu: select"},
+    {"Drop", "Drop item"},           {"QuickMove", "Quick move item"}, {"Pause", "Pause menu"},       {"Confirm", "Menu: select"},
     {"Cancel", "Menu: back"},
 };
 }  // namespace
@@ -65,6 +65,7 @@ void Input::resetBindings() {
     bind(Action::Interact, {K::key(SDL_SCANCODE_E), {}}, {SDL_GAMEPAD_BUTTON_NORTH, none});
     bind(Action::Inventory, {K::key(SDL_SCANCODE_TAB), K::key(SDL_SCANCODE_I)}, {SDL_GAMEPAD_BUTTON_BACK, none});
     bind(Action::Drop, {K::key(SDL_SCANCODE_Q), {}}, {SDL_GAMEPAD_BUTTON_RIGHT_STICK, none});
+    bind(Action::QuickMove, {K::key(SDL_SCANCODE_LSHIFT), K::key(SDL_SCANCODE_RSHIFT)}, {SDL_GAMEPAD_BUTTON_WEST, none});
     bind(Action::Pause, {K::key(SDL_SCANCODE_ESCAPE), {}}, {SDL_GAMEPAD_BUTTON_START, none});
     bind(Action::Confirm, {K::key(SDL_SCANCODE_RETURN), K::key(SDL_SCANCODE_SPACE)}, {SDL_GAMEPAD_BUTTON_SOUTH, none});
     bind(Action::Cancel, {K::key(SDL_SCANCODE_ESCAPE), K::key(SDL_SCANCODE_BACKSPACE)}, {SDL_GAMEPAD_BUTTON_EAST, none});
@@ -115,8 +116,17 @@ void Input::bindingsFromJson(const json& j) {
 
 std::string Input::keyName(Action a) const {
     std::string out;
+    std::string first;
     for (const KeyBinding& k : keyBindings[idx(a)]) {
-        if (!k.empty()) out += (out.empty() ? "" : "/") + k.name();
+        if (k.empty()) continue;
+        std::string n = k.name();
+        // "Left Shift" / "Right Shift" -> "Shift" (shown once) to keep prompts short.
+        for (const char* mod : {"Shift", "Ctrl", "Alt"}) {
+            if (n == std::string("Left ") + mod || n == std::string("Right ") + mod) n = mod;
+        }
+        if (n == first) continue;
+        if (first.empty()) first = n;
+        out += (out.empty() ? "" : "/") + n;
     }
     return out.empty() ? "?" : out;
 }

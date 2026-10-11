@@ -25,6 +25,8 @@ struct ObstacleDef {
     // Pushing through from the far side (so obstacles never trap you).
     float pushDamage = 0.0f;
     std::string pushMessage;
+    std::string hitSound = "chop";
+    std::string clearSound = "chop";
 
     static ObstacleDef fromJson(const std::string& id, const nlohmann::json& j);
 };

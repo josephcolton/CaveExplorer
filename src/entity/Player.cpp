@@ -33,6 +33,7 @@ void Player::placeAt(Vec2 feet) {
     jumping_ = false;
     hurtTimer_ = attackCooldown_ = 0.0f;
     swingTime_ = -1.0f;
+    climbing_ = false;
 }
 
 void Player::startAttack(float reach, float damage, float cooldown) {
@@ -68,6 +69,9 @@ bool Player::hurt(float damage, float fromX) {
 
 void Player::update(float dt, const Input& input, const Tilemap& map) {
     prevPos = box.pos();
+    events = 0;
+    const bool wasOnGround = contact.onGround;
+    const float fallSpeed = velocity.y;
     invulnerable = std::max(0.0f, invulnerable - dt);
     hurtTimer_ = std::max(0.0f, hurtTimer_ - dt);
     attackCooldown_ = std::max(0.0f, attackCooldown_ - dt);
@@ -77,6 +81,7 @@ void Player::update(float dt, const Input& input, const Tilemap& map) {
         if (swingTime_ > kSwingHitEnd) swingTime_ = -1.0f;
     }
     const bool control = hurtTimer_ <= 0.0f && !dead();
+    if (updateClimbing(dt, input, map, control)) return;
 
     // --- Horizontal: accelerate toward the target speed instead of snapping to it.
     float dir = 0.0f;
@@ -108,6 +113,7 @@ void Player::update(float dt, const Input& input, const Tilemap& map) {
     } else if (jumpBufferTimer_ > 0.0f && coyoteTimer_ > 0.0f) {
         velocity.y = -stats.jumpVelocity;
         jumping_ = true;
+        events |= Jumped;
         jumpBufferTimer_ = 0.0f;
         coyoteTimer_ = 0.0f;
     }
@@ -123,10 +129,79 @@ void Player::update(float dt, const Input& input, const Tilemap& map) {
     velocity.y = std::min(velocity.y + g * dt, stats.maxFallSpeed);
 
     contact = moveAndCollide(map, box, velocity, dt, dropThroughTimer_ > 0.0f);
+    if (contact.onGround && !wasOnGround && fallSpeed > 260.0f) events |= Landed;
 
     chooseAnimation();
     anim_.speed = anim_.clip() == "run" ? std::max(0.5f, std::fabs(velocity.x) / 165.0f) : 1.0f;
     anim_.update(dt);
+}
+
+const Rect* Player::ladderAt() const {
+    if (!ladders) return nullptr;
+    const float cx = box.center().x;
+    for (const Rect& l : *ladders) {
+        if (cx >= l.left() - 2.0f && cx <= l.right() + 2.0f && box.bottom() >= l.top() - 1.0f && box.top() < l.bottom()) {
+            return &l;
+        }
+    }
+    return nullptr;
+}
+
+// Returns true while on a ladder (normal movement is skipped).
+bool Player::updateClimbing(float dt, const Input& input, const Tilemap& map, bool control) {
+    constexpr float kClimbSpeed = 115.0f;
+    const Rect* ladder = ladderAt();
+    const bool up = input.down(Action::Up);
+    const bool down = input.down(Action::Down);
+    const bool atTop = ladder && contact.onGround && std::fabs(box.bottom() - ladder->top()) < 2.0f;
+    ladderHint_ = !ladder || climbing_ ? 0 : (atTop ? -1 : 1);
+
+    if (!climbing_) {
+        // Grab on with Up (or Down from the top). Not while jumping upward, so jumps past it stay smooth.
+        if (!ladder || !control || velocity.y < -50.0f) return false;
+        if (!((up && !atTop) || (down && (atTop || !contact.onGround)))) return false;
+        climbing_ = true;
+        jumping_ = false;
+        velocity = {};
+    }
+    if (!ladder || !control) {
+        climbing_ = false;
+        return false;
+    }
+
+    if (input.pressed(Action::Jump)) {
+        // Hop off sideways.
+        climbing_ = false;
+        const float dir = (input.down(Action::Right) ? 1.0f : 0.0f) - (input.down(Action::Left) ? 1.0f : 0.0f);
+        velocity = {dir * stats.runSpeed, -stats.jumpVelocity * 0.6f};
+        if (dir != 0.0f) facing = dir > 0.0f ? 1 : -1;
+        return false;
+    }
+
+    const float vy = (down ? 1.0f : 0.0f) - (up ? 1.0f : 0.0f);
+    velocity.y = vy * kClimbSpeed;
+    climbDistance_ += std::fabs(velocity.y) * dt;
+    if (climbDistance_ > 26.0f) {
+        climbDistance_ = 0.0f;
+        events |= ClimbStep;
+    }
+    velocity.x = (ladder->center().x - box.center().x) * 12.0f;  // ease onto the rungs
+    contact = moveAndCollide(map, box, velocity, dt, true);
+
+    if (vy < 0.0f && box.bottom() <= ladder->top() + 1.0f) {
+        // Climbed out at the top: stand on it.
+        box.y = ladder->top() - box.h;
+        velocity = {};
+        climbing_ = false;
+        contact.onGround = true;
+        contact.onOneWay = true;
+    } else if (vy > 0.0f && contact.onGround) {
+        climbing_ = false;  // reached the ground
+    }
+    anim_.play("climb");
+    anim_.speed = vy != 0.0f ? 1.0f : 0.0f;
+    anim_.update(dt);
+    return true;
 }
 
 void Player::chooseAnimation() {

@@ -29,7 +29,9 @@ covers the design decisions so far and how to build the first playable version.
 - [x] 8. Shrines (Leaping, Swiftness, Might, Warding, Shadows: timed; Vigor: until death) placed
        in both caves; hunger with healing gate and starving penalties; food fills hunger
 - [x] Music: beach (HitCtrl), Upper Caves (Spring Spring); boss_3 reserved
-- [ ] 9 (rest). Control rebinding, sound effects  ·  10. Packaging
+- [x] 9. Sound effects (32 events, CC0 packs, data/sounds.json), sound volume setting
+- [x] Ladders; level fixes so everything is reachable (tools/check_reach.py); Shift quick move
+- [ ] 10. Packaging
 
 ## Art sources
 - Item icons: Dungeon Crawl 32x32 tiles (CC0).

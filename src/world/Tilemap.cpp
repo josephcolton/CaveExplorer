@@ -19,6 +19,7 @@ void Tilemap::buildCollision() {
     collision_.assign(static_cast<std::size_t>(width * height), TileCollision::None);
     blocked_.assign(static_cast<std::size_t>(width * height), false);
     slippery_.assign(static_cast<std::size_t>(width * height), false);
+    extraOneWay_.assign(static_cast<std::size_t>(width * height), false);
     for (const TileLayer& layer : layers) {
         if (!layer.collides) continue;
         for (std::size_t i = 0; i < layer.gids.size() && i < collision_.size(); ++i) {
@@ -42,12 +43,19 @@ TileCollision Tilemap::collisionAt(int tx, int ty) const {
     if (tx < 0 || tx >= width || ty >= height) return TileCollision::Solid;
     if (ty < 0) return TileCollision::None;
     const auto i = static_cast<std::size_t>(ty * width + tx);
-    return blocked_[i] ? TileCollision::Solid : collision_[i];
+    if (blocked_[i]) return TileCollision::Solid;
+    if (extraOneWay_[i] && collision_[i] == TileCollision::None) return TileCollision::OneWay;
+    return collision_[i];
 }
 
 bool Tilemap::isSlippery(int tx, int ty) const {
     if (tx < 0 || ty < 0 || tx >= width || ty >= height) return false;
     return slippery_[static_cast<std::size_t>(ty * width + tx)];
+}
+
+void Tilemap::setOneWay(int tx, int ty) {
+    if (tx < 0 || ty < 0 || tx >= width || ty >= height) return;
+    extraOneWay_[static_cast<std::size_t>(ty * width + tx)] = true;
 }
 
 void Tilemap::setBlocked(int tx, int ty, bool blocked) {

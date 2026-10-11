@@ -22,6 +22,8 @@ ObstacleDef ObstacleDef::fromJson(const std::string& id, const json& j) {
     d.cleared = j.value("cleared", "The way is clear.");
     d.pushDamage = j.value("push_damage", 0.0f);
     d.pushMessage = j.value("push_message", "You force your way through.");
+    d.hitSound = j.value("hit_sound", "chop");
+    d.clearSound = j.value("clear_sound", d.hitSound);
     const auto c = j.value("debris", std::vector<int>{140, 140, 140});
     if (c.size() == 3) d.debris = {static_cast<Uint8>(c[0]), static_cast<Uint8>(c[1]), static_cast<Uint8>(c[2]), 255};
     return d;

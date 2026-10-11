@@ -36,6 +36,13 @@ the licenses below.
 - **"Cave Theme"** (`assets/soundtrack/deep_cave.ogg`) by Brandon Morris (Brandon75689). CC0 / OGA-BY 3.0.
   https://opengameart.org/content/cave-theme
 
+## Sound effects
+
+All CC0 (see `assets/sounds/README.md`):
+- **80 CC0 RPG SFX** by rubberduck — https://opengameart.org/content/80-cc0-rpg-sfx
+- **The Essential Retro Video Game Sound Effects Collection [512 sounds]** by Juhani Junkala
+  (SubspaceAudio) — https://opengameart.org/content/512-sound-effects-8-bit-style
+
 ## Libraries
 
 - SDL3, SDL3_image and SDL3_mixer — zlib license — https://libsdl.org

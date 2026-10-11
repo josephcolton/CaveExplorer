@@ -126,6 +126,7 @@ private:
     std::vector<Enemy> enemies_;
     std::vector<Projectile> projectiles_;
     std::vector<Obstacle> obstacles_;
+    std::vector<Rect> ladders_;
     struct Shrine {
         const ShrineDef* def;
         Vec2 feet;

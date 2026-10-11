@@ -21,6 +21,11 @@ MUSIC
   "Cave Theme" - Brandon Morris (CC0).
   "JRPG End Dungeon" - HydroGene (CC0).
 
+SOUND EFFECTS
+  "80 CC0 RPG SFX" - rubberduck (CC0).
+  "The Essential Retro Video Game Sound Effects Collection" -
+    Juhani Junkala / SubspaceAudio (CC0).
+
 LIBRARIES
   SDL3, SDL3_image, SDL3_mixer (zlib) - libsdl.org
   nlohmann/json (MIT)

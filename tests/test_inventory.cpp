@@ -76,6 +76,25 @@ TEST_CASE("swapping is refused when the other item cannot go back") {
     CHECK(inv.equipment.at(Inventory::RightHand).empty());
 }
 
+TEST_CASE("quick move sends a stack across, merging and respecting slot kinds") {
+    ItemDb db = makeDb();
+    Inventory inv;
+    Container chest(4);
+    chest.add(db, "apple", 4);
+    inv.add(db, "apple", 3);
+    // 4 apples into a pack holding 3 (stack 5): 2 top up the stack, 2 start a new one.
+    CHECK(moveStackInto(db, chest, 0, inv.backpack) == 4);
+    CHECK(chest.isEmpty());
+    CHECK(inv.backpack.countOf("apple") == 7);
+    // Boots can be quick-moved into equipment (feet); an apple can't.
+    inv.add(db, "boots", 1);
+    const std::size_t bootsSlot = 2;
+    REQUIRE(inv.backpack.at(bootsSlot).id == "boots");
+    CHECK(moveStackInto(db, inv.backpack, bootsSlot, inv.equipment) == 1);
+    CHECK(inv.equipment.at(Inventory::Feet).id == "boots");
+    CHECK(moveStackInto(db, inv.backpack, 0, inv.equipment) == 0);
+}
+
 TEST_CASE("merging same items respects the stack limit") {
     ItemDb db = makeDb();
     Container a(2), b(2);

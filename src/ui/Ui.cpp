@@ -11,6 +11,18 @@
 
 namespace ui {
 
+namespace {
+std::function<void(const char*)>& soundHook() {
+    static std::function<void(const char*)> hook;
+    return hook;
+}
+}  // namespace
+
+void setSoundHook(std::function<void(const char*)> hook) { soundHook() = std::move(hook); }
+void sound(const char* name) {
+    if (soundHook()) soundHook()(name);
+}
+
 void text(SDL_Renderer* r, float x, float y, const std::string& s, SDL_Color c) {
     x = std::round(x);
     y = std::round(y);
@@ -117,6 +129,7 @@ int navigate(const std::vector<SDL_FRect>& rects, int current, const Input& inpu
             best = static_cast<int>(i);
         }
     }
+    if (best != current) sound("menu_move");
     return best;
 }
 

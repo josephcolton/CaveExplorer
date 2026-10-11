@@ -2,23 +2,124 @@
  "_comment": "Animated sprite sheets. Frames are cells of cell=[w,h] read left-to-right; anchor is the point placed on the entity (feet for walkers, centre for flyers). 'faces' is the direction the art faces.",
  "sets": {
   "knight": {
-   "image": "sprites/knight.png", "cell": [96, 64], "columns": 8, "anchor": [48, 62], "faces": "right",
+   "image": "sprites/knight.png",
+   "cell": [
+    96,
+    64
+   ],
+   "columns": 8,
+   "anchor": [
+    48,
+    62
+   ],
+   "faces": "right",
    "clips": {
-    "idle":   {"frames": [0, 1, 2, 1], "fps": 4},
-    "run":    {"frames": [11, 12, 13, 14, 15, 16, 17, 18], "fps": 13},
-    "jump":   {"frames": [8], "fps": 1},
-    "fall":   {"frames": [9, 10], "fps": 6},
-    "attack": {"frames": [19, 20, 22, 22], "fps": 16, "loop": false},
-    "hurt":   {"frames": [5], "fps": 1},
-    "dead":   {"frames": [4], "fps": 1}
+    "idle": {
+     "frames": [
+      0,
+      1,
+      2,
+      1
+     ],
+     "fps": 4
+    },
+    "run": {
+     "frames": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+     ],
+     "fps": 13
+    },
+    "jump": {
+     "frames": [
+      8
+     ],
+     "fps": 1
+    },
+    "fall": {
+     "frames": [
+      9,
+      10
+     ],
+     "fps": 6
+    },
+    "attack": {
+     "frames": [
+      19,
+      20,
+      22,
+      22
+     ],
+     "fps": 16,
+     "loop": false
+    },
+    "hurt": {
+     "frames": [
+      5
+     ],
+     "fps": 1
+    },
+    "dead": {
+     "frames": [
+      4
+     ],
+     "fps": 1
+    },
+    "climb": {
+     "frames": [
+      8,
+      9
+     ],
+     "fps": 6
+    }
    }
   },
   "bat": {
-   "image": "sprites/bat.png", "cell": [32, 32], "columns": 10, "anchor": [16, 16], "faces": "left",
+   "image": "sprites/bat.png",
+   "cell": [
+    32,
+    32
+   ],
+   "columns": 10,
+   "anchor": [
+    16,
+    16
+   ],
+   "faces": "left",
    "clips": {
-    "fly":   {"frames": [0, 1, 2, 3, 2, 1], "fps": 14},
-    "glide": {"frames": [4, 5, 6, 7, 8], "fps": 10},
-    "hang":  {"frames": [9], "fps": 1}
+    "fly": {
+     "frames": [
+      0,
+      1,
+      2,
+      3,
+      2,
+      1
+     ],
+     "fps": 14
+    },
+    "glide": {
+     "frames": [
+      4,
+      5,
+      6,
+      7,
+      8
+     ],
+     "fps": 10
+    },
+    "hang": {
+     "frames": [
+      9
+     ],
+     "fps": 1
+    }
    }
   }
  }

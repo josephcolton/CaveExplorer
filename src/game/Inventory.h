@@ -52,6 +52,10 @@ private:
 // Returns false if nothing could move. from and to may be the same container.
 bool transferStack(const ItemDb& db, Container& from, std::size_t i, Container& to, std::size_t j);
 
+// Moves as much of from[i] as fits into `to` (topping up stacks, then empty slots that accept
+// it). Returns how many items moved. Used for quick-moving between backpack and chest.
+int moveStackInto(const ItemDb& db, Container& from, std::size_t i, Container& to);
+
 // The player's carried items.
 struct Inventory {
     enum Equip : std::size_t { RightHand = 0, LeftHand, Feet, Body, Head, EquipCount };
