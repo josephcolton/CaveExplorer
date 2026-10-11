@@ -1,0 +1,17 @@
+{
+ "_comment": "Named sprites: image (under assets/) and rect [x, y, w, h]. nature.png is by Paulina Riva (CC-BY 3.0).",
+ "sprites": {
+  "ladder":     {"image": "sprites/nature.png", "rect": [0, 0, 32, 128]},
+  "fence":      {"image": "sprites/nature.png", "rect": [32, 0, 96, 32]},
+  "boulder":    {"image": "sprites/nature.png", "rect": [32, 32, 32, 32]},
+  "flowers":    {"image": "sprites/nature.png", "rect": [32, 64, 32, 32]},
+  "vines":      {"image": "sprites/nature.png", "rect": [64, 32, 32, 64]},
+  "sign_left":  {"image": "sprites/nature.png", "rect": [96, 64, 32, 32]},
+  "sign_right": {"image": "sprites/nature.png", "rect": [128, 64, 32, 32]},
+  "signpost":   {"image": "sprites/nature.png", "rect": [160, 32, 32, 64]},
+  "chest":      {"image": "sprites/nature.png", "rect": [32, 96, 32, 32]},
+  "tree":       {"image": "sprites/nature.png", "rect": [192, 0, 128, 128]},
+  "lamp_post":  {"image": "sprites/nature.png", "rect": [192, 128, 32, 64]},
+  "mound":      {"image": "sprites/nature.png", "rect": [64, 128, 96, 64]}
+ }
+}

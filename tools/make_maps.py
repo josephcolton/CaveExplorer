@@ -125,6 +125,26 @@ class Map:
             ],
         })
 
+    def obj(self, otype, x, y, w, h, name="", **props):
+        o = {"name": name, "type": otype, "x": x, "y": y, "width": w, "height": h}
+        if props:
+            o["properties"] = [
+                {"name": k, "type": "bool" if isinstance(v, bool) else
+                 ("int" if isinstance(v, int) else "string"), "value": v}
+                for k, v in props.items()]
+        self.objects.append(o)
+
+    def decor(self, sprite, tx, ground_row, w, h, **props):
+        # Sprite's bottom-left sits on top of tile row ground_row at column tx.
+        self.obj("decor", tx * T, ground_row * T - h, w, h, name=sprite, sprite=sprite, **props)
+
+    def pickup(self, item, tx, ground_row, count=1, unique_id=None):
+        props = {"item": item, "count": count}
+        if unique_id:
+            props["unique_id"] = unique_id
+        self.obj("pickup", tx * T + T / 2, ground_row * T, 0, 0, name=item, **props)
+        self.objects[-1]["point"] = True
+
     def to_tmj(self):
         layers = {"background": [], "ground": []}
         for row in self.grid:
@@ -172,7 +192,13 @@ def beach():
     m.fill(14, 10, 18, 10, "S")
     m.fill(16, 9, 17, 9, "S")
     m.fill(24, 7, 27, 7, "=")
-    m.fill(30, 7, 35, 10, "H")  # shop (placeholder)
+    m.fill(30, 7, 35, 10, "H")  # shop hut (placeholder tiles)
+    m.obj("shop", 30 * T, 7 * T, 6 * T, 4 * T, name="shop", shop_id="beach_shop")
+    m.decor("lamp_post", 28, 11, 32, 64)
+    m.decor("signpost", 43, 11, 32, 64)
+    m.pickup("coins", 12, 11, count=5)
+    m.pickup("coins", 25, 7, count=10)
+    m.pickup("banana", 16, 9)
     m.spawn("start", 10, 11)
     m.spawn("from_forest", 44, 11)
     m.door(47, 8, 47, 10, "forest", "from_beach", trigger="touch")
@@ -185,10 +211,16 @@ def forest():
     m.fill(0, 12, 47, 13, "D")
     m.fill(20, 9, 26, 9, "G")
     m.fill(20, 10, 26, 10, "D")
-    for x in (6, 13, 30, 37):
-        m.fill(x, 7, x, 10, "T")
-        m.fill(x - 1, 5, x + 1, 6, "L")
+    for x in (3, 11, 27):
+        m.decor("tree", x, 11, 128, 128)
+    m.decor("tree", 21, 9, 128, 128)
+    m.decor("flowers", 9, 11, 32, 32)
+    m.decor("flowers", 17, 11, 32, 32)
+    m.decor("fence", 34, 11, 96, 32)
+    m.decor("signpost", 40, 11, 32, 64)
     m.fill(32, 8, 35, 8, "=")
+    m.obj("chest", 38 * T, 10 * T, T, T, name="chest")
+    m.pickup("apple", 24, 9)
     # Cliff with the cave mouth.
     m.fill(42, 0, 47, 13, "#")
     m.fill(43, 9, 44, 10, "C")
@@ -213,6 +245,10 @@ def cave_1():
     m.fill(16, 22, 18, 22, "=")
     m.fill(29, 22, 32, 22, "=")
     m.fill(36, 23, 39, 26, "b")  # passage east
+    m.pickup("stones", 6, 5, count=6)
+    m.pickup("bone", 12, 24)
+    m.pickup("coins", 20, 27, count=8)
+    m.pickup("crystal", 30, 22)
     m.spawn("from_forest", 4, 5)
     m.spawn("from_cave_2", 36, 27)
     m.door(2, 3, 3, 4, "forest", "from_cave")
@@ -227,6 +263,9 @@ def cave_2():
     m.fill(14, 12, 17, 12, "=")
     m.fill(20, 13, 26, 16, "r")
     m.fill(28, 10, 31, 10, "=")
+    m.pickup("machete", 35, 17, unique_id="cave2_machete")
+    m.pickup("crystal", 29, 10)
+    m.pickup("coins", 23, 13, count=12)
     m.spawn("from_cave_1", 2, 17)
     m.door(0, 14, 0, 16, "cave_1", "from_cave_2", trigger="touch")
     return m

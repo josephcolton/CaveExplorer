@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.25)
 project(CaveExplorer VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -21,20 +21,49 @@ FetchContent_Declare(SDL3
   GIT_SHALLOW TRUE)
 
 FetchContent_Declare(json
-  URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+  URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+  SYSTEM)
 
-FetchContent_MakeAvailable(SDL3 json)
+# SDL_image: PNG/BMP only, using its built-in stb_image backend (no extra system libs).
+set(SDLIMAGE_VENDORED OFF CACHE BOOL "" FORCE)
+set(SDLIMAGE_SAMPLES OFF CACHE BOOL "" FORCE)
+set(SDLIMAGE_TESTS OFF CACHE BOOL "" FORCE)
+set(SDLIMAGE_AVIF OFF CACHE BOOL "" FORCE)
+set(SDLIMAGE_JXL OFF CACHE BOOL "" FORCE)
+set(SDLIMAGE_TIF OFF CACHE BOOL "" FORCE)
+set(SDLIMAGE_WEBP OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(SDL3_image
+  GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
+  GIT_TAG release-3.2.6
+  GIT_SHALLOW TRUE)
+
+FetchContent_MakeAvailable(SDL3 json SDL3_image)
+
+# --- Game logic without SDL (shared with the unit tests) ---------------------
+add_library(cave_logic STATIC
+  src/game/Items.cpp
+  src/game/Inventory.cpp
+  src/game/WorldSave.cpp)
+target_include_directories(cave_logic PUBLIC src)
+target_link_libraries(cave_logic PUBLIC nlohmann_json::nlohmann_json)
 
 # --- Game -------------------------------------------------------------------
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.h)
+list(REMOVE_ITEM GAME_SOURCES
+  ${CMAKE_SOURCE_DIR}/src/game/Items.cpp
+  ${CMAKE_SOURCE_DIR}/src/game/Inventory.cpp
+  ${CMAKE_SOURCE_DIR}/src/game/WorldSave.cpp)
 add_executable(cave_explorer ${GAME_SOURCES})
-target_include_directories(cave_explorer PRIVATE src)
-target_link_libraries(cave_explorer PRIVATE SDL3::SDL3 nlohmann_json::nlohmann_json)
+target_link_libraries(cave_explorer PRIVATE cave_logic SDL3::SDL3 SDL3_image::SDL3_image)
 
 if(MSVC)
   target_compile_options(cave_explorer PRIVATE /W4 /permissive-)
 else()
   target_compile_options(cave_explorer PRIVATE -Wall -Wextra)
+endif()
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  # False positives from nlohmann/json once inlined at -O2.
+  target_compile_options(cave_explorer PRIVATE -Wno-maybe-uninitialized)
 endif()
 
 if(MINGW)
@@ -57,3 +86,21 @@ add_custom_target(copy_content ALL
           ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:cave_explorer>/data
   COMMENT "Copying game content")
 add_dependencies(cave_explorer copy_content)
+
+# --- Unit tests ---------------------------------------------------------------
+option(CAVE_BUILD_TESTS "Build unit tests" ON)
+if(CAVE_BUILD_TESTS)
+  FetchContent_Declare(doctest
+    URL https://raw.githubusercontent.com/doctest/doctest/v2.4.11/doctest/doctest.h
+    DOWNLOAD_NO_EXTRACT TRUE)
+  FetchContent_MakeAvailable(doctest)
+  file(GLOB TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
+  add_executable(cave_tests ${TEST_SOURCES})
+  target_include_directories(cave_tests PRIVATE ${doctest_SOURCE_DIR})
+  target_link_libraries(cave_tests PRIVATE cave_logic)
+  if(MINGW)
+    target_link_options(cave_tests PRIVATE -static-libgcc -static-libstdc++ -static)
+  endif()
+  enable_testing()
+  add_test(NAME cave_tests COMMAND cave_tests)
+endif()

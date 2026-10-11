@@ -61,3 +61,7 @@ build-*/
 # Editors / tools
 .vscode/
 *.tiled-session
+
+# Music: test downloads stay local; only tracks the game uses are committed (listed below).
+assets/music/*
+!assets/music/forest.ogg

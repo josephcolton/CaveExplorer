@@ -15,6 +15,8 @@ int main(int argc, char* argv[]) {
         else if (arg == "--frames") options.screenshotFrames = std::stoi(next());
         else if (arg == "--hold-right") options.holdRight = true;
         else if (arg == "--debug") options.debug = true;
+        else if (arg == "--give") options.giveItems = next();
+        else if (arg == "--ui") options.openUi = next();
     }
 
     App app;

@@ -1,0 +1,39 @@
+# Icon atlas manifest: <icon name> <path inside the Dungeon Crawl 32x32 tile pack>
+# Pack: https://opengameart.org/content/dungeon-crawl-32x32-tiles (CC0)
+# Rebuild with: python tools/pack_icons.py "<path to unzipped 'crawl-tiles Oct-5-2010'>"
+# Append new icons at the END so existing indices stay stable.
+
+coins           item/misc/gold_pile.png
+dagger          item/weapon/dagger.png
+short_sword     item/weapon/short_sword1.png
+machete         item/weapon/falchion1.png
+club            item/weapon/club.png
+hand_axe        item/weapon/hand_axe1.png
+pickaxe         item/weapon/hammer1.png
+sling           item/weapon/ranged/sling1.png
+bow             item/weapon/ranged/bow1.png
+stones          item/weapon/ranged/stone.png
+buckler         item/armour/shields/buckler1.png
+lantern         item/misc/misc_lamp.png
+leather_boots   item/armour/boots1_brown.png
+nonslip_boots   item/armour/boots4_green.png
+jackboots       item/armour/boots2_jackboots.png
+leather_jacket  item/armour/leather_armour1.png
+warm_cloak      item/armour/cloak1_leather.png
+robe            item/armour/robe1.png
+leather_cap     item/armour/headgear/elven_leather_helm.png
+helmet          item/armour/headgear/helmet3.png
+wizard_hat      item/armour/headgear/wizard_hat1.png
+apple           item/food/apple.png
+bread           item/food/bread_ration.png
+meat            item/food/meat_ration.png
+cheese          item/food/cheese.png
+banana          item/food/banana.png
+jerky           item/food/beef_jerky.png
+healing_potion  item/potion/ruby.png
+crystal         item/misc/misc_crystal.png
+bone            item/food/bone.png
+feather_charm   item/amulet/celtic_blue.png
+horn            item/misc/misc_horn.png
+prop_chest      item/misc/misc_box.png
+prop_shop       dc-dngn/shops/shop_general.png

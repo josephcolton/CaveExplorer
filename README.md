@@ -9,8 +9,9 @@ for the design and roadmap.
 
 ## Building
 
-Requirements: CMake 3.24+, a C++20 compiler (GCC 11+, Clang 14+, or MSVC 2022), Git, and
-internet access on the first configure (SDL3 and nlohmann/json are fetched automatically).
+Requirements: CMake 3.25+, a C++20 compiler (GCC 11+, Clang 14+, or MSVC 2022), Git, and
+internet access on the first configure (SDL3, SDL3_image, nlohmann/json and doctest are
+fetched automatically). Run the unit tests with `ctest --test-dir build` or `build/cave_tests`.
 
 On Ubuntu, install SDL's system dependencies first:
 
@@ -36,6 +37,10 @@ cmake --build build
 | Jump               | Space             | A (south)          |
 | Drop through ledge | Down + Space      | Down + A           |
 | Enter door / cave  | W / ↑ / E         | Up / Y (north)     |
+| Open chest / shop  | E                 | Y (north)          |
+| Inventory          | Tab / I           | Back / View        |
+| Menus: move / pick | Arrows, Enter     | D-pad, A           |
+| Menus: use / drop  | E / Q             | Y / right stick    |
 | Right-hand item    | J                 | X (west) / RB      |
 | Left-hand item     | K                 | LB                 |
 | Fullscreen         | F11 / Alt+Enter   |                    |
@@ -55,6 +60,23 @@ Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 3
 `tools/make_maps.py` generated the starting maps and placeholder tileset; it will not overwrite
 existing maps unless run with `--force`. Edit the maps in Tiled from here on.
 
+Objects also include `pickup` (point; `item` id or `coins`, `count`, optional `unique_id` so it
+never respawns once taken), `chest` (the persistent storage chest), `shop` (`shop_id` from
+`data/shops.json`) and `decor` (`sprite` name from `data/sprites.json`, drawn on its bottom-left).
+
+## Game data
+
+- `data/items.json` — every item: name, icon, equipment slot, stack size, value, damage, food...
+- `data/shops.json` — shop names and stock.
+- `data/sprites.json` — named sprites in the sprite sheets.
+- Item icons are packed by `tools/pack_icons.py` from the list in `tools/icons.txt`.
+
+The persistent world save (chest contents, unique items taken) is `world.json` in the
+per-user data folder (`%APPDATA%\CaveExplorer\CaveExplorer` on Windows,
+`~/.local/share/CaveExplorer/CaveExplorer` on Linux). Delete it to reset the world.
+
+See [CREDITS.md](CREDITS.md) for art and library credits.
+
 ## Debug command-line options
 
 ```
@@ -62,4 +84,6 @@ existing maps unless run with `--force`. Edit the maps in Tiled from here on.
 --debug                      start with the debug overlay on
 --shot <file.bmp> --frames N run N frames, save a screenshot, and exit
 --hold-right                 simulate holding Right (automated movement checks)
+--give <id,id,...>           start with these items in the backpack
+--ui inventory|chest|shop    open a screen immediately
 ```

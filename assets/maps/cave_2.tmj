@@ -11,7 +11,7 @@
  "tileheight": 32,
  "backgroundcolor": "#0c0a10",
  "nextlayerid": 4,
- "nextobjectid": 3,
+ "nextobjectid": 6,
  "properties": [
   {
    "name": "display_name",
@@ -1834,6 +1834,83 @@
    "objects": [
     {
      "id": 1,
+     "name": "machete",
+     "type": "pickup",
+     "x": 1136.0,
+     "y": 544,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "item",
+       "type": "string",
+       "value": "machete"
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "unique_id",
+       "type": "string",
+       "value": "cave2_machete"
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "name": "crystal",
+     "type": "pickup",
+     "x": 944.0,
+     "y": 320,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "item",
+       "type": "string",
+       "value": "crystal"
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "name": "coins",
+     "type": "pickup",
+     "x": 752.0,
+     "y": 416,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "item",
+       "type": "string",
+       "value": "coins"
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "value": 12
+      }
+     ]
+    },
+    {
+     "id": 4,
      "name": "from_cave_1",
      "type": "spawn",
      "x": 80.0,
@@ -1845,7 +1922,7 @@
      "point": true
     },
     {
-     "id": 2,
+     "id": 5,
      "name": "to_cave_1",
      "type": "door",
      "x": 0,

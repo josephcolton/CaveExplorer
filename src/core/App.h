@@ -23,6 +23,8 @@ public:
         int screenshotFrames = 60;
         bool holdRight = false;      // simulate holding Right (for automated movement checks)
         bool debug = false;          // start with debug overlay (F3)
+        std::string giveItems;       // comma-separated item ids added to the backpack
+        std::string openUi;          // open a screen at start: inventory | chest | shop
     };
 
     bool init(const Options& options);

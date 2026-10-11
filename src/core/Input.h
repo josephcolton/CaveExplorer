@@ -18,6 +18,7 @@ enum class Action {
     UseLeft,   // item held in the left hand (ranged / torch / shield)
     Interact,
     Inventory,
+    Drop,
     Pause,
     Confirm,
     Cancel,

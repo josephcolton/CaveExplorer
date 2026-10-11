@@ -8,6 +8,21 @@ areas, Metroidvania-style. When a character dies, everything they carried drops 
 pile stays there across runs until a later character, with newly rolled stats, picks it up. This plan
 covers the design decisions so far and how to build the first playable version.
 
+## Progress
+- [x] 1. Project setup, window, fixed-step loop, input
+- [x] 2. Tiled areas, player physics, camera
+- [x] 3. Beach → Forest → Cave 1 → Cave 2 with doors
+- [x] 4. Items, inventory (9 + 5 equipment slots), pickups, persistent chest, beach shop, coins
+- [ ] 5. Combat  ·  6. Death loop  ·  7. Gated obstacle  ·  7b. Item abilities, NPCs/quests
+- [ ] 8. Shrine buff, hunger  ·  9. Menus/settings/saving  ·  10. Packaging
+
+## Art sources
+- Item icons: Dungeon Crawl 32x32 tiles (CC0).
+- Outdoor props (tree, chest, fence, signs...): Nature tileset by Paulina Riva (CC-BY 3.0, credit required).
+- Candidate for later: "castle platformer" by Jetrel (CC0) has an animated bat enemy, spikes
+  and cave backgrounds; its knight could be a temporary animated player.
+- Still needed: animated side-view explorer, side-view ground/ledge tiles for beach, forest and caves.
+
 ## Decisions made
 - **Tech:** C++20, SDL3 (+ SDL3_image, SDL3_mixer, SDL3_ttf), CMake. Builds on Windows and Ubuntu.
 - **World:** hand-built areas made in the **Tiled** editor (.tmj JSON files). Only one area is loaded
