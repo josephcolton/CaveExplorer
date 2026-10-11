@@ -8,8 +8,8 @@
 
 class ItemDb;
 struct Inventory;
-
 // Changes to an explorer's abilities, from gear (carried or worn), quest rewards and
+// shrines. Multipliers stack by multiplying; max health adds; the biggest light radius wins.
 // (later) shrines. Multipliers stack by multiplying; max health adds.
 struct Modifiers {
     float runSpeed = 1.0f;

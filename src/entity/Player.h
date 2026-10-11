@@ -14,7 +14,7 @@ struct Character;
 struct Modifiers;
 
 // Movement tuning. Values are in pixels and seconds. The explorer's rolled stats
-// scale these (and later gear, buffs and hunger will too).
+// scale these, along with gear, abilities, shrine blessings and hunger (see Player::applyStats).
 struct MovementStats {
     float runSpeed = 165.0f;
     float groundAccel = 1500.0f;

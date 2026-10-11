@@ -23,7 +23,7 @@ struct ItemDef {
     int value = 0;  // shop price; the shop buys for half
     bool sellable = true;
     bool unique = false;
-    // Gameplay numbers; systems that use them arrive in later steps.
+    // Gameplay numbers.
     int damage = 0;
     float reach = 24.0f;            // melee: hitbox length in front of the explorer (px)
     float cooldown = 0.35f;         // seconds between attacks / shots

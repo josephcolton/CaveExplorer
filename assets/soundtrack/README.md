@@ -13,7 +13,7 @@ if you reuse them.
 | `boss_1.ogg` | Gloomey | Ove Melaa | CC-BY 3.0 | First boss arena (planned) | [Ove's Essential Game Audio Pack](https://opengameart.org/content/oves-essential-game-audio-pack-collection-160-files-updated) |
 | `boss_2.ogg` | Infection By Chewing | Ove Melaa | CC-BY 3.0 | Second boss arena (planned) | [Ove's Essential Game Audio Pack](https://opengameart.org/content/oves-essential-game-audio-pack-collection-160-files-updated) |
 | `boss_3.mp3` | JRPG End Dungeon | HydroGene | CC0 | Third boss arena (planned) | [JRPG End Dungeon](https://opengameart.org/content/jrpg-end-dungeon) |
-| `deep_cave.ogg` | Cave Theme | Brandon Morris (Brandon75689) | CC0 / OGA-BY 3.0 | Deep cave area (planned) | [Cave Theme](https://opengameart.org/content/cave-theme) |
+| `deep_cave.ogg` | Cave Theme | Brandon Morris (Brandon75689) | CC0 / OGA-BY 3.0 | Drowned Tunnel (for now; meant for a deep cave area) | [Cave Theme](https://opengameart.org/content/cave-theme) |
 
 ## Credit lines
 
