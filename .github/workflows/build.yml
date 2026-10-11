@@ -36,11 +36,22 @@ jobs:
       - name: Configure
         shell: bash
         run: |
+          set -o pipefail
           if [ "$RUNNER_OS" = "Linux" ]; then
-            cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+            cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release 2>&1 | tee configure.log
           else
-            cmake -S . -B build
+            cmake -S . -B build 2>&1 | tee configure.log
           fi
+
+      - name: Report configure errors
+        if: failure()
+        shell: bash
+        run: |
+          # Surface CMake errors as annotations (visible without signing in).
+          grep -n -A 8 "CMake Error" configure.log | head -60 > errors.txt || true
+          [ -s errors.txt ] || tail -40 configure.log > errors.txt
+          msg=$(sed -e 's/%/%25/g' errors.txt | awk '{printf "%s%%0A", $0}')
+          echo "::error title=Configure failed::$msg"
 
       - name: Build
         run: cmake --build build --config Release --parallel
