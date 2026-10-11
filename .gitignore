@@ -53,3 +53,11 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Build output
+build/
+build-*/
+
+# Editors / tools
+.vscode/
+*.tiled-session
