@@ -12,6 +12,7 @@ ART
     opengameart.org/content/nature-tileset
 
 MUSIC
+  "Beach Town Guitar Theme" - HitCtrl (CC-BY 3.0).
   "Approaching The Green Grass", "Hero Within", "Gloomey" and
   "Infection By Chewing" - written and produced by
   Ove Melaa (omsoftware@hotmail.com), -2013 Ove Melaa (CC-BY 3.0).

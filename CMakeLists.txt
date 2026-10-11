@@ -62,7 +62,9 @@ add_library(cave_logic STATIC
   src/game/Inventory.cpp
   src/game/WorldSave.cpp
   src/game/Character.cpp
-  src/game/SaveGame.cpp)
+  src/game/SaveGame.cpp
+  src/game/Modifiers.cpp
+  src/game/Quests.cpp)
 target_include_directories(cave_logic PUBLIC src)
 target_link_libraries(cave_logic PUBLIC nlohmann_json::nlohmann_json)
 
@@ -73,7 +75,9 @@ list(REMOVE_ITEM GAME_SOURCES
   ${CMAKE_SOURCE_DIR}/src/game/Inventory.cpp
   ${CMAKE_SOURCE_DIR}/src/game/WorldSave.cpp
   ${CMAKE_SOURCE_DIR}/src/game/Character.cpp
-  ${CMAKE_SOURCE_DIR}/src/game/SaveGame.cpp)
+  ${CMAKE_SOURCE_DIR}/src/game/SaveGame.cpp
+  ${CMAKE_SOURCE_DIR}/src/game/Modifiers.cpp
+  ${CMAKE_SOURCE_DIR}/src/game/Quests.cpp)
 add_executable(cave_explorer ${GAME_SOURCES})
 target_link_libraries(cave_explorer PRIVATE cave_logic SDL3::SDL3 SDL3_image::SDL3_image SDL3_mixer::SDL3_mixer)
 

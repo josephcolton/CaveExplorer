@@ -42,6 +42,24 @@ void GameData::load(Assets& assets) {
     const json obstacleList = obstacleDoc.value("obstacles", json::object());
     for (auto& [id, o] : obstacleList.items()) obstacles[id] = ObstacleDef::fromJson(id, o);
 
+    const json abilityDoc = loadJson("abilities.json");
+    const json abilityList = abilityDoc.value("abilities", json::object());
+    for (auto& [id, a] : abilityList.items()) {
+        abilities[id] = {id, a.value("name", id), a.value("description", ""),
+                         Modifiers::fromJson(a.value("modifiers", json::object()))};
+    }
+
+    const json npcDoc = loadJson("npcs.json");
+    const json npcList = npcDoc.value("npcs", json::object());
+    for (auto& [id, n] : npcList.items()) {
+        npcs[id] = {id, n.value("name", id), n.value("icon", ""), n.value("shop", ""), n.value("greeting", ""),
+                    n.value("idle", "Safe travels."), n.value("quests", std::vector<std::string>{})};
+    }
+
+    const json questDoc = loadJson("quests.json");
+    const json questList = questDoc.value("quests", json::object());
+    for (auto& [id, q] : questList.items()) quests[id] = QuestDef::fromJson(id, q);
+
     characterConfig = loadJson("characters.json");
     sprites.load(assets);
     anims.load(assets);

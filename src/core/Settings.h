@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
+
 #include <string>
 
 enum class Difficulty { Easy = 0, Normal = 1, Hard = 2 };
@@ -12,6 +14,7 @@ struct Settings {
     int soundVolume = 8;  // 0..10
     bool fullscreen = false;
     Difficulty difficulty = Difficulty::Normal;
+    nlohmann::json bindings;  // control bindings (empty = defaults)
 
     void load();
     void save() const;

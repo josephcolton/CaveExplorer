@@ -32,8 +32,10 @@ TILES = {
     "H": (9, "background", None, (170, 120, 80)),   # hut wall
     "C": (10, "background", None, (16, 14, 20)),    # cave mouth darkness
     "r": (11, "ground", "solid", (80, 76, 88)),     # darker rock (variation)
+    "m": (12, "ground", "solid", (60, 104, 84)),    # slick mossy rock (slippery)
 }
 COLUMNS, ROWS = 8, 2
+SLIPPERY = {"m"}
 
 
 # --------------------------------------------------------------------- tileset
@@ -53,10 +55,13 @@ def tile_pixel(tid, color, x, y):
         return KEY
     if tid == 1 and y < 7:  # grass top
         return (shade(70, n), shade(170, n), shade(60, n))
+    if tid == 12:  # moss: wet sheen streaks on top
+        if y < 6:
+            return (shade(90, n), shade(170, n), shade(120, n)) if (x + y) % 7 else (200, 240, 220)
     if tid == 6:  # water ripples
         return (r, g, b) if (y + (x // 6)) % 8 else (120, 170, 230)
     edge = x in (0, 31) or y in (0, 31)
-    if edge and tid in (0, 2, 3, 11):
+    if edge and tid in (0, 2, 3, 11, 12):
         return (shade(r, -18), shade(g, -18), shade(b, -18))
     return (shade(r, n), shade(g, n), shade(b, n))
 
@@ -88,6 +93,8 @@ def tileset_json():
         props = [{"name": "char", "type": "string", "value": ch}]
         if coll:
             props.append({"name": "collision", "type": "string", "value": coll})
+        if ch in SLIPPERY:
+            props.append({"name": "surface", "type": "string", "value": "slippery"})
         tiles.append({"id": tid, "properties": props})
     return {
         "firstgid": 1, "name": "placeholder", "image": "../tiles/placeholder.bmp",
@@ -115,7 +122,7 @@ class Map:
         # Point at the player's feet: bottom-centre of tile column tx, standing on top of row ty.
         self.objects.append({"name": name, "type": "spawn", "x": tx * T + T / 2, "y": ty * T, "point": True})
 
-    def door(self, x0, y0, x1, y1, target_area, target_spawn, trigger="interact"):
+    def door(self, x0, y0, x1, y1, target_area, target_spawn, trigger="interact", label=None, glow=None):
         self.objects.append({
             "name": f"to_{target_area}", "type": "door",
             "x": x0 * T, "y": y0 * T, "width": (x1 - x0 + 1) * T, "height": (y1 - y0 + 1) * T,
@@ -125,6 +132,10 @@ class Map:
                 {"name": "trigger", "type": "string", "value": trigger},
             ],
         })
+        if label:
+            self.objects[-1]["properties"].append({"name": "label", "type": "string", "value": label})
+        if glow:
+            self.objects[-1]["properties"].append({"name": "glow", "type": "string", "value": glow})
 
     def obj(self, otype, x, y, w, h, name="", **props):
         o = {"name": name, "type": otype, "x": x, "y": y, "width": w, "height": h}
@@ -146,8 +157,15 @@ class Map:
         self.obj("pickup", tx * T + T / 2, ground_row * T, 0, 0, name=item, **props)
         self.objects[-1]["point"] = True
 
-    def obstacle(self, kind, x0, y0, x1, y1):
-        self.obj("obstacle", x0 * T, y0 * T, (x1 - x0 + 1) * T, (y1 - y0 + 1) * T, name=kind, obstacle=kind)
+    def obstacle(self, kind, x0, y0, x1, y1, passable_from=None):
+        props = {"obstacle": kind}
+        if passable_from:
+            props["passable_from"] = passable_from  # can be pushed through from this side
+        self.obj("obstacle", x0 * T, y0 * T, (x1 - x0 + 1) * T, (y1 - y0 + 1) * T, name=kind, **props)
+
+    def npc(self, npc_id, tx, row):
+        self.obj("npc", tx * T + T / 2, row * T, 0, 0, name=npc_id, npc_id=npc_id)
+        self.objects[-1]["point"] = True
 
     def enemy(self, kind, tx, row, flying=False, **props):
         # Walkers: point = feet on top of tile row `row`. Flyers: point = centre of that tile.
@@ -197,7 +215,7 @@ class Map:
 
 
 def beach():
-    m = Map("beach", 48, 14, "The Beach", "#8ecdf0")
+    m = Map("beach", 48, 14, "The Beach", "#8ecdf0", music="beach.ogg")
     m.fill(0, 9, 7, 10, "~")
     m.fill(0, 11, 47, 13, "S")
     m.fill(14, 10, 18, 10, "S")
@@ -238,7 +256,7 @@ def forest():
     m.spawn("from_beach", 2, 11)
     m.spawn("from_cave", 41, 11)
     m.door(0, 8, 0, 10, "beach", "from_forest", trigger="touch")
-    m.door(43, 9, 44, 10, "cave_1", "from_forest")
+    m.door(43, 9, 44, 10, "cave_1", "from_forest", label="Enter the cave")
     return m
 
 
@@ -256,11 +274,12 @@ def cave_1():
     m.fill(29, 22, 32, 22, "=")
     m.fill(36, 23, 39, 26, "b")  # passage east
     m.pickup("stones", 6, 5, count=6)
+    m.npc("hob", 7, 5)  # Old Hob, trader and quest giver
     m.pickup("bone", 12, 24)
     m.pickup("coins", 20, 27, count=8)
     m.pickup("crystal", 30, 22)
     m.pickup("machete", 17, 22, unique_id="cave1_machete")
-    m.obstacle("bush", 37, 23, 37, 26)  # blocks the way to Mossy Hollow
+    m.obstacle("bush", 37, 23, 37, 26, passable_from="right")  # blocks the way to Mossy Hollow
     m.enemy("bat", 23, 11, flying=True, enemy_easy="none")
     m.enemy("bat", 18, 20, flying=True)
     m.enemy("rat", 15, 27)
@@ -268,7 +287,7 @@ def cave_1():
     m.enemy("none", 33, 27, enemy_hard="beetle")
     m.spawn("from_forest", 4, 5)
     m.spawn("from_cave_2", 36, 27)
-    m.door(2, 3, 3, 4, "forest", "from_cave")
+    m.door(2, 3, 3, 4, "forest", "from_cave", label="Leave the cave", glow="#fff0c0")
     m.door(39, 23, 39, 26, "cave_2", "from_cave_1", trigger="touch")
     return m
 
@@ -277,15 +296,18 @@ def cave_2():
     m = Map("cave_2", 40, 20, "Mossy Hollow", "#0c0a10", fill="#", backdrop="b")
     m.fill(0, 3, 38, 16, "b")
     m.fill(8, 14, 11, 16, "r")
+    m.fill(12, 17, 31, 17, "m")  # slick moss floor
+    m.fill(20, 13, 26, 13, "m")
     m.fill(14, 12, 17, 12, "=")
     m.fill(20, 13, 26, 16, "r")
     m.fill(28, 10, 31, 10, "=")
     # Treasure alcove behind a boulder (needs a pickaxe).
     m.fill(33, 3, 33, 14, "#")
-    m.obstacle("rock", 33, 15, 33, 16)
+    m.obstacle("rock", 33, 15, 33, 16, passable_from="right")
     m.pickup("feather_charm", 36, 17, unique_id="cave2_charm")
     m.pickup("crystal", 35, 17, count=2)
     m.pickup("crystal", 29, 10)
+    m.pickup("bone", 17, 17)
     m.pickup("coins", 23, 13, count=12)
     m.enemy("bat", 12, 7, flying=True)
     m.enemy("bat", 30, 6, flying=True, enemy_hard="giant_bat")

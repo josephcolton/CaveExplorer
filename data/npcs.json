@@ -1,0 +1,16 @@
+{
+ "_comment": "People in the caves. Place in Tiled as 'npc' point objects (feet) with property npc_id. 'shop' is a shop id from shops.json; quests are offered in order, one at a time.",
+ "npcs": {
+  "hob": {
+   "name": "Old Hob",
+   "icon": "npc_miner",
+   "shop": "miner_shop",
+   "greeting": "Another one come looking for the deep, eh? Name's Hob. I trade, if you've got coin.",
+   "quests": [
+    "rat_problem",
+    "old_bones"
+   ],
+   "idle": "Mind the moss in the Hollow. Slick as soap."
+  }
+ }
+}

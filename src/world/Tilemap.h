@@ -22,6 +22,7 @@ struct Tileset {
     int tileHeight = 32;
     SDL_Texture* texture = nullptr;
     std::vector<TileCollision> collision;  // indexed by local tile id
+    std::vector<bool> slippery;            // surface = slippery (mossy/wet/icy)
 };
 
 struct TileLayer {
@@ -52,6 +53,9 @@ public:
     // Rebuild the merged collision grid after layers/tilesets change.
     void buildCollision();
 
+    // Slick ground (moss, ice): little grip unless wearing non-slip boots.
+    bool isSlippery(int tx, int ty) const;
+
     // Runtime blockers (obstacles such as bushes and boulders) make tiles solid until cleared.
     void setBlocked(int tx, int ty, bool blocked);
 
@@ -59,4 +63,5 @@ private:
     const Tileset* tilesetFor(std::uint32_t gid) const;
     std::vector<TileCollision> collision_;
     std::vector<bool> blocked_;
+    std::vector<bool> slippery_;
 };

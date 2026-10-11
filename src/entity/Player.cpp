@@ -2,6 +2,7 @@
 
 #include "core/Input.h"
 #include "game/Character.h"
+#include "game/Modifiers.h"
 #include "world/Tilemap.h"
 
 namespace {
@@ -12,11 +13,13 @@ constexpr float kSwingHitEnd = 0.20f;
 constexpr float kAttackAnimTime = 0.25f;
 }  // namespace
 
-void Player::applyCharacter(const Character& c) {
+void Player::applyStats(const Character& c, const Modifiers& m) {
     const MovementStats base;
-    stats.runSpeed = base.runSpeed * c.speed;
-    stats.jumpVelocity = base.jumpVelocity * c.jump;
-    maxHealth = c.maxHealth;
+    stats.runSpeed = base.runSpeed * c.speed * m.runSpeed;
+    stats.jumpVelocity = base.jumpVelocity * c.jump * m.jump;
+    maxHealth = c.maxHealth + m.maxHealth;
+    health = std::min(health, maxHealth);
+    nonSlip = m.has("nonslip");
 }
 
 void Player::placeAt(Vec2 feet) {
@@ -81,8 +84,13 @@ void Player::update(float dt, const Input& input, const Tilemap& map) {
     // Keep facing the swing direction until it finishes.
     if (dir != 0.0f && swingTime_ < 0.0f) facing = dir > 0.0f ? 1 : -1;
     const float target = dir * stats.runSpeed;
+    // Slick ground (moss, ice) gives little grip unless you wear non-slip boots.
+    const int footCol = static_cast<int>(std::floor(box.center().x / Tilemap::kTileSize));
+    const int footRow = static_cast<int>(std::floor((box.bottom() + 1.0f) / Tilemap::kTileSize));
+    const bool slick = contact.onGround && !nonSlip && map.isSlippery(footCol, footRow);
     float accel = contact.onGround ? stats.groundAccel : stats.airAccel;
     if (dir == 0.0f && contact.onGround) accel = stats.groundFriction;
+    if (slick) accel *= dir == 0.0f ? 0.05f : 0.25f;
     if (!control) accel = contact.onGround ? stats.groundFriction * 0.5f : 200.0f;
     velocity.x = approach(velocity.x, target, accel * dt);
 

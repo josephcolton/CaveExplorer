@@ -9,6 +9,7 @@
 class Input;
 class Tilemap;
 struct Character;
+struct Modifiers;
 
 // Movement tuning. Values are in pixels and seconds. The explorer's rolled stats
 // scale these (and later gear, buffs and hunger will too).
@@ -33,7 +34,8 @@ public:
     static constexpr float kHeight = 30.0f;
 
     void setAnimations(const AnimSet* set) { anim_.setSet(set); }
-    void applyCharacter(const Character& c);
+    // Explorer's rolled stats combined with gear, abilities and buffs.
+    void applyStats(const Character& c, const Modifiers& m);
     void placeAt(Vec2 feet);  // feet = bottom-center
     void update(float dt, const Input& input, const Tilemap& map);
     void render(SDL_Renderer* renderer, Vec2 camera, float alpha, bool debug) const;
@@ -59,6 +61,7 @@ public:
     float health = 100.0f;
     float maxHealth = 100.0f;
     float invulnerable = 0.0f;
+    bool nonSlip = false;  // grip on slippery ground
 
 private:
     void chooseAnimation();

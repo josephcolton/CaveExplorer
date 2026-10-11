@@ -6,6 +6,7 @@ if you reuse them.
 
 | File | Track | Artist | License | Used for | Download |
 |------|-------|--------|---------|----------|----------|
+| `beach.ogg` | Beach Town Guitar Theme | HitCtrl | CC-BY 3.0 | The Beach | [Beach Town Guitar Theme](https://opengameart.org/content/beach-town-guitar-theme) |
 | `forest.ogg` | Approaching The Green Grass | Ove Melaa | CC-BY 3.0 | The Forest | [Ove's Essential Game Audio Pack](https://opengameart.org/content/oves-essential-game-audio-pack-collection-160-files-updated) |
 | `underground_city.mp3` | Hero Within | Ove Melaa | CC-BY 3.0 | Underground city (planned) | [Ove's Essential Game Audio Pack](https://opengameart.org/content/oves-essential-game-audio-pack-collection-160-files-updated) |
 | `boss_1.ogg` | Gloomey | Ove Melaa | CC-BY 3.0 | First boss arena (planned) | [Ove's Essential Game Audio Pack](https://opengameart.org/content/oves-essential-game-audio-pack-collection-160-files-updated) |
@@ -18,6 +19,8 @@ Ove Melaa asks for this form of credit:
 
 > Approaching The Green Grass, Hero Within, Gloomey, Infection By Chewing —
 > written and produced by Ove Melaa (omsoftware@hotmail.com), -2013 Ove Melaa
+
+Beach Town Guitar Theme by HitCtrl (CC-BY 3.0).
 
 Cave Theme by Brandon Morris is CC0, so credit isn't required. We give it anyway.
 

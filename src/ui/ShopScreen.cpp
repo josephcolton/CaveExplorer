@@ -105,7 +105,12 @@ void ShopScreen::render(SDL_Renderer* r) const {
                                             : (def.sellable ? "Sell for " + std::to_string(def.sellPrice()) : "Not for sale");
         ui::text(r, kInfoPanel.x + kInfoPanel.w - 12 - ui::textWidth(price), kInfoPanel.y + 10, price, ui::kGold);
         const auto lines = ui::wrap(def.description, 72);
-        if (!lines.empty()) ui::text(r, kInfoPanel.x + 12, kInfoPanel.y + 24, lines[0]);
+        auto effects = def.equipped.describe();
+        const auto carried = def.carried.describe();
+        effects.insert(effects.end(), carried.begin(), carried.end());
+        std::string line = lines.empty() ? "" : lines[0];
+        for (const std::string& e : effects) line += (line.empty() ? "" : "  ") + std::string("[") + e + "]";
+        ui::text(r, kInfoPanel.x + 12, kInfoPanel.y + 24, line.substr(0, 74));
     }
     ui::text(r, kInfoPanel.x + 12, kInfoPanel.y + 42, message_, messageBad_ ? ui::kBad : ui::kGood);
     ui::text(r, kInfoPanel.x + 12, kInfoPanel.y + 60, "Enter: buy / sell one   Esc: leave", ui::kDim);

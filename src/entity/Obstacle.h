@@ -22,6 +22,9 @@ struct ObstacleDef {
     std::string verb = "Clear";
     std::string cleared;
     SDL_Color debris{140, 140, 140, 255};
+    // Pushing through from the far side (so obstacles never trap you).
+    float pushDamage = 0.0f;
+    std::string pushMessage;
 
     static ObstacleDef fromJson(const std::string& id, const nlohmann::json& j);
 };
@@ -34,6 +37,8 @@ struct Obstacle {
     int lastAttackId = -1;
     float shake = 0.0f;
     bool cleared = false;
+    int passableFrom = 0;    // -1: can be pushed through from the left, +1 from the right, 0: never
+    float pushTime = 0.0f;   // how long the explorer has been pushing against it
 
     Rect rect() const;
     void block(Tilemap& map, bool blocked) const;

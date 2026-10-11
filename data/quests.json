@@ -1,0 +1,36 @@
+{
+ "_comment": "objective.type: kill (target = enemy id) or fetch (target = item id, taken on turn-in). reward: item/count, coins, ability (from abilities.json). Text may use {n} and {count}.",
+ "quests": {
+  "rat_problem": {
+   "title": "Rat Problem",
+   "intro": "Rats! They chew through my rope and my rations. Thin them out for me - three should teach the rest a lesson.",
+   "accepted": "Good. They skulk about in the big chamber below.",
+   "progress": "Rats dealt with: {n} of {count}.",
+   "complete": "Ha! That'll teach 'em. Here - my spare boots. They grip the slick moss down in the Hollow.",
+   "objective": {
+    "type": "kill",
+    "target": "rat",
+    "count": 3
+   },
+   "reward": {
+    "item": "nonslip_boots",
+    "coins": 10
+   }
+  },
+  "old_bones": {
+   "title": "Old Bones",
+   "intro": "I collect old bones. Don't ask why. Bring me three and I'll teach you a miner's trick for lasting longer down there.",
+   "accepted": "Rats drag them about. Have a look.",
+   "progress": "Bones brought: {n} of {count}.",
+   "complete": "Lovely. Now breathe deep, like this... hold it... There. You'll last longer down there.",
+   "objective": {
+    "type": "fetch",
+    "target": "bone",
+    "count": 3
+   },
+   "reward": {
+    "ability": "miners_grit"
+   }
+  }
+ }
+}

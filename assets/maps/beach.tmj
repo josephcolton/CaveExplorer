@@ -21,7 +21,7 @@
   {
    "name": "music",
    "type": "string",
-   "value": ""
+   "value": "beach.ogg"
   }
  ],
  "tilesets": [
@@ -186,6 +186,26 @@
        "name": "collision",
        "type": "string",
        "value": "solid"
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "properties": [
+      {
+       "name": "char",
+       "type": "string",
+       "value": "m"
+      },
+      {
+       "name": "collision",
+       "type": "string",
+       "value": "solid"
+      },
+      {
+       "name": "surface",
+       "type": "string",
+       "value": "slippery"
       }
      ]
     }

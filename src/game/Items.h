@@ -1,5 +1,7 @@
 #pragma once
 
+#include "game/Modifiers.h"
+
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -30,6 +32,8 @@ struct ItemDef {
     float food = 0.0f;
     float heal = 0.0f;
     std::vector<std::string> tags;  // e.g. "cut" (clears bushes), "break" (breaks rocks)
+    Modifiers carried;   // applies while the item is anywhere on the explorer
+    Modifiers equipped;  // applies only while worn or held in an equipment slot
 
     bool hasTag(const std::string& tag) const;
     bool isRanged() const { return !ammo.empty(); }

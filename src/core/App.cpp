@@ -55,6 +55,7 @@ void App::shutdown() {
 
 void App::applySettings() {
     audio_.setMusicVolume(static_cast<float>(settings_.musicVolume) / 10.0f);
+    if (settings_.bindings.is_object()) input_.bindingsFromJson(settings_.bindings);
     if (window_) SDL_SetWindowFullscreen(window_, settings_.fullscreen);
 }
 

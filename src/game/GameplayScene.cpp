@@ -22,7 +22,7 @@ constexpr const char* kStartArea = "beach";
 constexpr const char* kStartSpawn = "start";
 constexpr float T = static_cast<float>(Tilemap::kTileSize);
 
-enum PauseItem { Resume, SaveItem, SettingsItem, CreditsItem, AboutItem, QuitToTitle, ExitGame };
+enum PauseItem { Resume, RestartItem, SaveItem, SettingsItem, CreditsItem, AboutItem, QuitToTitle, ExitGame };
 
 float difficultyDamageScale(Difficulty d) {
     return d == Difficulty::Easy ? 0.7f : d == Difficulty::Hard ? 1.35f : 1.0f;
@@ -37,7 +37,7 @@ float difficultyHealthScale(Difficulty d) {
 GameplayScene::GameplayScene(App& app, int slot, bool newGame)
     : Scene(app), data_(app.data()), slot_(slot), rng_(std::random_device{}()) {
     player_.setAnimations(data_.anims.find("knight"));
-    pauseMenu_.setItems({"Resume", "Save game", "Settings", "Credits", "About", "Save & quit to title",
+    pauseMenu_.setItems({"Resume", "Restart area", "Save game", "Settings", "Credits", "About", "Save & quit to title",
                          "Save & exit game"});
 
     SaveGame save;
@@ -46,9 +46,11 @@ GameplayScene::GameplayScene(App& app, int slot, bool newGame)
         character_ = save.character;
         inventory_ = save.inventory;
         takenPickups_ = save.takenPickups;
+        abilities_ = save.abilities;
+        quests_ = save.quests;
         playSeconds_ = save.playSeconds;
-        player_.applyCharacter(character_);
-        enterArea(save.area, kStartSpawn);
+        refreshStats();
+        enterArea(save.area, save.entrySpawn);
         player_.health = std::clamp(save.health, 1.0f, player_.maxHealth);
         if (save.hasPosition) {
             player_.placeAt({save.x, save.y});
@@ -70,10 +72,17 @@ GameplayScene::GameplayScene(App& app, int slot, bool newGame)
                 SDL_Log("--give: unknown item '%s'", id.c_str());
                 continue;
             }
-            // Weapons go straight into empty hands (melee right, ranged left) for quick testing.
-            const std::size_t hand = def->isRanged() ? Inventory::LeftHand : Inventory::RightHand;
-            if (def->slot == EquipSlot::Hand && inventory_.equipment.at(hand).empty()) {
-                inventory_.equipment.at(hand) = {id, 1};
+            // Gear goes straight into its empty equipment slot (melee right hand, ranged left).
+            std::size_t slot = Inventory::EquipCount;
+            switch (def->slot) {
+            case EquipSlot::Hand: slot = def->isRanged() ? Inventory::LeftHand : Inventory::RightHand; break;
+            case EquipSlot::Feet: slot = Inventory::Feet; break;
+            case EquipSlot::Body: slot = Inventory::Body; break;
+            case EquipSlot::Head: slot = Inventory::Head; break;
+            default: break;
+            }
+            if (slot != Inventory::EquipCount && inventory_.equipment.at(slot).empty()) {
+                inventory_.equipment.at(slot) = {id, 1};
             } else {
                 inventory_.add(data_.items, id, def->maxStack > 1 ? def->maxStack : 1);
             }
@@ -104,7 +113,10 @@ void GameplayScene::newExplorer() {
     inventory_ = Inventory();
     inventory_.coins = character_.startingCoins;
     takenPickups_.clear();  // freebies return for the new explorer
-    player_.applyCharacter(character_);
+    abilities_.clear();     // abilities and quest progress die with the explorer
+    quests_.clear();
+    player_.health = 1.0f;  // refreshStats clamps; set full health after
+    refreshStats();
     player_.health = player_.maxHealth;
 }
 
@@ -115,9 +127,12 @@ void GameplayScene::saveGame() {
     s.character = character_;
     s.inventory = inventory_;
     s.takenPickups = takenPickups_;
+    s.abilities = abilities_;
+    s.quests = quests_;
     s.health = player_.dead() ? player_.maxHealth : player_.health;
     s.area = area_.id;
     s.areaName = area_.displayName;
+    s.entrySpawn = entrySpawn_;
     s.x = player_.box.center().x;
     s.y = player_.box.bottom();
     s.hasPosition = !player_.dead();
@@ -175,6 +190,15 @@ void GameplayScene::enterArea(const std::string& areaId, const std::string& spaw
     }
     const MapObject* sp = area_.findObject("spawn", spawn);
     if (!sp) sp = area_.findObject("spawn", kStartSpawn);
+    if (!sp) {  // fall back to the first spawn point in the area
+        for (const MapObject& o : area_.objects) {
+            if (o.type == "spawn") {
+                sp = &o;
+                break;
+            }
+        }
+    }
+    entrySpawn_ = sp ? sp->name : spawn;
     int tileX = 0, tileY = 0;
     if (std::sscanf(spawn.c_str(), "%d,%d", &tileX, &tileY) == 2) {
         // Debug: "--spawn tx,ty" stands the player on top of tile row ty in column tx.
@@ -234,6 +258,8 @@ void GameplayScene::spawnAreaObjects() {
             ob.tw = std::max(1, static_cast<int>(std::round(o.rect.w / T)));
             ob.th = std::max(1, static_cast<int>(std::round(o.rect.h / T)));
             ob.hitsLeft = ob.def->hits;
+            const std::string side = o.getString("passable_from");
+            ob.passableFrom = side == "left" ? -1 : side == "right" ? 1 : 0;
             ob.block(area_.map, true);
             obstacles_.push_back(ob);
         } else if (o.type == "enemy") {
@@ -302,6 +328,9 @@ void GameplayScene::update(float dt) {
     case Mode::Text:
         if (!textScreen_.update(in)) mode_ = textReturnMode_;
         return;
+    case Mode::Dialogue:
+        updateDialogue();
+        return;
     case Mode::Dead:
         deathTimer_ -= dt;
         player_.update(dt, in, area_.map);
@@ -319,6 +348,7 @@ void GameplayScene::update(float dt) {
 void GameplayScene::updatePlay(float dt) {
     if (fadeDirection_ == 1) return;  // freeze while the screen goes dark
     playSeconds_ += dt;
+    refreshStats();  // gear can change at any time (pickups, menus)
     bannerTimer_ = std::max(0.0f, bannerTimer_ - dt);
 
     const Input& in = app_.input();
@@ -334,6 +364,12 @@ void GameplayScene::updatePlay(float dt) {
     updateEnemies(dt);
     updatePickups(dt);
     for (Obstacle& ob : obstacles_) ob.update(dt);
+    updateObstaclePushing(dt);
+    // Safety net: falling out of the level puts you back at the entrance, a little bruised.
+    if (player_.box.top() > area_.map.pixelHeight() + 64.0f && fadeDirection_ == 0) {
+        player_.hurt(10.0f, player_.box.center().x);
+        restartArea("You climb back up to the entrance.");
+    }
     for (Particle& p : particles_) {
         p.vel.y += 600.0f * dt;
         p.pos += p.vel * dt;
@@ -384,7 +420,7 @@ void GameplayScene::updateAttacks() {
             inventory_.backpack.takeFrom(ammoSlot, 1);
             Projectile p;
             p.icon = data_.items.get(def->ammo).icon;
-            p.damage = static_cast<float>(def->damage) * character_.strength;
+            p.damage = static_cast<float>(def->damage) * character_.strength * currentModifiers().damage;
             p.attackId = nextProjectileId_++;
             const float f = static_cast<float>(player_.facing);
             p.launch(player_.box.center() + Vec2{f * 10.0f, -6.0f}, {f * def->projectileSpeed, -140.0f});
@@ -392,7 +428,9 @@ void GameplayScene::updateAttacks() {
             player_.startAttack(0.0f, 0.0f, def->cooldown);
         } else if (def && def->isMelee()) {
             swingItem_ = held.id;
-            player_.startAttack(def->reach, static_cast<float>(def->damage) * character_.strength, def->cooldown);
+            player_.startAttack(def->reach,
+                                static_cast<float>(def->damage) * character_.strength * currentModifiers().damage,
+                                def->cooldown);
         } else {
             // Bare hands (or a lantern/shield/food): a weak shove.
             swingItem_ = held.empty() ? "" : held.id;
@@ -422,7 +460,7 @@ void GameplayScene::hitObstacles() {
         if (!tool || !tool->hasTag(ob.def->requiredTag)) {
             burst(contact, {200, 200, 200, 255}, 3);
             if (messageCooldown_ <= 0.0f) {
-                toast(ob.def->hint);
+                toast(obstacleHint(ob));
                 messageCooldown_ = 2.0f;
             }
             continue;
@@ -472,7 +510,7 @@ void GameplayScene::updateProjectiles(float dt) {
 }
 
 void GameplayScene::updateEnemies(float dt) {
-    const float damageScale = difficultyDamageScale(app_.settings().difficulty);
+    const float damageScale = difficultyDamageScale(app_.settings().difficulty) * currentModifiers().defense;
     for (Enemy& e : enemies_) {
         e.update(dt, area_.map, player_.box, !player_.dead());
         if (!e.dead && e.touchCooldown <= 0.0f && e.box.overlaps(player_.box) && mode_ == Mode::Play) {
@@ -483,6 +521,12 @@ void GameplayScene::updateEnemies(float dt) {
         }
         if (e.dead) {
             if (app_.debugDraw) SDL_Log("killed %s", e.def->name.c_str());
+            for (const std::string& id : quests_.onKill(e.def->id, data_.quests)) {
+                const QuestDef& q = data_.quests.at(id);
+                const int n = quests_.progress(q, inventory_);
+                toast(q.title + ": " + std::to_string(n) + "/" + std::to_string(q.count) +
+                      (n >= q.count ? " - done! Go back and tell them." : ""));
+            }
             spawnDrops(e);
         }
     }
@@ -548,8 +592,18 @@ GameplayScene::Interactable GameplayScene::findInteractable() const {
         }
     }
     for (const MapObject& o : area_.objects) {
-        if (!o.rect.overlaps(player_.box)) continue;
         using K = Interactable::Kind;
+        if (o.type == "npc") {
+            // NPCs are point objects at their feet.
+            const Rect talk{o.rect.x - 18.0f, o.rect.y - 40.0f, 36.0f, 40.0f};
+            if (talk.overlaps(player_.box) && data_.npcs.count(o.getString("npc_id"))) {
+                found.kind = K::Npc;
+                found.object = &o;
+                return found;
+            }
+            continue;
+        }
+        if (!o.rect.overlaps(player_.box)) continue;
         if (o.type == "chest") found.kind = K::Chest;
         else if (o.type == "shop") found.kind = K::Shop;
         else if (o.type == "door") found.kind = o.getString("trigger", "interact") == "touch" ? K::TouchDoor : K::Door;
@@ -581,15 +635,221 @@ void GameplayScene::handleInteraction() {
     case K::Corpse:
         if (pressed) openCorpse(it.corpse);
         break;
+    case K::Npc:
+        if (pressed) talkTo(data_.npcs.at(it.object->getString("npc_id")));
+        break;
     case K::None:
         break;
     }
 }
 
+// ============================================================================ people & quests
+
+Modifiers GameplayScene::currentModifiers() const {
+    Modifiers m = gearModifiers(inventory_, data_.items);
+    for (const std::string& id : abilities_) {
+        if (auto it = data_.abilities.find(id); it != data_.abilities.end()) m.combine(it->second.modifiers);
+    }
+    return m;
+}
+
+void GameplayScene::refreshStats() { player_.applyStats(character_, currentModifiers()); }
+
+std::vector<std::string> GameplayScene::statsSummary() const {
+    const Modifiers m = currentModifiers();
+    char buf[96];
+    std::vector<std::string> out;
+    out.push_back(character_.name + "  (explorer #" + std::to_string(character_.number) + ")");
+    std::snprintf(buf, sizeof buf, "Health %d / %d", static_cast<int>(std::ceil(player_.health)),
+                  static_cast<int>(player_.maxHealth));
+    out.emplace_back(buf);
+    std::snprintf(buf, sizeof buf, "Strength %.2f   Speed %.2f   Jump %.2f", character_.strength * m.damage,
+                  character_.speed * m.runSpeed, character_.jump * m.jump);
+    out.emplace_back(buf);
+    if (m.defense != 1.0f) {
+        std::snprintf(buf, sizeof buf, "Damage taken %d%%", static_cast<int>(std::lround(m.defense * 100.0f)));
+        out.emplace_back(buf);
+    }
+    std::vector<std::string> effects;
+    for (const std::string& id : abilities_) {
+        if (auto it = data_.abilities.find(id); it != data_.abilities.end()) effects.push_back(it->second.name);
+    }
+    for (const std::string& e : m.describe()) effects.push_back(e);
+    if (!effects.empty()) {
+        out.emplace_back("");
+        out.emplace_back("Active effects:");
+        for (const std::string& e : effects) out.push_back("  " + e);
+    }
+    return out;
+}
+
+const QuestDef* GameplayScene::nextQuestFor(const NpcDef& npc) const {
+    for (const std::string& id : npc.quests) {
+        auto it = data_.quests.find(id);
+        if (it == data_.quests.end()) continue;
+        if (quests_.status(id) != QuestState::Status::Done) return &it->second;
+    }
+    return nullptr;
+}
+
+void GameplayScene::talkTo(const NpcDef& npc) {
+    talkingTo_ = &npc;
+    dialogue_.open(data_.sprites, npc.name, npc.icon);
+    showDialogueRoot(npc.greeting);
+    mode_ = Mode::Dialogue;
+}
+
+void GameplayScene::showDialogueRoot(const std::string& text) {
+    using K = DialogueChoice::Kind;
+    choices_.clear();
+    std::vector<std::string> labels;
+    if (!talkingTo_->shop.empty()) {
+        choices_.push_back({K::Trade, ""});
+        labels.emplace_back("Let's trade.");
+    }
+    if (const QuestDef* q = nextQuestFor(*talkingTo_)) {
+        const auto status = quests_.status(q->id);
+        if (status == QuestState::Status::NotStarted) {
+            choices_.push_back({K::AskWork, q->id});
+            labels.emplace_back("Need a hand with anything?");
+        } else if (quests_.ready(*q, inventory_)) {
+            choices_.push_back({K::TurnIn, q->id});
+            labels.push_back("About \"" + q->title + "\" - it's done.");
+        } else {
+            choices_.push_back({K::Report, q->id});
+            labels.push_back("About \"" + q->title + "\"...");
+        }
+    }
+    choices_.push_back({K::Goodbye, ""});
+    labels.emplace_back("Goodbye.");
+    dialogue_.say(text, labels);
+}
+
+void GameplayScene::updateDialogue() {
+    using K = DialogueChoice::Kind;
+    const int pick = dialogue_.update(app_.input());
+    if (pick == Menu::kNone) return;
+    if (pick == Menu::kCancelled || pick >= static_cast<int>(choices_.size())) {
+        mode_ = Mode::Play;
+        return;
+    }
+    const DialogueChoice choice = choices_[static_cast<std::size_t>(pick)];
+    const QuestDef* q = choice.quest.empty() ? nullptr : &data_.quests.at(choice.quest);
+    switch (choice.kind) {
+    case K::Trade:
+        openShop(talkingTo_->shop);
+        break;
+    case K::AskWork:
+        choices_ = {{K::Accept, q->id}, {K::Decline, q->id}};
+        dialogue_.say(q->intro, {"I'll do it.", "Not right now."});
+        break;
+    case K::Accept:
+        quests_.start(q->id);
+        toast("New task: " + q->title);
+        showDialogueRoot(q->accepted);
+        break;
+    case K::Decline:
+        showDialogueRoot("Suit yourself.");
+        break;
+    case K::Report:
+        showDialogueRoot(fillQuestText(q->progress, quests_.progress(*q, inventory_), q->count));
+        break;
+    case K::TurnIn: {
+        QuestLog::Reward reward;
+        if (!quests_.turnIn(*q, inventory_, data_.items, reward)) break;
+        std::string text = q->complete;
+        if (!reward.item.empty()) {
+            text += "  [Received " + data_.items.get(reward.item).name + "]";
+            if (reward.itemsThatDidNotFit > 0) {
+                ItemStack extra{reward.item, reward.itemsThatDidNotFit};
+                dropStack(extra);
+                text += " (your pack was full - it's on the ground)";
+            }
+        }
+        if (reward.coins > 0) text += "  [+" + std::to_string(reward.coins) + " coins]";
+        if (!reward.ability.empty()) {
+            abilities_.push_back(reward.ability);
+            auto it = data_.abilities.find(reward.ability);
+            if (it != data_.abilities.end()) text += "  [Learned " + it->second.name + "]";
+        }
+        refreshStats();
+        toast("Task complete: " + q->title);
+        showDialogueRoot(text);
+        saveGame();
+        break;
+    }
+    case K::Goodbye:
+        mode_ = Mode::Play;
+        break;
+    }
+}
+
+void GameplayScene::restartArea(const std::string& reason) {
+    // Reload the area as if walking back in through the doorway we used. Health, items and
+    // quests are untouched; freebies already taken stay taken.
+    toast(reason);
+    requestTransition(area_.id, entrySpawn_);
+}
+
+void GameplayScene::updateObstaclePushing(float dt) {
+    const Input& in = app_.input();
+    for (Obstacle& ob : obstacles_) {
+        if (ob.cleared || ob.passableFrom == 0) continue;
+        const Rect r = ob.rect();
+        // Standing right against the obstacle on its passable side and pushing toward it.
+        const bool fromRight = ob.passableFrom > 0 && std::fabs(player_.box.left() - r.right()) < 1.5f &&
+                               in.down(Action::Left);
+        const bool fromLeft = ob.passableFrom < 0 && std::fabs(player_.box.right() - r.left()) < 1.5f &&
+                              in.down(Action::Right);
+        const bool overlapsY = player_.box.bottom() > r.top() && player_.box.top() < r.bottom();
+        if ((fromRight || fromLeft) && overlapsY) {
+            ob.pushTime += dt;
+            ob.shake = std::max(ob.shake, 0.1f);
+            if (ob.pushTime >= 0.5f) {
+                ob.cleared = true;
+                ob.block(area_.map, false);
+                burst(r.center(), ob.def->debris, 14);
+                if (ob.def->pushDamage > 0.0f) {
+                    // A scratch, not a hit: no knockback (it could throw you back the way you came).
+                    player_.health = std::max(1.0f, player_.health - ob.def->pushDamage);
+                    player_.invulnerable = 0.4f;
+                    regenDelay_ = kRegenDelay;
+                }
+                toast(ob.def->pushMessage);
+            }
+        } else {
+            ob.pushTime = 0.0f;
+        }
+    }
+}
+
+std::string GameplayScene::obstacleHint(const Obstacle& ob) const {
+    // Name the exact problem: the right tool in the other hand, in the pack, or not at all.
+    const Input& in = app_.input();
+    const std::pair<std::size_t, Action> hands[] = {{Inventory::RightHand, Action::UseRight},
+                                                    {Inventory::LeftHand, Action::UseLeft}};
+    for (const auto& [slot, action] : hands) {
+        const ItemStack& held = inventory_.equipment.at(slot);
+        if (!held.empty() && data_.items.get(held.id).hasTag(ob.def->requiredTag)) {
+            return "Your " + data_.items.get(held.id).name + " is in your " +
+                   (slot == Inventory::RightHand ? "right" : "left") + " hand - press " + in.keyName(action) + ".";
+        }
+    }
+    for (std::size_t i = 0; i < inventory_.backpack.size(); ++i) {
+        const ItemStack& s = inventory_.backpack.at(i);
+        if (!s.empty() && data_.items.get(s.id).hasTag(ob.def->requiredTag)) {
+            return "Hold the " + data_.items.get(s.id).name + " in a hand to use it (" + in.keyName(Action::Inventory) +
+                   ": inventory).";
+        }
+    }
+    return ob.def->hint;
+}
+
 // ============================================================================ menus
 
 void GameplayScene::openPause() {
-    pauseMenu_.setItems({"Resume", slot_ == kDevSlot ? "Save game (dev game: off)" : "Save game", "Settings", "Credits",
+    pauseMenu_.setItems({"Resume", "Restart area (back to the entrance)",
+                         slot_ == kDevSlot ? "Save game (dev game: off)" : "Save game", "Settings", "Credits",
                          "About", "Save & quit to title", "Save & exit game"});
     pauseMessage_.clear();
     mode_ = Mode::Pause;
@@ -620,6 +880,10 @@ void GameplayScene::updatePause() {
         textReturnMode_ = Mode::Pause;
         mode_ = Mode::Text;
         break;
+    case RestartItem:
+        mode_ = Mode::Play;
+        restartArea("You retrace your steps to the entrance.");
+        break;
     case QuitToTitle:
         // Saving happens in the destructor when the scene is replaced.
         app_.setScene(std::make_unique<TitleScene>(app_));
@@ -635,6 +899,11 @@ void GameplayScene::updatePause() {
 void GameplayScene::openInventory(Container* chest, const std::string& title) {
     chestOpen_ = chest != nullptr;
     inventoryScreen_.open(data_.items, data_.sprites, inventory_, chest, title);
+    inventoryScreen_.setSummaryProvider([this] { return statsSummary(); });
+    const Input& in = app_.input();
+    inventoryScreen_.setKeyHints("Enter: move   " + in.keyName(Action::Interact) + ": use   " +
+                                     in.keyName(Action::Drop) + ": drop   " + in.keyName(Action::Inventory) + ": close",
+                                 "Enter: place here   Esc: cancel");
     mode_ = Mode::Inventory;
 }
 
@@ -710,6 +979,31 @@ void GameplayScene::renderWorldObjects(SDL_Renderer* r, Vec2 cam, bool foregroun
         std::string sprite;
         if (o.type == "decor") sprite = o.getString("sprite");
         else if (o.type == "chest") sprite = "chest";
+        if (o.type == "door" && !foreground && o.getString("trigger", "interact") != "touch") {
+            // Make doorways easy to spot: optional light spilling through, and a bobbing arrow.
+            const std::string glow = o.getString("glow");
+            if (glow.size() == 7) {
+                const unsigned long c = std::stoul(glow.substr(1), nullptr, 16);
+                const auto cr = static_cast<Uint8>(c >> 16), cg = static_cast<Uint8>(c >> 8), cb = static_cast<Uint8>(c);
+                for (int i = 0; i < 6; ++i) {
+                    const float inset = static_cast<float>(i) * 3.0f;
+                    const SDL_FRect g{o.rect.x + inset - cam.x, o.rect.y + inset - cam.y, o.rect.w - inset * 2, o.rect.h - inset};
+                    SDL_SetRenderDrawColor(r, cr, cg, cb, 28);
+                    SDL_RenderFillRect(r, &g);
+                }
+            }
+            const float bob = std::sin(static_cast<float>(SDL_GetTicks()) * 0.006f) * 3.0f;
+            ui::textCentered(r, o.rect.x + o.rect.w * 0.5f - cam.x, o.rect.y - 14.0f + bob - cam.y, "^", ui::kGold);
+            continue;
+        }
+        if (o.type == "npc" && !foreground) {
+            auto it = data_.npcs.find(o.getString("npc_id"));
+            if (it == data_.npcs.end()) continue;
+            // Face the explorer.
+            const bool flip = player_.box.center().x < o.rect.x;
+            data_.sprites.drawIcon(r, it->second.icon, o.rect.x - 16.0f - cam.x, o.rect.y - 32.0f - cam.y, 32.0f, flip);
+            continue;
+        }
         if (sprite.empty() || o.getBool("foreground") != foreground) continue;
         // Sprites sit on the bottom-left corner of their object.
         const SDL_FPoint size = data_.sprites.size(sprite);
@@ -752,6 +1046,17 @@ void GameplayScene::renderHud(SDL_Renderer* r) const {
     data_.sprites.drawIcon(r, "coins", 86, 20, 24);
     ui::text(r, 112, 30, std::to_string(inventory_.coins), ui::kGold);
     ui::text(r, App::kViewWidth - 8 - ui::textWidth(character_.name), 8, character_.name, ui::kDim);
+    // Active tasks under the name.
+    float qy = 22.0f;
+    for (const std::string& id : quests_.active()) {
+        auto it = data_.quests.find(id);
+        if (it == data_.quests.end()) continue;
+        const QuestDef& q = it->second;
+        const int n = quests_.progress(q, inventory_);
+        const std::string line = q.title + "  " + std::to_string(n) + "/" + std::to_string(q.count);
+        ui::text(r, App::kViewWidth - 8 - ui::textWidth(line), qy, line, n >= q.count ? ui::kGood : ui::kText);
+        qy += 12.0f;
+    }
 
     float y = App::kViewHeight - 16.0f;
     for (auto it = toasts_.rbegin(); it != toasts_.rend(); ++it) {
@@ -804,20 +1109,23 @@ void GameplayScene::render(SDL_Renderer* renderer, float alpha) {
         const Interactable it = findInteractable();
         std::string prompt;
         using K = Interactable::Kind;
-        if (it.kind == K::Chest) prompt = "[E] Open chest";
-        else if (it.kind == K::Shop) prompt = "[E] Shop";
-        else if (it.kind == K::Door) prompt = "[Up] Enter";
-        else if (it.kind == K::Corpse) prompt = "[E] Search " + world_.corpses[static_cast<std::size_t>(it.corpse)].explorer;
+        const Input& keys = app_.input();
+        const std::string use = "[" + keys.keyName(Action::Interact) + "] ";
+        if (it.kind == K::Chest) prompt = use + "Open chest";
+        else if (it.kind == K::Shop) prompt = use + "Shop";
+        else if (it.kind == K::Door) prompt = "[" + keys.keyName(Action::Up) + "] " + it.object->getString("label", "Enter");
+        else if (it.kind == K::Corpse) prompt = use + "Search " + world_.corpses[static_cast<std::size_t>(it.corpse)].explorer;
+        else if (it.kind == K::Npc) prompt = use + "Talk to " + data_.npcs.at(it.object->getString("npc_id")).name;
         if (prompt.empty()) {
             if (const Obstacle* ob = obstacleNearPlayer()) {
                 // Suggest the hand holding a suitable tool, or just name the obstacle.
                 prompt = ob->def->name;
-                const std::pair<std::size_t, const char*> hands[] = {{Inventory::RightHand, "[J] "},
-                                                                     {Inventory::LeftHand, "[K] "}};
-                for (const auto& [slot, key] : hands) {
+                const std::pair<std::size_t, Action> hands[] = {{Inventory::RightHand, Action::UseRight},
+                                                                {Inventory::LeftHand, Action::UseLeft}};
+                for (const auto& [slot, action] : hands) {
                     const ItemStack& held = inventory_.equipment.at(slot);
                     if (!held.empty() && data_.items.get(held.id).hasTag(ob->def->requiredTag)) {
-                        prompt = key + ob->def->verb + " the " + ob->def->name;
+                        prompt = "[" + keys.keyName(action) + "] " + ob->def->verb + " the " + ob->def->name;
                         break;
                     }
                 }
@@ -881,6 +1189,7 @@ void GameplayScene::render(SDL_Renderer* renderer, float alpha) {
     }
     case Mode::Settings: settingsScreen_.render(renderer); break;
     case Mode::Text: textScreen_.render(renderer); break;
+    case Mode::Dialogue: dialogue_.render(renderer); break;
     default: break;
     }
 

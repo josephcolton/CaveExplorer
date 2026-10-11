@@ -8,7 +8,10 @@
 #include "entity/Projectile.h"
 #include "game/Character.h"
 #include "game/Inventory.h"
+#include "game/Modifiers.h"
+#include "game/Quests.h"
 #include "game/WorldSave.h"
+#include "ui/DialogueScreen.h"
 #include "ui/InventoryScreen.h"
 #include "ui/Menus.h"
 #include "ui/ShopScreen.h"
@@ -21,6 +24,7 @@
 #include <vector>
 
 struct GameData;
+struct NpcDef;
 
 class GameplayScene : public Scene {
 public:
@@ -34,10 +38,10 @@ public:
     void render(SDL_Renderer* renderer, float alpha) override;
 
 private:
-    enum class Mode { Play, Inventory, Shop, Pause, Settings, Text, Dead };
+    enum class Mode { Play, Inventory, Shop, Pause, Settings, Text, Dialogue, Dead };
 
     struct Interactable {
-        enum class Kind { None, Door, TouchDoor, Chest, Shop, Corpse } kind = Kind::None;
+        enum class Kind { None, Door, TouchDoor, Chest, Shop, Corpse, Npc } kind = Kind::None;
         const MapObject* object = nullptr;
         int corpse = -1;
     };
@@ -69,6 +73,17 @@ private:
 
     // --- menus
     void updatePause();
+    void restartArea(const std::string& reason);
+    void updateObstaclePushing(float dt);
+    std::string obstacleHint(const Obstacle& ob) const;
+    void talkTo(const NpcDef& npc);
+    void showDialogueRoot(const std::string& text);
+    void updateDialogue();
+    const QuestDef* nextQuestFor(const NpcDef& npc) const;
+    // Gear + lasting abilities.
+    Modifiers currentModifiers() const;
+    void refreshStats();
+    std::vector<std::string> statsSummary() const;
     void openPause();
     void openInventory(Container* chest, const std::string& title = "Storage Chest");
     void openCorpse(int index);
@@ -91,6 +106,8 @@ private:
     Character character_;
     Inventory inventory_;
     std::set<std::string> takenPickups_;  // this explorer's collected freebies
+    std::vector<std::string> abilities_;   // lasting abilities until death
+    QuestLog quests_;
     double playSeconds_ = 0.0;
 
     // Current area
@@ -119,6 +136,13 @@ private:
     Menu pauseMenu_;
     SettingsScreen settingsScreen_;
     TextScreen textScreen_;
+    DialogueScreen dialogue_;
+    const NpcDef* talkingTo_ = nullptr;
+    struct DialogueChoice {
+        enum class Kind { Trade, AskWork, Accept, Decline, Report, TurnIn, Goodbye } kind;
+        std::string quest;
+    };
+    std::vector<DialogueChoice> choices_;
     std::string pauseMessage_;
     bool chestOpen_ = false;
     int openCorpse_ = -1;
@@ -135,6 +159,7 @@ private:
     float deathTimer_ = 0.0f;
     float regenDelay_ = 0.0f;
 
+    std::string entrySpawn_ = "start";  // how we entered the current area
     std::string pendingArea_;
     std::string pendingSpawn_;
     float fade_ = 1.0f;        // 0 = clear, 1 = black

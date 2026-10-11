@@ -188,6 +188,26 @@
        "value": "solid"
       }
      ]
+    },
+    {
+     "id": 12,
+     "properties": [
+      {
+       "name": "char",
+       "type": "string",
+       "value": "m"
+      },
+      {
+       "name": "collision",
+       "type": "string",
+       "value": "solid"
+      },
+      {
+       "name": "surface",
+       "type": "string",
+       "value": "slippery"
+      }
+     ]
     }
    ]
   }
@@ -1837,6 +1857,11 @@
        "name": "trigger",
        "type": "string",
        "value": "interact"
+      },
+      {
+       "name": "label",
+       "type": "string",
+       "value": "Enter the cave"
       }
      ]
     }

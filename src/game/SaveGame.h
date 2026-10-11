@@ -2,11 +2,13 @@
 
 #include "game/Character.h"
 #include "game/Inventory.h"
+#include "game/Quests.h"
 #include "game/WorldSave.h"
 
 #include <nlohmann/json.hpp>
 
 #include <set>
+#include <vector>
 #include <string>
 
 // The complete contents of one save slot: the persistent world plus the
@@ -21,9 +23,13 @@ struct SaveGame {
     // Placed coins/items ("area#objectId") this explorer already took. They stay gone until a
     // new explorer arrives, so walking back and forth can't farm them.
     std::set<std::string> takenPickups;
+    std::vector<std::string> abilities;  // lasting abilities (until death)
+    QuestLog quests;                     // this explorer's quests
+
     float health = 100.0f;
     std::string area = "beach";
     std::string areaName = "The Beach";
+    std::string entrySpawn = "start";  // the spawn point you entered this area by
     float x = 0.0f;  // feet position in the area; ignored if !hasPosition
     float y = 0.0f;
     bool hasPosition = false;

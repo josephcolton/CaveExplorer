@@ -1,0 +1,12 @@
+{
+ "_comment": "Lasting abilities (until the explorer dies), granted by quests and later shrines. modifiers: speed, jump, damage, defense (damage taken multiplier), max_health (added), flags.",
+ "abilities": {
+  "miners_grit": {
+   "name": "Miner's Grit",
+   "description": "Hob's breathing trick. You can take more punishment.",
+   "modifiers": {
+    "max_health": 15
+   }
+  }
+ }
+}

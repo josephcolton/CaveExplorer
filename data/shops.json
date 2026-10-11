@@ -20,6 +20,19 @@
     "buckler",
     "healing_potion"
    ]
+  },
+  "miner_shop": {
+   "name": "Hob's Supplies",
+   "greeting": "Coin first, questions later.",
+   "stock": [
+    "stones",
+    "bread",
+    "jerky",
+    "healing_potion",
+    "lantern",
+    "helmet",
+    "pickaxe"
+   ]
   }
  }
 }

@@ -31,21 +31,23 @@ cmake --build build
 
 ## Controls (defaults)
 
-| Action             | Keyboard          | Gamepad            |
-|--------------------|-------------------|--------------------|
-| Move               | A/D or ←/→        | D-pad / left stick |
-| Jump               | Space             | A (south)          |
-| Drop through ledge | Down + Space      | Down + A           |
-| Enter door / cave  | W / ↑ / E         | Up / Y (north)     |
-| Open chest / shop  | E                 | Y (north)          |
-| Inventory          | Tab / I           | Back / View        |
-| Menus: move / pick | Arrows, Enter     | D-pad, A           |
-| Menus: use / drop  | E / Q             | Y / right stick    |
-| Use right hand     | J                 | X (west) / RB      |
-| Use left hand      | K                 | LB                 |
-| Pause menu         | Esc               | Start              |
-| Fullscreen         | F11 / Alt+Enter   |                    |
-| Debug overlay      | F3                |                    |
+All of these can be changed in **Settings → Controls** (two keys or mouse buttons plus a gamepad
+button per action). Pause (Esc / Start) and the menu keys are fixed.
+
+| Action             | Keyboard / mouse           | Gamepad            |
+|--------------------|----------------------------|--------------------|
+| Move               | A/D or ←/→                 | D-pad / left stick |
+| Jump               | Space or Z                 | A (south)          |
+| Drop through ledge | Down + Jump                | Down + A           |
+| Enter door / cave  | W or ↑                     | Up                 |
+| Use right hand     | J, X or left click         | X (west) / RB      |
+| Use left hand      | K, C or right click        | LB                 |
+| Interact (talk, open, search) | E               | Y (north)          |
+| Inventory          | Tab or I                   | Back / View        |
+| Drop item (in inventory) | Q                    | Right stick click  |
+| Pause menu         | Esc                        | Start              |
+| Fullscreen         | F11 / Alt+Enter            |                    |
+| Debug overlay      | F3                         |                    |
 
 ## Maps
 
@@ -54,17 +56,21 @@ Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 3
   while in the area and crossfaded on area changes; empty = silence).
 - Tile layers: `background` (decoration) and `ground` (custom property `collides = true`).
   A layer with `foreground = true` is drawn in front of the player.
-- Tile collision comes from the tileset tile property `collision` = `solid` or `oneway`.
+- Tile collision comes from the tileset tile property `collision` = `solid` or `oneway`;
+  `surface` = `slippery` makes slick ground (moss) that only non-slip boots grip.
 - Object layer `objects`:
   - `spawn` (point, named) — where the player appears.
   - `door` (rectangle) with `target_area`, `target_spawn`, and `trigger` = `touch` (area edge)
-    or `interact` (press Up).
+    or `interact` (press Up). Interactive doors show a ↑ marker; optional `label` (prompt text)
+    and `glow` (`#rrggbb` light spilling through, e.g. daylight at a cave exit).
 
 `tools/make_maps.py` generated the starting maps and placeholder tileset; it will not overwrite
 existing maps unless run with `--force`. Edit the maps in Tiled from here on.
 
 Objects also include `obstacle` (a rectangle covering whole tiles; `obstacle` type from
-`data/obstacles.json`, e.g. `bush` needs a tool tagged `cut`, `rock` needs `break`), `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
+`data/obstacles.json`, e.g. `bush` needs a tool tagged `cut`, `rock` needs `break`;
+`passable_from` = `left`/`right` lets players push through from that side), `npc` (point at the
+feet; `npc_id` from `data/npcs.json`), `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
 from `data/enemies.json`, optional `enemy_easy` / `enemy_hard` overrides where `none` removes it,
 and `hp_scale`), `pickup` (point; `item` id or `coins`, `count`, optional `unique_id` so it
 never respawns once taken), `chest` (the persistent storage chest), `shop` (`shop_id` from
@@ -73,7 +79,7 @@ never respawns once taken), `chest` (the persistent storage chest), `shop` (`sho
 ## Music
 
 Tracks the game uses live in `assets/soundtrack/`. `assets/music/` is ignored by git and is a
-scratch area for auditioning downloads. Current tracks: `forest.ogg` (The Forest) and `deep_cave.ogg`
+scratch area for auditioning downloads. Current tracks: `beach.ogg` (The Beach), `forest.ogg` (The Forest) and `deep_cave.ogg`
 (reserved for a deep cave area) `boss_1.ogg` / `boss_2.ogg` (the first two boss arenas) and
 `underground_city.mp3` (reserved for the underground city).
 
@@ -86,6 +92,8 @@ scratch area for auditioning downloads. Current tracks: `forest.ogg` (The Forest
 - `data/enemies.json` — creatures: behaviour (walker/flyer), health, damage, speed, drops.
 - `data/characters.json` — names and stat ranges for newly rolled explorers.
 - `data/obstacles.json` — bushes, boulders and other blockers: required tool tag, hits, art, hint.
+- `data/npcs.json`, `data/quests.json`, `data/abilities.json` — people, their jobs, and the lasting
+  abilities jobs can teach. Items get effects through `carried` / `equipped` in `items.json`.
 - `data/credits.txt` — the in-game credits page.
 - Item icons are packed by `tools/pack_icons.py` from the list in `tools/icons.txt`.
 
@@ -120,7 +128,16 @@ See [CREDITS.md](CREDITS.md) for art and library credits.
 - Creatures and obstacles come back every time an area loads. Coins and items lying in the world
   do not: once an explorer takes them they stay gone until the next explorer arrives (after a
   death). Unique items never come back.
-- Bushes need something sharp (machete, hand axe); boulders need a pickaxe. Swing at them.
+- Bushes need something sharp (machete, hand axe); boulders need a pickaxe. Swing at them with
+  the hand that holds the tool. Obstacles never trap you: from the far side you can push through
+  (a bush scratches a little).
+- Stuck? **Esc → Restart area** puts you back at the doorway you came in by. Creatures and
+  obstacles reset; your health, items and quests don't.
+- Some items help just by being carried (the Feather Charm), others when worn or held (boots,
+  helmets, the buckler). Hover an item in the inventory to see its effects; hover an empty slot
+  for your explorer's stats.
+- People in the caves trade and hand out small jobs. Jobs and the abilities they teach last until
+  the explorer dies.
 - When an explorer dies, everything they carried stays where they fell (search it with E), and a
   new explorer with different stats arrives at the beach.
 ```

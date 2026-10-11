@@ -39,6 +39,8 @@
   "mon_rat": 34,
   "mon_beetle": 35,
   "remains": 36,
-  "obstacle_bush": 37
+  "obstacle_bush": 37,
+  "npc_miner": 38,
+  "npc_halfling": 39
  }
 }

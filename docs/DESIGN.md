@@ -22,7 +22,11 @@ covers the design decisions so far and how to build the first playable version.
 - [x] 7. Obstacles: thorny bush (cut: machete/hand axe) gates Mossy Hollow; boulder (break:
        pickaxe) guards a treasure alcove. Machete moved to the Upper Caves; shop sells hand axe
        and pickaxe as fallbacks. Fixed the forest cave mouth (it was walled off).
-- [ ] 7b. Item abilities, NPCs/quests  ·  8. Shrine buff, hunger
+- [x] 7b. Item effects (carried / worn), lasting abilities, slick moss + non-slip boots, Old Hob
+       (trader, two quests: kill 3 rats -> non-slip boots; bring 3 bones -> Miner's Grit)
+- [x] Quality: Restart area (Esc menu), push through obstacles from the far side, visible cave
+       doorways, control rebinding (keys, mouse, gamepad) with closer defaults, clearer hints
+- [ ] 8. Shrine buff, hunger
 - [ ] 9 (rest). Control rebinding, sound effects  ·  10. Packaging
 
 ## Art sources
@@ -173,6 +177,9 @@ Key mechanisms:
 - **Freebies don't respawn:** placed coins/items, once taken, stay gone for the rest of that
   explorer's life (tracked per explorer in the save); they return for the next explorer. Creatures,
   obstacles and enemy drops still refresh whenever an area loads. This stops beach/forest farming.
+- **Never stuck:** obstacles can be pushed through from their far side; "Restart area" in the
+  Esc menu reloads the area at the doorway you entered by (keeping health/items/quests); falling
+  out of a level returns you to the entrance with a little damage.
 - **Save slots:** three slots, each a separate world (chest, corpse piles, unique items taken,
   explorers lost) plus the current explorer and their position. Starting a new game in a slot
   wipes it. Autosaves on area change, chest/corpse close, unique pickup, death and quitting.

@@ -147,12 +147,30 @@ void InventoryScreen::render(SDL_Renderer* r) const {
         if (def.damage > 0) { ui::text(r, info.x + 12, y, "Damage " + std::to_string(def.damage)); y += ui::kLineH; }
         if (def.food > 0) { ui::text(r, info.x + 12, y, "Food +" + std::to_string(static_cast<int>(def.food))); y += ui::kLineH; }
         if (def.heal > 0) { ui::text(r, info.x + 12, y, "Heals " + std::to_string(static_cast<int>(def.heal))); y += ui::kLineH; }
+        for (const auto& [label, mods] : {std::pair<const char*, const Modifiers*>{"While carried:", &def.carried},
+                                          std::pair<const char*, const Modifiers*>{"When worn or held:", &def.equipped}}) {
+            const auto lines = mods->describe();
+            if (lines.empty()) continue;
+            ui::text(r, info.x + 12, y, label, ui::kGood);
+            y += ui::kLineH;
+            for (const std::string& l : lines) {
+                ui::text(r, info.x + 20, y, "- " + l, ui::kGood);
+                y += ui::kLineH;
+            }
+        }
         const int worth = def.sellPrice();
         ui::text(r, info.x + 12, y, "Worth " + std::to_string(worth) + (worth == 1 ? " coin" : " coins"), ui::kDim);
     }
 
+    if (stack.empty() && summary_) {
+        for (const std::string& line : summary_()) {
+            if (y > info.y + info.h - 40) break;
+            ui::text(r, info.x + 12, y, line, line.rfind("  ", 0) == 0 ? ui::kGood : ui::kText);
+            y += ui::kLineH;
+        }
+    }
     if (!message_.empty()) ui::text(r, info.x + 12, info.y + info.h - 34, message_, messageBad_ ? ui::kBad : ui::kGood);
     ui::text(r, info.x + 12, info.y + info.h - 18,
-             selected_ >= 0 ? "Enter: place here   Esc: cancel" : "Enter: move   E: use   Q: drop   Tab: close",
+             selected_ >= 0 ? hintPlacing_ : hintNormal_,
              ui::kDim);
 }

@@ -17,6 +17,8 @@ the licenses below.
 
 ## Music
 
+- **"Beach Town Guitar Theme"** (`assets/soundtrack/beach.ogg`) by HitCtrl. CC-BY 3.0.
+  https://opengameart.org/content/beach-town-guitar-theme
 - **"Approaching The Green Grass"** (`assets/soundtrack/forest.ogg`) — written and produced by
   Ove Melaa (omsoftware@hotmail.com), -2013 Ove Melaa. CC-BY 3.0.
   https://opengameart.org/content/oves-essential-game-audio-pack-collection-160-files-updated

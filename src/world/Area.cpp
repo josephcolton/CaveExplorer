@@ -96,6 +96,7 @@ bool Area::load(const std::string& areaId, Assets& assets) {
         ts.tileWidth = tsj.value("tilewidth", Tilemap::kTileSize);
         ts.tileHeight = tsj.value("tileheight", Tilemap::kTileSize);
         ts.collision.assign(static_cast<std::size_t>(ts.tileCount), TileCollision::None);
+        ts.slippery.assign(static_cast<std::size_t>(ts.tileCount), false);
 
         const std::string image = (mapDir / tsj.value("image", "")).string();
         ts.texture = assets.texture(image, parseColor(tsj.value("transparentcolor", "")));
@@ -106,6 +107,9 @@ bool Area::load(const std::string& areaId, Assets& assets) {
             const auto props = readProperties(tile);
             if (auto it = props.find("collision"); it != props.end() && it->second.is_string()) {
                 ts.collision[static_cast<std::size_t>(localId)] = parseCollision(it->second.get<std::string>());
+            }
+            if (auto it = props.find("surface"); it != props.end() && it->second == "slippery") {
+                ts.slippery[static_cast<std::size_t>(localId)] = true;
             }
         }
         map.tilesets.push_back(std::move(ts));

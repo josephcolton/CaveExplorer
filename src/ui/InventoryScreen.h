@@ -4,6 +4,7 @@
 
 #include <SDL3/SDL.h>
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -25,6 +26,15 @@ public:
     InventoryRequest update(const Input& input);
     void render(SDL_Renderer* r) const;
 
+    // Lines shown in the details panel when the cursor is on an empty slot (explorer stats).
+    void setSummaryProvider(std::function<std::vector<std::string>()> f) { summary_ = std::move(f); }
+
+    // Footer hints, e.g. "Enter: move  E: use ..." (normal) and while an item is picked up.
+    void setKeyHints(std::string normal, std::string placing) {
+        hintNormal_ = std::move(normal);
+        hintPlacing_ = std::move(placing);
+    }
+
     void setMessage(const std::string& msg, bool bad = false) { message_ = msg; messageBad_ = bad; }
 
 private:
@@ -42,6 +52,9 @@ private:
     Inventory* inv_ = nullptr;
     Container* chest_ = nullptr;
     std::string chestTitle_;
+    std::string hintNormal_ = "Enter: move   E: use   Q: drop   Tab: close";
+    std::string hintPlacing_ = "Enter: place here   Esc: cancel";
+    std::function<std::vector<std::string>()> summary_;
 
     std::vector<Slot> slots_;
     std::vector<SDL_FRect> rects_;

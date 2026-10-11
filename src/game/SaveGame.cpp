@@ -8,9 +8,12 @@ json SaveGame::toJson() const {
             {"character", character.toJson()},
             {"inventory", inventory.toJson()},
             {"taken_pickups", takenPickups},
+            {"abilities", abilities},
+            {"quests", quests.toJson()},
             {"health", health},
             {"area", area},
             {"area_name", areaName},
+            {"entry_spawn", entrySpawn},
             {"position", hasPosition ? json{x, y} : json(nullptr)},
             {"play_seconds", playSeconds},
             {"saved_at", savedAt}};
@@ -22,9 +25,12 @@ bool SaveGame::fromJson(const json& j) {
     character.fromJson(j.value("character", json::object()));
     inventory.fromJson(j.value("inventory", json::object()));
     takenPickups = j.value("taken_pickups", std::set<std::string>{});
+    abilities = j.value("abilities", std::vector<std::string>{});
+    quests.fromJson(j.value("quests", json::object()));
     health = j.value("health", character.maxHealth);
     area = j.value("area", "beach");
     areaName = j.value("area_name", area);
+    entrySpawn = j.value("entry_spawn", "start");
     const json pos = j.value("position", json());
     hasPosition = pos.is_array() && pos.size() == 2;
     if (hasPosition) {

@@ -11,7 +11,7 @@
  "tileheight": 32,
  "backgroundcolor": "#0c0a10",
  "nextlayerid": 4,
- "nextobjectid": 12,
+ "nextobjectid": 13,
  "properties": [
   {
    "name": "display_name",
@@ -186,6 +186,26 @@
        "name": "collision",
        "type": "string",
        "value": "solid"
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "properties": [
+      {
+       "name": "char",
+       "type": "string",
+       "value": "m"
+      },
+      {
+       "name": "collision",
+       "type": "string",
+       "value": "solid"
+      },
+      {
+       "name": "surface",
+       "type": "string",
+       "value": "slippery"
       }
      ]
     }
@@ -1710,26 +1730,26 @@
     4,
     4,
     4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
     4,
     4,
     4,
@@ -1852,6 +1872,11 @@
        "name": "obstacle",
        "type": "string",
        "value": "rock"
+      },
+      {
+       "name": "passable_from",
+       "type": "string",
+       "value": "right"
       }
      ]
     },
@@ -1934,6 +1959,30 @@
     },
     {
      "id": 5,
+     "name": "bone",
+     "type": "pickup",
+     "x": 560.0,
+     "y": 544,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "item",
+       "type": "string",
+       "value": "bone"
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "id": 6,
      "name": "coins",
      "type": "pickup",
      "x": 752.0,
@@ -1957,7 +2006,7 @@
      ]
     },
     {
-     "id": 6,
+     "id": 7,
      "name": "bat",
      "type": "enemy",
      "x": 400.0,
@@ -1976,7 +2025,7 @@
      ]
     },
     {
-     "id": 7,
+     "id": 8,
      "name": "bat",
      "type": "enemy",
      "x": 976.0,
@@ -2000,7 +2049,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 9,
      "name": "beetle",
      "type": "enemy",
      "x": 752.0,
@@ -2024,7 +2073,7 @@
      ]
     },
     {
-     "id": 9,
+     "id": 10,
      "name": "rat",
      "type": "enemy",
      "x": 208.0,
@@ -2043,7 +2092,7 @@
      ]
     },
     {
-     "id": 10,
+     "id": 11,
      "name": "from_cave_1",
      "type": "spawn",
      "x": 80.0,
@@ -2055,7 +2104,7 @@
      "point": true
     },
     {
-     "id": 11,
+     "id": 12,
      "name": "to_cave_1",
      "type": "door",
      "x": 0,

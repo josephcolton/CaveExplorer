@@ -52,13 +52,11 @@ void SettingsScreen::open(App& app) {
 }
 
 SettingsScreen::Result SettingsScreen::update() {
-    const Input& in = app_->input();
     if (showingControls_) {
-        if (in.pressed(Action::Cancel) || in.pressed(Action::Confirm)) showingControls_ = false;
-        if (in.down(Action::Down)) controlsScroll_ += 2.0f;
-        if (in.down(Action::Up)) controlsScroll_ = std::max(0.0f, controlsScroll_ - 2.0f);
+        updateControls();
         return Result::Stay;
     }
+    const Input& in = app_->input();
 
     Settings& s = app_->settings();
     if (in.pressed(Action::Up)) cursor_ = (cursor_ + RowCount - 1) % RowCount;
@@ -87,7 +85,9 @@ SettingsScreen::Result SettingsScreen::update() {
     case ControlsRow:
         if (confirm) {
             showingControls_ = true;
-            controlsScroll_ = 0.0f;
+            controlRow_ = 0;
+            controlCol_ = 0;
+            controlMessage_.clear();
         }
         break;
     case BackRow:
@@ -108,19 +108,7 @@ SettingsScreen::Result SettingsScreen::update() {
 void SettingsScreen::render(SDL_Renderer* r) const {
     ui::dimScreen(r, 170);
     if (showingControls_) {
-        const SDL_FRect panel{90, 30, 460, 300};
-        ui::panel(r, panel, "Controls");
-        SDL_Rect clip{static_cast<int>(panel.x), static_cast<int>(panel.y + 24), static_cast<int>(panel.w),
-                      static_cast<int>(panel.h - 44)};
-        SDL_SetRenderClipRect(r, &clip);
-        float y = panel.y + 28 - controlsScroll_;
-        std::istringstream lines(describeControls(app_->input()));
-        for (std::string line; std::getline(lines, line);) {
-            ui::text(r, panel.x + 14, y, line);
-            y += ui::kLineH;
-        }
-        SDL_SetRenderClipRect(r, nullptr);
-        ui::text(r, panel.x + 14, panel.y + panel.h - 16, "Rebinding comes in a later update.  Esc: back", ui::kDim);
+        renderControls(r);
         return;
     }
 
@@ -187,6 +175,142 @@ void TextScreen::render(SDL_Renderer* r) const {
     ui::text(r, panel.x + 14, panel.y + panel.h - 16, "Up/Down: scroll   Esc: back", ui::kDim);
 }
 
+// ---------------------------------------------------------------------------- Controls
+
+namespace {
+// Actions players may rebind. Pause (Esc / Start) and the menu keys stay fixed so menus always work.
+constexpr Action kRebindable[] = {Action::Left,     Action::Right,   Action::Up,       Action::Down,
+                                  Action::Jump,     Action::UseRight, Action::UseLeft, Action::Interact,
+                                  Action::Inventory, Action::Drop};
+constexpr int kRebindCount = static_cast<int>(std::size(kRebindable));
+constexpr int kResetRow = kRebindCount;
+constexpr int kBackRow = kRebindCount + 1;
+constexpr SDL_FRect kControlsPanel{30, 16, 580, 330};
+}  // namespace
+
+std::string padButtonName(SDL_GamepadButton b) {
+    switch (b) {
+    case SDL_GAMEPAD_BUTTON_INVALID: return "-";
+    case SDL_GAMEPAD_BUTTON_SOUTH: return "Pad A";
+    case SDL_GAMEPAD_BUTTON_EAST: return "Pad B";
+    case SDL_GAMEPAD_BUTTON_WEST: return "Pad X";
+    case SDL_GAMEPAD_BUTTON_NORTH: return "Pad Y";
+    case SDL_GAMEPAD_BUTTON_BACK: return "Back";
+    case SDL_GAMEPAD_BUTTON_START: return "Start";
+    case SDL_GAMEPAD_BUTTON_LEFT_STICK: return "L-Stick";
+    case SDL_GAMEPAD_BUTTON_RIGHT_STICK: return "R-Stick";
+    case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER: return "LB";
+    case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER: return "RB";
+    case SDL_GAMEPAD_BUTTON_DPAD_UP: return "D-Up";
+    case SDL_GAMEPAD_BUTTON_DPAD_DOWN: return "D-Down";
+    case SDL_GAMEPAD_BUTTON_DPAD_LEFT: return "D-Left";
+    case SDL_GAMEPAD_BUTTON_DPAD_RIGHT: return "D-Right";
+    default: {
+        const char* n = SDL_GetGamepadStringForButton(b);
+        return n ? n : "?";
+    }
+    }
+}
+
+void SettingsScreen::updateControls() {
+    Input& in = app_->input();
+    if (in.capturing()) {
+        const Input::Capture c = in.takeCapture();
+        if (c.kind == Input::Capture::Kind::Waiting) return;
+        const auto a = static_cast<std::size_t>(kRebindable[controlRow_]);
+        if (c.kind == Input::Capture::Kind::Cancelled) {
+            controlMessage_ = "Unchanged.";
+        } else if (controlCol_ < 2 && c.kind == Input::Capture::Kind::Key) {
+            // A key can only do one thing: take it away from any other action that had it.
+            for (int other = 0; other < kRebindCount; ++other) {
+                for (KeyBinding& k : in.keyBindings[static_cast<std::size_t>(kRebindable[other])]) {
+                    if (k == c.key) {
+                        k = {};
+                        if (static_cast<std::size_t>(kRebindable[other]) != a) {
+                            controlMessage_ = c.key.name() + " was removed from \"" + actionLabel(kRebindable[other]) + "\". ";
+                        }
+                    }
+                }
+            }
+            in.keyBindings[a][static_cast<std::size_t>(controlCol_)] = c.key;
+            controlMessage_ += std::string(actionLabel(kRebindable[controlRow_])) + ": " + c.key.name();
+        } else if (controlCol_ == 2 && c.kind == Input::Capture::Kind::Pad) {
+            in.padBindings[a][0] = c.pad;
+            controlMessage_ = std::string(actionLabel(kRebindable[controlRow_])) + ": " + padButtonName(c.pad);
+        } else {
+            controlMessage_ = controlCol_ == 2 ? "Press a gamepad button for this column." : "Press a key or mouse button.";
+        }
+        app_->settings().bindings = in.bindingsToJson();
+        return;
+    }
+
+    const int rows = kRebindCount + 2;
+    if (in.pressed(Action::Up)) controlRow_ = (controlRow_ + rows - 1) % rows;
+    if (in.pressed(Action::Down)) controlRow_ = (controlRow_ + 1) % rows;
+    if (in.pressed(Action::Left)) controlCol_ = (controlCol_ + 2) % 3;
+    if (in.pressed(Action::Right)) controlCol_ = (controlCol_ + 1) % 3;
+    if (in.pressed(Action::Cancel)) {
+        showingControls_ = false;
+        app_->settings().save();
+        return;
+    }
+    if (!in.pressed(Action::Confirm)) return;
+    if (controlRow_ == kBackRow) {
+        showingControls_ = false;
+        app_->settings().save();
+    } else if (controlRow_ == kResetRow) {
+        in.resetBindings();
+        app_->settings().bindings = in.bindingsToJson();
+        controlMessage_ = "Controls reset to the defaults.";
+    } else {
+        in.startCapture();
+        controlMessage_.clear();
+    }
+}
+
+void SettingsScreen::renderControls(SDL_Renderer* r) const {
+    const Input& in = app_->input();
+    const SDL_FRect& p = kControlsPanel;
+    ui::panel(r, p, "Controls");
+    const float colX[3] = {p.x + 210, p.x + 330, p.x + 450};
+    ui::text(r, colX[0], p.y + 24, "Key 1", ui::kDim);
+    ui::text(r, colX[1], p.y + 24, "Key 2", ui::kDim);
+    ui::text(r, colX[2], p.y + 24, "Gamepad", ui::kDim);
+
+    for (int row = 0; row < kRebindCount + 2; ++row) {
+        const float y = p.y + 40 + static_cast<float>(row) * 18.0f + (row >= kRebindCount ? 8.0f : 0.0f);
+        const bool selRow = row == controlRow_;
+        if (row >= kRebindCount) {
+            ui::text(r, p.x + 16, y, (selRow ? "> " : "  ") + std::string(row == kResetRow ? "Reset to defaults" : "Back"),
+                     selRow ? ui::kGold : ui::kText);
+            continue;
+        }
+        const auto a = static_cast<std::size_t>(kRebindable[row]);
+        ui::text(r, p.x + 16, y, (selRow ? "> " : "  ") + std::string(actionLabel(kRebindable[row])),
+                 selRow ? ui::kGold : ui::kText);
+        const std::string cells[3] = {in.keyBindings[a][0].name(), in.keyBindings[a][1].name(),
+                                      padButtonName(in.padBindings[a][0])};
+        for (int c = 0; c < 3; ++c) {
+            const bool sel = selRow && c == controlCol_;
+            if (sel) {
+                const SDL_FRect box{colX[c] - 4, y - 3, 112, 14};
+                SDL_SetRenderDrawColor(r, 90, 70, 40, 255);
+                SDL_RenderFillRect(r, &box);
+            }
+            std::string text = sel && in.capturing() ? "press..." : cells[c];
+            if (text.size() > 13) text = text.substr(0, 13);
+            ui::text(r, colX[c], y, text, sel ? ui::kGold : ui::kText);
+        }
+    }
+    const float footer = p.y + p.h - 44;
+    if (!controlMessage_.empty()) ui::text(r, p.x + 16, footer, controlMessage_.substr(0, 68), ui::kGood);
+    ui::text(r, p.x + 16, footer + 13, "Left click / right click also use the right / left hand.", ui::kDim);
+    ui::text(r, p.x + 16, footer + 26,
+             in.capturing() ? "Press the new key, mouse or pad button.  Esc: keep the old one."
+                            : "Enter: change   Esc: back   (Pause = Esc / Start, fixed)",
+             ui::kDim);
+}
+
 // ---------------------------------------------------------------------------- About
 
 std::string aboutText() {
@@ -199,36 +323,4 @@ std::string aboutText() {
            "Code licensed under the GNU GPL v3.\n"
            "github.com/josephcolton/CaveExplorer\n\n"
            "Built with SDL3.";
-}
-
-// ---------------------------------------------------------------------------- Controls text
-
-std::string describeControls(const Input& input) {
-    static const std::pair<Action, const char*> rows[] = {
-        {Action::Left, "Move left"},          {Action::Right, "Move right"},
-        {Action::Up, "Up / enter door"},      {Action::Down, "Down"},
-        {Action::Jump, "Jump"},               {Action::UseRight, "Use right hand"},
-        {Action::UseLeft, "Use left hand"},   {Action::Interact, "Interact / use item"},
-        {Action::Inventory, "Inventory"},     {Action::Drop, "Drop item (inventory)"},
-        {Action::Pause, "Pause menu"},        {Action::Confirm, "Menu: select"},
-        {Action::Cancel, "Menu: back"},
-    };
-    std::ostringstream out;
-    for (const auto& [action, label] : rows) {
-        const auto i = static_cast<std::size_t>(action);
-        std::string keys;
-        for (SDL_Scancode sc : input.keyBindings[i]) keys += (keys.empty() ? "" : ", ") + std::string(SDL_GetScancodeName(sc));
-        std::string pad;
-        for (SDL_GamepadButton b : input.padBindings[i]) {
-            const char* n = SDL_GetGamepadStringForButton(b);
-            pad += (pad.empty() ? "" : ", ") + std::string(n ? n : "?");
-        }
-        std::string line = std::string(label);
-        line.resize(24, ' ');
-        line += keys;
-        line.resize(46, ' ');
-        out << line << pad << "\n";
-    }
-    out << "\nAlso: F11 or Alt+Enter toggles fullscreen.\n";
-    return out.str();
 }

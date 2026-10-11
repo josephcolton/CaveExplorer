@@ -61,6 +61,8 @@ bool ItemDb::loadFromJson(const std::string& text, std::string* error) {
         d.food = j.value("food", 0.0f);
         d.heal = j.value("heal", 0.0f);
         d.tags = j.value("tags", std::vector<std::string>{});
+        d.carried = Modifiers::fromJson(j.value("carried", json::object()));
+        d.equipped = Modifiers::fromJson(j.value("equipped", json::object()));
         items_[d.id] = std::move(d);
     }
     return true;

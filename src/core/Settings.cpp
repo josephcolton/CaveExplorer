@@ -29,12 +29,14 @@ void Settings::load() {
     soundVolume = std::clamp(j.value("sound_volume", soundVolume), 0, 10);
     fullscreen = j.value("fullscreen", fullscreen);
     difficulty = static_cast<Difficulty>(std::clamp(j.value("difficulty", 1), 0, 2));
+    bindings = j.value("bindings", json());
 }
 
 void Settings::save() const {
     const json j = {{"music_volume", musicVolume},
                     {"sound_volume", soundVolume},
                     {"fullscreen", fullscreen},
-                    {"difficulty", static_cast<int>(difficulty)}};
+                    {"difficulty", static_cast<int>(difficulty)},
+                    {"bindings", bindings}};
     writeTextFile(savePath(kFile), j.dump(1));
 }

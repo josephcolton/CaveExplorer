@@ -36,10 +36,15 @@ public:
     void render(SDL_Renderer* r) const;
 
 private:
+    void updateControls();
+    void renderControls(SDL_Renderer* r) const;
+
     App* app_ = nullptr;
     int cursor_ = 0;
     bool showingControls_ = false;
-    float controlsScroll_ = 0.0f;
+    int controlRow_ = 0;
+    int controlCol_ = 0;  // 0-1 keyboard/mouse slots, 2 gamepad
+    std::string controlMessage_;
 };
 
 // A scrolling page of text (credits, about).
@@ -58,5 +63,5 @@ private:
 // The About page text.
 std::string aboutText();
 
-// The controls list as text, built from the current bindings.
-std::string describeControls(const Input& input);
+// Readable gamepad button name ("Pad A", "LB"...).
+std::string padButtonName(SDL_GamepadButton b);
