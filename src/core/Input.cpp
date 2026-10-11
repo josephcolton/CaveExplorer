@@ -83,7 +83,7 @@ void Input::handleEvent(const SDL_Event& e) {
 
 void Input::refresh() {
     for (std::size_t a = 0; a < kActionCount; ++a) {
-        bool held = stickHeld_[a];
+        bool held = stickHeld_[a] || scriptHeld_[a];
         for (SDL_Scancode sc : keyBindings[a]) held = held || keysHeld_[sc];
         for (SDL_GamepadButton b : padBindings[a]) held = held || buttonsHeld_[b];
 

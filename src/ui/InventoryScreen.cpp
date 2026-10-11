@@ -10,7 +10,9 @@ constexpr SDL_FRect kChestPanel{228, 24, 396, 150};
 constexpr float kPitch = 40.0f;
 }  // namespace
 
-void InventoryScreen::open(const ItemDb& db, const SpriteDb& sprites, Inventory& inv, Container* chest) {
+void InventoryScreen::open(const ItemDb& db, const SpriteDb& sprites, Inventory& inv, Container* chest,
+                           std::string chestTitle) {
+    chestTitle_ = std::move(chestTitle);
     db_ = &db;
     sprites_ = &sprites;
     inv_ = &inv;
@@ -112,7 +114,7 @@ void InventoryScreen::render(SDL_Renderer* r) const {
     ui::dimScreen(r);
     ui::panel(r, kGearPanel, "Explorer");
     ui::text(r, kGearPanel.x + 8, 162, "Backpack", ui::kGold);
-    if (chest_) ui::panel(r, kChestPanel, "Storage Chest");
+    if (chest_) ui::panel(r, kChestPanel, chestTitle_.c_str());
 
     for (std::size_t i = 0; i < slots_.size(); ++i) {
         const Slot& s = slots_[i];

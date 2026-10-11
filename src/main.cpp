@@ -12,8 +12,8 @@ int main(int argc, char* argv[]) {
         if (arg == "--area") options.startArea = next();
         else if (arg == "--spawn") options.startSpawn = next();
         else if (arg == "--shot") options.screenshotPath = next();
-        else if (arg == "--frames") options.screenshotFrames = std::stoi(next());
-        else if (arg == "--hold-right") options.holdRight = true;
+        else if (arg == "--ticks") options.screenshotTicks = std::stoi(next());
+        else if (arg == "--script") options.script = next();
         else if (arg == "--debug") options.debug = true;
         else if (arg == "--give") options.giveItems = next();
         else if (arg == "--ui") options.openUi = next();

@@ -49,7 +49,7 @@ void Audio::playMusic(const std::string& file) {
     MIX_Audio*& slot = music_[static_cast<std::size_t>(current_)];
 
     // Stream from disk (predecode = false): music files are large.
-    MIX_Audio* audio = MIX_LoadAudio(mixer_, assetPath("music/" + file).c_str(), false);
+    MIX_Audio* audio = MIX_LoadAudio(mixer_, assetPath("soundtrack/" + file).c_str(), false);
     if (!audio) {
         SDL_Log("Could not load music %s: %s", file.c_str(), SDL_GetError());
         return;

@@ -11,7 +11,7 @@
  "tileheight": 32,
  "backgroundcolor": "#0c0a10",
  "nextlayerid": 4,
- "nextobjectid": 9,
+ "nextobjectid": 14,
  "properties": [
   {
    "name": "display_name",
@@ -2735,6 +2735,116 @@
     },
     {
      "id": 5,
+     "name": "bat",
+     "type": "enemy",
+     "x": 752.0,
+     "y": 368.0,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "enemy",
+       "type": "string",
+       "value": "bat"
+      },
+      {
+       "name": "enemy_easy",
+       "type": "string",
+       "value": "none"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "bat",
+     "type": "enemy",
+     "x": 592.0,
+     "y": 656.0,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "enemy",
+       "type": "string",
+       "value": "bat"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "rat",
+     "type": "enemy",
+     "x": 496.0,
+     "y": 864,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "enemy",
+       "type": "string",
+       "value": "rat"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "rat",
+     "type": "enemy",
+     "x": 848.0,
+     "y": 864,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "enemy",
+       "type": "string",
+       "value": "rat"
+      },
+      {
+       "name": "enemy_easy",
+       "type": "string",
+       "value": "none"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "none",
+     "type": "enemy",
+     "x": 1072.0,
+     "y": 864,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "enemy",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "enemy_hard",
+       "type": "string",
+       "value": "beetle"
+      }
+     ]
+    },
+    {
+     "id": 10,
      "name": "from_forest",
      "type": "spawn",
      "x": 144.0,
@@ -2746,7 +2856,7 @@
      "point": true
     },
     {
-     "id": 6,
+     "id": 11,
      "name": "from_cave_2",
      "type": "spawn",
      "x": 1168.0,
@@ -2758,7 +2868,7 @@
      "point": true
     },
     {
-     "id": 7,
+     "id": 12,
      "name": "to_forest",
      "type": "door",
      "x": 64,
@@ -2786,7 +2896,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 13,
      "name": "to_cave_2",
      "type": "door",
      "x": 1248,

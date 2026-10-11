@@ -62,7 +62,5 @@ build-*/
 .vscode/
 *.tiled-session
 
-# Music: test downloads stay local; only tracks the game uses are committed (listed below).
-assets/music/*
-!assets/music/forest.ogg
-!assets/music/deep_cave.ogg
+# Music test downloads stay local; tracks the game uses live in assets/soundtrack/.
+assets/music/

@@ -11,7 +11,7 @@
  "tileheight": 32,
  "backgroundcolor": "#0c0a10",
  "nextlayerid": 4,
- "nextobjectid": 6,
+ "nextobjectid": 10,
  "properties": [
   {
    "name": "display_name",
@@ -1916,6 +1916,92 @@
     },
     {
      "id": 4,
+     "name": "bat",
+     "type": "enemy",
+     "x": 400.0,
+     "y": 240.0,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "enemy",
+       "type": "string",
+       "value": "bat"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "bat",
+     "type": "enemy",
+     "x": 976.0,
+     "y": 208.0,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "enemy",
+       "type": "string",
+       "value": "bat"
+      },
+      {
+       "name": "enemy_hard",
+       "type": "string",
+       "value": "giant_bat"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "beetle",
+     "type": "enemy",
+     "x": 752.0,
+     "y": 416,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "enemy",
+       "type": "string",
+       "value": "beetle"
+      },
+      {
+       "name": "enemy_easy",
+       "type": "string",
+       "value": "rat"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "rat",
+     "type": "enemy",
+     "x": 208.0,
+     "y": 544,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "enemy",
+       "type": "string",
+       "value": "rat"
+      }
+     ]
+    },
+    {
+     "id": 8,
      "name": "from_cave_1",
      "type": "spawn",
      "x": 80.0,
@@ -1927,7 +2013,7 @@
      "point": true
     },
     {
-     "id": 5,
+     "id": 9,
      "name": "to_cave_1",
      "type": "door",
      "x": 0,

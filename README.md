@@ -41,15 +41,16 @@ cmake --build build
 | Inventory          | Tab / I           | Back / View        |
 | Menus: move / pick | Arrows, Enter     | D-pad, A           |
 | Menus: use / drop  | E / Q             | Y / right stick    |
-| Right-hand item    | J                 | X (west) / RB      |
-| Left-hand item     | K                 | LB                 |
+| Use right hand     | J                 | X (west) / RB      |
+| Use left hand      | K                 | LB                 |
+| Pause menu         | Esc               | Start              |
 | Fullscreen         | F11 / Alt+Enter   |                    |
 | Debug overlay      | F3                |                    |
 
 ## Maps
 
 Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 32x32 tiles.
-- Map properties: `display_name` (shown on entry) and `music` (a file in `assets/music/`, looped
+- Map properties: `display_name` (shown on entry) and `music` (a file in `assets/soundtrack/`, looped
   while in the area and crossfaded on area changes; empty = silence).
 - Tile layers: `background` (decoration) and `ground` (custom property `collides = true`).
   A layer with `foreground = true` is drawn in front of the player.
@@ -62,26 +63,32 @@ Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 3
 `tools/make_maps.py` generated the starting maps and placeholder tileset; it will not overwrite
 existing maps unless run with `--force`. Edit the maps in Tiled from here on.
 
-Objects also include `pickup` (point; `item` id or `coins`, `count`, optional `unique_id` so it
+Objects also include `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
+from `data/enemies.json`, optional `enemy_easy` / `enemy_hard` overrides where `none` removes it,
+and `hp_scale`), `pickup` (point; `item` id or `coins`, `count`, optional `unique_id` so it
 never respawns once taken), `chest` (the persistent storage chest), `shop` (`shop_id` from
 `data/shops.json`) and `decor` (`sprite` name from `data/sprites.json`, drawn on its bottom-left).
 
 ## Music
 
-Only tracks the game uses are committed (whitelisted in `.gitignore`); anything else dropped
-into `assets/music/` stays local. Current tracks: `forest.ogg` (The Forest) and `deep_cave.ogg`
-(reserved for a deep cave area).
+Tracks the game uses live in `assets/soundtrack/`. `assets/music/` is ignored by git and is a
+scratch area for auditioning downloads. Current tracks: `forest.ogg` (The Forest) and `deep_cave.ogg`
+(reserved for a deep cave area) `boss_1.ogg` / `boss_2.ogg` (the first two boss arenas) and
+`underground_city.mp3` (reserved for the underground city).
 
 ## Game data
 
 - `data/items.json` — every item: name, icon, equipment slot, stack size, value, damage, food...
 - `data/shops.json` — shop names and stock.
 - `data/sprites.json` — named sprites in the sprite sheets.
+- `data/animations.json` — animated sprite sheets (the knight, the bat) and their clips.
+- `data/enemies.json` — creatures: behaviour (walker/flyer), health, damage, speed, drops.
+- `data/characters.json` — names and stat ranges for newly rolled explorers.
+- `data/credits.txt` — the in-game credits page.
 - Item icons are packed by `tools/pack_icons.py` from the list in `tools/icons.txt`.
 
-The persistent world save (chest contents, unique items taken) is `world.json` in the
-per-user data folder (`%APPDATA%\CaveExplorer\CaveExplorer` on Windows,
-`~/.local/share/CaveExplorer/CaveExplorer` on Linux). Delete it to reset the world.
+Save slots (`slot1.json` ... `slot3.json`) and `settings.json` live in the per-user data folder (`%APPDATA%\CaveExplorer\CaveExplorer` on Windows,
+`~/.local/share/CaveExplorer/CaveExplorer` on Linux). Delete a slot file to reset that world.
 
 See [CREDITS.md](CREDITS.md) for art and library credits.
 
@@ -90,8 +97,25 @@ See [CREDITS.md](CREDITS.md) for art and library credits.
 ```
 --area <id> --spawn <name>   start in a given area
 --debug                      start with the debug overlay on
---shot <file.bmp> --frames N run N frames, save a screenshot, and exit
---hold-right                 simulate holding Right (automated movement checks)
---give <id,id,...>           start with these items in the backpack
---ui inventory|chest|shop    open a screen immediately
+--shot <file.bmp> --ticks N  run N simulation ticks (60/s), save a screenshot, and exit
+--script "Right:0-120,UseRight:130"
+                             hold actions during tick ranges (automated testing)
+--give <id,id,...>           start with these items (weapons go into empty hands)
+--ui inventory|chest|shop|pause      open an in-game screen immediately
+--ui slots|settings|credits|about    open a title-screen page immediately
+```
+`--area`, `--give` and the in-game `--ui` pages start a throwaway "dev game" that never saves.
+
+## Playing
+
+- **Title screen → Play** lists three save slots. An empty slot starts a new expedition;
+  an existing one can be continued or deleted.
+- Each slot is its own world: its own forest chest, its own fallen explorers and their belongings.
+- The game autosaves when you change areas, close the chest, take a unique item, or die, and
+  whenever you leave through the pause menu (Esc). "Save game" in the pause menu saves on demand.
+- Hold weapons in your hands (inventory, Tab): the right hand attacks with J, the left with K.
+  Slings fire stones from your backpack.
+- When an explorer dies, everything they carried stays where they fell (search it with E), and a
+  new explorer with different stats arrives at the beach.
+```
 ```

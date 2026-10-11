@@ -1,0 +1,16 @@
+{
+ "_comment": "Each new explorer is rolled from these ranges [min, max].",
+ "first_names": ["Ada", "Bram", "Cora", "Dax", "Edda", "Finn", "Gwen", "Hale", "Ivy", "Jory", "Kit",
+                 "Lena", "Milo", "Nell", "Otto", "Pia", "Quinn", "Rhea", "Sol", "Tess", "Ulf", "Vera",
+                 "Wren", "Yara", "Zed"],
+ "last_names": ["Ashdown", "Blackrock", "Coldwater", "Dunmore", "Fairhill", "Greystone", "Holloway",
+                "Ironside", "Kettle", "Lowmoor", "Marsh", "Northcott", "Pike", "Quarry", "Redfern",
+                "Stonebridge", "Thorne", "Underhill", "Vale", "Westbrook"],
+ "stats": {
+  "max_health": [70, 120],
+  "strength": [0.85, 1.25],
+  "speed": [0.92, 1.1],
+  "jump": [0.94, 1.07]
+ },
+ "starting_coins": [25, 60]
+}

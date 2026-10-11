@@ -1,8 +1,10 @@
 #include "core/App.h"
 
 #include "game/GameplayScene.h"
+#include "game/TitleScene.h"
 
 #include <algorithm>
+#include <sstream>
 
 bool App::init(const Options& options) {
     options_ = options;
@@ -27,12 +29,22 @@ bool App::init(const Options& options) {
     input_.init();
     assets_.init(renderer_);
     audio_.init();
-    scene_ = std::make_unique<GameplayScene>(*this);
+    settings_.load();
+    applySettings();
+    data_.load(assets_);
+    parseScript();
+
+    if (options_.devGame()) {
+        scene_ = std::make_unique<GameplayScene>(*this, GameplayScene::kDevSlot, true);
+    } else {
+        scene_ = std::make_unique<TitleScene>(*this);
+    }
     return true;
 }
 
 void App::shutdown() {
-    scene_.reset();
+    nextScene_.reset();
+    scene_.reset();  // gameplay saves its slot on destruction
     audio_.shutdown();
     assets_.clear();
     input_.shutdown();
@@ -41,9 +53,15 @@ void App::shutdown() {
     SDL_Quit();
 }
 
+void App::applySettings() {
+    audio_.setMusicVolume(static_cast<float>(settings_.musicVolume) / 10.0f);
+    if (window_) SDL_SetWindowFullscreen(window_, settings_.fullscreen);
+}
+
 void App::toggleFullscreen() {
-    fullscreen_ = !fullscreen_;
-    SDL_SetWindowFullscreen(window_, fullscreen_);
+    settings_.fullscreen = !settings_.fullscreen;
+    applySettings();
+    settings_.save();
 }
 
 void App::processEvents() {
@@ -59,6 +77,39 @@ void App::processEvents() {
             if (e.key.scancode == SDL_SCANCODE_F3) debugDraw = !debugDraw;
         }
         input_.handleEvent(e);
+    }
+}
+
+void App::parseScript() {
+    // Format: "Action:from-to,Action:tick" with action names as in Input (e.g. Right, Jump, UseRight).
+    static const std::pair<const char*, Action> names[] = {
+        {"Left", Action::Left},         {"Right", Action::Right},       {"Up", Action::Up},
+        {"Down", Action::Down},         {"Jump", Action::Jump},         {"UseRight", Action::UseRight},
+        {"UseLeft", Action::UseLeft},   {"Interact", Action::Interact}, {"Inventory", Action::Inventory},
+        {"Pause", Action::Pause},       {"Confirm", Action::Confirm},   {"Cancel", Action::Cancel},
+        {"Drop", Action::Drop}};
+    std::stringstream ss(options_.script);
+    for (std::string step; std::getline(ss, step, ',');) {
+        const auto colon = step.find(':');
+        if (colon == std::string::npos) continue;
+        const std::string name = step.substr(0, colon);
+        const std::string range = step.substr(colon + 1);
+        const auto dash = range.find('-');
+        const int from = std::stoi(range.substr(0, dash));
+        const int to = dash == std::string::npos ? from : std::stoi(range.substr(dash + 1));
+        for (const auto& [n, a] : names) {
+            if (name == n) script_.push_back({a, from, to});
+        }
+    }
+}
+
+void App::applyScript() {
+    for (const ScriptStep& s : script_) {
+        bool held = false;
+        for (const ScriptStep& o : script_) {
+            if (o.action == s.action && tickCount_ >= o.from && tickCount_ <= o.to) held = true;
+        }
+        input_.setScripted(s.action, held);
     }
 }
 
@@ -79,16 +130,13 @@ void App::run() {
         accumulator += frame;
         if (frame > 0.0) fps_ = fps_ * 0.95f + static_cast<float>(1.0 / frame) * 0.05f;
 
-        if (options_.holdRight) {
-            SDL_Event fake{};
-            fake.type = SDL_EVENT_KEY_DOWN;
-            fake.key.scancode = SDL_SCANCODE_RIGHT;
-            input_.handleEvent(fake);
-        }
         while (accumulator >= tick) {
+            if (!script_.empty()) applyScript();
             scene_->update(static_cast<float>(tick));
             input_.consumeEdges();
             accumulator -= tick;
+            ++tickCount_;
+            if (nextScene_) break;
         }
 
         SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
@@ -98,11 +146,16 @@ void App::run() {
             SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255);
             SDL_RenderDebugTextFormat(renderer_, kViewWidth - 72, 4, "%3.0f fps", fps_);
         }
-        if (!options_.screenshotPath.empty() && --options_.screenshotFrames <= 0) {
+        if (!options_.screenshotPath.empty() && tickCount_ >= options_.screenshotTicks) {
             saveScreenshot(options_.screenshotPath);
             running_ = false;
         }
         SDL_RenderPresent(renderer_);
+
+        if (nextScene_) {
+            scene_ = std::move(nextScene_);
+            accumulator = 0.0;
+        }
     }
 }
 

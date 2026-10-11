@@ -20,7 +20,8 @@ struct InventoryRequest {
 // Moving items: Confirm on a slot selects it, Confirm on another slot moves/merges/swaps.
 class InventoryScreen {
 public:
-    void open(const ItemDb& db, const SpriteDb& sprites, Inventory& inv, Container* chest);
+    void open(const ItemDb& db, const SpriteDb& sprites, Inventory& inv, Container* chest,
+              std::string chestTitle = "Storage Chest");
     InventoryRequest update(const Input& input);
     void render(SDL_Renderer* r) const;
 
@@ -40,6 +41,7 @@ private:
     const SpriteDb* sprites_ = nullptr;
     Inventory* inv_ = nullptr;
     Container* chest_ = nullptr;
+    std::string chestTitle_;
 
     std::vector<Slot> slots_;
     std::vector<SDL_FRect> rects_;

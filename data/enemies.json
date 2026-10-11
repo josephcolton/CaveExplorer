@@ -1,0 +1,25 @@
+{
+ "_comment": "Creature types. behavior: walker (patrols ground, chases on sight) or flyer (hovers, swoops). Art is either an animation set ('anim') or a 32x32 icon ('icon'). size = collision box [w,h]. Place them in Tiled as 'enemy' objects.",
+ "enemies": {
+  "bat": {
+   "name": "Cave Bat", "behavior": "flyer", "anim": "bat",
+   "health": 5, "damage": 8, "speed": 85, "sight": 190, "size": [20, 14],
+   "drops": [{"item": "coins", "min": 1, "max": 3, "chance": 0.6}]
+  },
+  "giant_bat": {
+   "name": "Giant Bat", "behavior": "flyer", "anim": "bat", "tint": [255, 140, 140],
+   "health": 12, "damage": 14, "speed": 110, "sight": 230, "size": [20, 14],
+   "drops": [{"item": "coins", "min": 3, "max": 7, "chance": 0.8}, {"item": "horn", "min": 1, "max": 1, "chance": 0.2}]
+  },
+  "rat": {
+   "name": "Cave Rat", "behavior": "walker", "icon": "mon_rat", "faces": "left",
+   "health": 4, "damage": 6, "speed": 45, "chase_speed": 95, "sight": 170, "size": [24, 16],
+   "drops": [{"item": "coins", "min": 1, "max": 2, "chance": 0.5}, {"item": "bone", "min": 1, "max": 1, "chance": 0.3}]
+  },
+  "beetle": {
+   "name": "Giant Beetle", "behavior": "walker", "icon": "mon_beetle", "faces": "left",
+   "health": 14, "damage": 12, "speed": 28, "chase_speed": 60, "sight": 140, "size": [28, 20],
+   "drops": [{"item": "coins", "min": 2, "max": 6, "chance": 0.8}, {"item": "horn", "min": 1, "max": 1, "chance": 0.5}]
+  }
+ }
+}

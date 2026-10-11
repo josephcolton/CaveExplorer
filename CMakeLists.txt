@@ -60,7 +60,9 @@ FetchContent_MakeAvailable(SDL3 json SDL3_image SDL3_mixer)
 add_library(cave_logic STATIC
   src/game/Items.cpp
   src/game/Inventory.cpp
-  src/game/WorldSave.cpp)
+  src/game/WorldSave.cpp
+  src/game/Character.cpp
+  src/game/SaveGame.cpp)
 target_include_directories(cave_logic PUBLIC src)
 target_link_libraries(cave_logic PUBLIC nlohmann_json::nlohmann_json)
 
@@ -69,7 +71,9 @@ file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.h)
 list(REMOVE_ITEM GAME_SOURCES
   ${CMAKE_SOURCE_DIR}/src/game/Items.cpp
   ${CMAKE_SOURCE_DIR}/src/game/Inventory.cpp
-  ${CMAKE_SOURCE_DIR}/src/game/WorldSave.cpp)
+  ${CMAKE_SOURCE_DIR}/src/game/WorldSave.cpp
+  ${CMAKE_SOURCE_DIR}/src/game/Character.cpp
+  ${CMAKE_SOURCE_DIR}/src/game/SaveGame.cpp)
 add_executable(cave_explorer ${GAME_SOURCES})
 target_link_libraries(cave_explorer PRIVATE cave_logic SDL3::SDL3 SDL3_image::SDL3_image SDL3_mixer::SDL3_mixer)
 
@@ -98,7 +102,13 @@ endif()
 # Runs on every build so edited maps/data are always picked up.
 add_custom_target(copy_content ALL
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:cave_explorer>/assets
+          ${CMAKE_SOURCE_DIR}/assets/maps $<TARGET_FILE_DIR:cave_explorer>/assets/maps
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_SOURCE_DIR}/assets/tiles $<TARGET_FILE_DIR:cave_explorer>/assets/tiles
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_SOURCE_DIR}/assets/sprites $<TARGET_FILE_DIR:cave_explorer>/assets/sprites
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_SOURCE_DIR}/assets/soundtrack $<TARGET_FILE_DIR:cave_explorer>/assets/soundtrack
   COMMAND ${CMAKE_COMMAND} -E copy_directory
           ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:cave_explorer>/data
   COMMENT "Copying game content")

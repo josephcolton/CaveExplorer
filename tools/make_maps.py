@@ -101,7 +101,7 @@ def tileset_json():
 class Map:
     def __init__(self, area_id, w, h, display, bg, fill=".", backdrop=None, music=""):
         self.id, self.w, self.h, self.display, self.bg = area_id, w, h, display, bg
-        self.music = music  # file in assets/music/
+        self.music = music  # file in assets/soundtrack/
         self.backdrop = backdrop  # background tile drawn behind see-through ground tiles
         self.grid = [[fill] * w for _ in range(h)]
         self.objects = []
@@ -144,6 +144,12 @@ class Map:
         if unique_id:
             props["unique_id"] = unique_id
         self.obj("pickup", tx * T + T / 2, ground_row * T, 0, 0, name=item, **props)
+        self.objects[-1]["point"] = True
+
+    def enemy(self, kind, tx, row, flying=False, **props):
+        # Walkers: point = feet on top of tile row `row`. Flyers: point = centre of that tile.
+        y = row * T + (T / 2 if flying else 0)
+        self.obj("enemy", tx * T + T / 2, y, 0, 0, name=kind, enemy=kind, **props)
         self.objects[-1]["point"] = True
 
     def to_tmj(self):
@@ -251,6 +257,11 @@ def cave_1():
     m.pickup("bone", 12, 24)
     m.pickup("coins", 20, 27, count=8)
     m.pickup("crystal", 30, 22)
+    m.enemy("bat", 23, 11, flying=True, enemy_easy="none")
+    m.enemy("bat", 18, 20, flying=True)
+    m.enemy("rat", 15, 27)
+    m.enemy("rat", 26, 27, enemy_easy="none")
+    m.enemy("none", 33, 27, enemy_hard="beetle")
     m.spawn("from_forest", 4, 5)
     m.spawn("from_cave_2", 36, 27)
     m.door(2, 3, 3, 4, "forest", "from_cave")
@@ -268,6 +279,10 @@ def cave_2():
     m.pickup("machete", 35, 17, unique_id="cave2_machete")
     m.pickup("crystal", 29, 10)
     m.pickup("coins", 23, 13, count=12)
+    m.enemy("bat", 12, 7, flying=True)
+    m.enemy("bat", 30, 6, flying=True, enemy_hard="giant_bat")
+    m.enemy("beetle", 23, 13, enemy_easy="rat")
+    m.enemy("rat", 6, 17)
     m.spawn("from_cave_1", 2, 17)
     m.door(0, 14, 0, 16, "cave_1", "from_cave_2", trigger="touch")
     return m

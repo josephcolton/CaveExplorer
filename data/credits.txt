@@ -1,0 +1,23 @@
+CAVE EXPLORER
+
+Game design: Joseph Colton
+Code: Joseph Colton, with Claude (Anthropic)
+
+ART
+  Item icons, creatures - Dungeon Crawl 32x32 tiles (CC0), many artists.
+    opengameart.org/content/dungeon-crawl-32x32-tiles
+  Knight and bat - "castle platformer" by Jetrel (CC0).
+    opengameart.org/content/castle-platformer
+  Trees, chest, fence, signs - "Nature tileset" by Paulina Riva (CC-BY 3.0).
+    opengameart.org/content/nature-tileset
+
+MUSIC
+  "Approaching The Green Grass", "Hero Within", "Gloomey" and
+  "Infection By Chewing" - written and produced by
+  Ove Melaa (omsoftware@hotmail.com), -2013 Ove Melaa (CC-BY 3.0).
+  "Cave Theme" - Brandon Morris (CC0).
+
+LIBRARIES
+  SDL3, SDL3_image, SDL3_mixer (zlib) - libsdl.org
+  nlohmann/json (MIT)
+  stb_image, stb_vorbis, dr_mp3, dr_flac (public domain / MIT-0)

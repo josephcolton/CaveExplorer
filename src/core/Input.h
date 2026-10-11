@@ -38,6 +38,9 @@ public:
     bool pressed(Action a) const { return pressed_[idx(a)]; }
     bool released(Action a) const { return released_[idx(a)]; }
 
+    // Debug/automation: holds an action as if a key were down.
+    void setScripted(Action a, bool held) { scriptHeld_[idx(a)] = held; refresh(); }
+
     // Called after each fixed update tick so edge events are seen exactly once.
     void consumeEdges();
 
@@ -52,6 +55,7 @@ private:
     std::array<bool, SDL_SCANCODE_COUNT> keysHeld_{};
     std::array<bool, SDL_GAMEPAD_BUTTON_COUNT> buttonsHeld_{};
     std::array<bool, kActionCount> stickHeld_{};
+    std::array<bool, kActionCount> scriptHeld_{};
 
     std::array<bool, kActionCount> down_{};
     std::array<bool, kActionCount> pressed_{};

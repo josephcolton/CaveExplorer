@@ -23,11 +23,17 @@ struct ItemDef {
     bool unique = false;
     // Gameplay numbers; systems that use them arrive in later steps.
     int damage = 0;
+    float reach = 24.0f;            // melee: hitbox length in front of the explorer (px)
+    float cooldown = 0.35f;         // seconds between attacks / shots
+    std::string ammo;               // ranged: item id consumed per shot (empty = melee)
+    float projectileSpeed = 400.0f; // ranged: launch speed (px/s)
     float food = 0.0f;
     float heal = 0.0f;
     std::vector<std::string> tags;  // e.g. "cut" (clears bushes), "break" (breaks rocks)
 
     bool hasTag(const std::string& tag) const;
+    bool isRanged() const { return !ammo.empty(); }
+    bool isMelee() const { return damage > 0 && ammo.empty(); }
     int sellPrice() const { return value > 1 ? value / 2 : (value > 0 ? 1 : 0); }
 };
 
@@ -42,5 +48,11 @@ public:
 
 private:
     std::unordered_map<std::string, ItemDef> items_;
-    ItemDef unknown_{"unknown", "???", "", "", "", EquipSlot::None, 1, 0, false, false, 0, 0, 0, {}};
+    ItemDef unknown_ = [] {
+        ItemDef d;
+        d.id = "unknown";
+        d.name = "???";
+        d.sellable = false;
+        return d;
+    }();
 };

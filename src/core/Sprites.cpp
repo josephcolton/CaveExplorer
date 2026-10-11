@@ -54,7 +54,8 @@ SDL_FPoint SpriteDb::size(const std::string& name) const {
     return it == sprites_.end() ? SDL_FPoint{0, 0} : SDL_FPoint{it->second.src.w, it->second.src.h};
 }
 
-void SpriteDb::drawIcon(SDL_Renderer* r, const std::string& icon, float x, float y, float size) const {
+void SpriteDb::drawIcon(SDL_Renderer* r, const std::string& icon, float x, float y, float size, bool flipX,
+                        SDL_Color tint) const {
     const SDL_FRect dst{std::round(x), std::round(y), size, size};
     auto it = icons_.find(icon);
     if (it == icons_.end() || !iconTexture_) {
@@ -63,5 +64,9 @@ void SpriteDb::drawIcon(SDL_Renderer* r, const std::string& icon, float x, float
         SDL_RenderDebugText(r, dst.x + size / 2 - 4, dst.y + size / 2 - 4, "?");
         return;
     }
-    SDL_RenderTexture(r, iconTexture_, &it->second, &dst);
+    SDL_SetTextureColorMod(iconTexture_, tint.r, tint.g, tint.b);
+    SDL_SetTextureAlphaMod(iconTexture_, tint.a);
+    SDL_RenderTextureRotated(r, iconTexture_, &it->second, &dst, 0.0, nullptr, flipX ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+    SDL_SetTextureColorMod(iconTexture_, 255, 255, 255);
+    SDL_SetTextureAlphaMod(iconTexture_, 255);
 }

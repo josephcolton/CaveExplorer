@@ -35,6 +35,9 @@
   "feather_charm": 30,
   "horn": 31,
   "prop_chest": 32,
-  "prop_shop": 33
+  "prop_shop": 33,
+  "mon_rat": 34,
+  "mon_beetle": 35,
+  "remains": 36
  }
 }

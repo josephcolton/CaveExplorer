@@ -54,6 +54,10 @@ bool ItemDb::loadFromJson(const std::string& text, std::string* error) {
         d.sellable = j.value("sellable", true);
         d.unique = j.value("unique", false);
         d.damage = j.value("damage", 0);
+        d.reach = j.value("reach", 24.0f);
+        d.cooldown = j.value("cooldown", 0.35f);
+        d.ammo = j.value("ammo", "");
+        d.projectileSpeed = j.value("projectile_speed", 400.0f);
         d.food = j.value("food", 0.0f);
         d.heal = j.value("heal", 0.0f);
         d.tags = j.value("tags", std::vector<std::string>{});

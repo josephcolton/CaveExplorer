@@ -37,3 +37,6 @@ feather_charm   item/amulet/celtic_blue.png
 horn            item/misc/misc_horn.png
 prop_chest      item/misc/misc_box.png
 prop_shop       dc-dngn/shops/shop_general.png
+mon_rat         dc-mon/animals/rat.png
+mon_beetle      dc-mon/animals/giant_beetle.png
+remains         item/armour/animal_skin1.png

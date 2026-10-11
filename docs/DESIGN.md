@@ -14,8 +14,13 @@ covers the design decisions so far and how to build the first playable version.
 - [x] 3. Beach → Forest → Cave 1 → Cave 2 with doors
 - [x] 4. Items, inventory (9 + 5 equipment slots), pickups, persistent chest, beach shop, coins
 - [x] Music: looping per-area tracks with crossfade (forest done; deep_cave.ogg reserved for a deep area)
-- [ ] 5. Combat  ·  6. Death loop  ·  7. Gated obstacle  ·  7b. Item abilities, NPCs/quests
-- [ ] 8. Shrine buff, hunger  ·  9. Menus/settings/saving  ·  10. Packaging
+- [x] 5. Combat: melee per hand, sling + stones, bats (flyers), rats and beetles (walkers), drops,
+       per-difficulty enemy placement; temporary knight player sprite
+- [x] 6. Death loop: corpse piles (searchable, persistent), new explorer with rolled stats
+- [x] 9 (part). Title screen, 3 save slots, pause menu (save, settings, credits, about, quit),
+       settings (music/sound volume, fullscreen, difficulty, controls list), autosaves
+- [ ] 7. Gated obstacle  ·  7b. Item abilities, NPCs/quests  ·  8. Shrine buff, hunger
+- [ ] 9 (rest). Control rebinding, sound effects  ·  10. Packaging
 
 ## Art sources
 - Item icons: Dungeon Crawl 32x32 tiles (CC0).
@@ -157,4 +162,12 @@ Key mechanisms:
 - **NPC memory:** while a character lives, NPC quest state and stock changes are remembered, even
   though the rest of the area refreshes. All of it is cleared when the character dies. Stored in a
   per-character `RunState` that sits next to the persistent `WorldSave`.
+- **Boss arenas:** bosses live in their own small areas (mini-areas just for the fight), each with
+  its own music. `boss_1.ogg` ("Gloomey") and `boss_2.ogg` ("Infection By Chewing"), both by Ove Melaa,
+  are reserved for the first two bosses.
+- **Underground city:** a deep, inhabited area (traders, quest givers). Music: `underground_city.mp3`
+  ("Hero Within", Ove Melaa).
+- **Save slots:** three slots, each a separate world (chest, corpse piles, unique items taken,
+  explorers lost) plus the current explorer and their position. Starting a new game in a slot
+  wipes it. Autosaves on area change, chest/corpse close, unique pickup, death and quitting.
 - Still to decide while building: rules for rolling character stats, shop prices, the enemy roster.

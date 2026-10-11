@@ -14,7 +14,7 @@ public:
     bool init();
     void shutdown();
 
-    // Plays a looping track from assets/music/, crossfading from whatever is playing.
+    // Plays a looping track from assets/soundtrack/, crossfading from whatever is playing.
     // Asking for the track that is already playing does nothing; "" fades music out.
     void playMusic(const std::string& file);
 

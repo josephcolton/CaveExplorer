@@ -5,19 +5,28 @@ the licenses below.
 
 ## Art
 
-- **Dungeon Crawl 32x32 tiles** — item icons (`assets/sprites/icons.png`).
+- **Dungeon Crawl 32x32 tiles** — item icons and creatures (`assets/sprites/icons.png`).
   Many artists; see the pack's `utility/FilteredList.txt`. CC0 1.0.
   https://opengameart.org/content/dungeon-crawl-32x32-tiles
+- **"castle platformer"** by **Jetrel** — the knight (temporary player sprite) and the bat
+  (`assets/sprites/knight.png`, `assets/sprites/bat.png`). CC0.
+  https://opengameart.org/content/castle-platformer
 - **Nature tileset** by **Paulina Riva (PauR)** — trees, chest, fence, signs and other outdoor
   props (`assets/sprites/nature.png`). CC-BY 3.0.
   https://opengameart.org/content/nature-tileset
 
 ## Music
 
-- **"Approaching The Green Grass"** (`assets/music/forest.ogg`) — written and produced by
+- **"Approaching The Green Grass"** (`assets/soundtrack/forest.ogg`) — written and produced by
   Ove Melaa (omsoftware@hotmail.com), -2013 Ove Melaa. CC-BY 3.0.
   https://opengameart.org/content/oves-essential-game-audio-pack-collection-160-files-updated
-- **"Cave Theme"** (`assets/music/deep_cave.ogg`) by Brandon Morris (Brandon75689). CC0 / OGA-BY 3.0.
+- **"Hero Within"** (`assets/soundtrack/underground_city.mp3`) — written and produced by Ove Melaa
+  (omsoftware@hotmail.com), -2013 Ove Melaa. CC-BY 3.0. Same pack as above.
+- **"Gloomey"** (`assets/soundtrack/boss_1.ogg`) — written and produced by Ove Melaa
+  (omsoftware@hotmail.com), -2013 Ove Melaa. CC-BY 3.0. Same pack as above.
+- **"Infection By Chewing"** (`assets/soundtrack/boss_2.ogg`) — written and produced by Ove Melaa
+  (omsoftware@hotmail.com), -2013 Ove Melaa. CC-BY 3.0. Same pack as above.
+- **"Cave Theme"** (`assets/soundtrack/deep_cave.ogg`) by Brandon Morris (Brandon75689). CC0 / OGA-BY 3.0.
   https://opengameart.org/content/cave-theme
 
 ## Libraries

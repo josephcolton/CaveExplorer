@@ -18,7 +18,8 @@ public:
     SDL_FPoint size(const std::string& name) const;
 
     // Draws a 32x32 item icon with its top-left at (x, y). Unknown icons draw a "?" box.
-    void drawIcon(SDL_Renderer* r, const std::string& icon, float x, float y, float size = 32.0f) const;
+    void drawIcon(SDL_Renderer* r, const std::string& icon, float x, float y, float size = 32.0f, bool flipX = false,
+                  SDL_Color tint = {255, 255, 255, 255}) const;
 
 private:
     struct Sprite {
