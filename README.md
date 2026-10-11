@@ -10,7 +10,7 @@ for the design and roadmap.
 ## Building
 
 Requirements: CMake 3.25+, a C++20 compiler (GCC 11+, Clang 14+, or MSVC 2022), Git, and
-internet access on the first configure (SDL3, SDL3_image, nlohmann/json and doctest are
+internet access on the first configure (SDL3, SDL3_image, SDL3_mixer, nlohmann/json and doctest are
 fetched automatically). Run the unit tests with `ctest --test-dir build` or `build/cave_tests`.
 
 On Ubuntu, install SDL's system dependencies first:
@@ -49,6 +49,8 @@ cmake --build build
 ## Maps
 
 Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 32x32 tiles.
+- Map properties: `display_name` (shown on entry) and `music` (a file in `assets/music/`, looped
+  while in the area and crossfaded on area changes; empty = silence).
 - Tile layers: `background` (decoration) and `ground` (custom property `collides = true`).
   A layer with `foreground = true` is drawn in front of the player.
 - Tile collision comes from the tileset tile property `collision` = `solid` or `oneway`.
@@ -63,6 +65,12 @@ existing maps unless run with `--force`. Edit the maps in Tiled from here on.
 Objects also include `pickup` (point; `item` id or `coins`, `count`, optional `unique_id` so it
 never respawns once taken), `chest` (the persistent storage chest), `shop` (`shop_id` from
 `data/shops.json`) and `decor` (`sprite` name from `data/sprites.json`, drawn on its bottom-left).
+
+## Music
+
+Only tracks the game uses are committed (whitelisted in `.gitignore`); anything else dropped
+into `assets/music/` stays local. Current tracks: `forest.ogg` (The Forest) and `deep_cave.ogg`
+(reserved for a deep cave area).
 
 ## Game data
 

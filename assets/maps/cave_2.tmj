@@ -17,6 +17,11 @@
    "name": "display_name",
    "type": "string",
    "value": "Mossy Hollow"
+  },
+  {
+   "name": "music",
+   "type": "string",
+   "value": ""
   }
  ],
  "tilesets": [

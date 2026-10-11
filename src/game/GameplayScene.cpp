@@ -95,6 +95,7 @@ void GameplayScene::enterArea(const std::string& areaId, const std::string& spaw
     camera_.snapTo(player_.box.center(), area_.map.pixelWidth(), area_.map.pixelHeight(), App::kViewWidth,
                    App::kViewHeight);
     areaTitleTimer_ = kAreaTitleTime;
+    app_.audio().playMusic(area_.music);
     spawnAreaObjects();
 }
 

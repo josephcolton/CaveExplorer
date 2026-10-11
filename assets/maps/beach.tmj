@@ -17,6 +17,11 @@
    "name": "display_name",
    "type": "string",
    "value": "The Beach"
+  },
+  {
+   "name": "music",
+   "type": "string",
+   "value": ""
   }
  ],
  "tilesets": [

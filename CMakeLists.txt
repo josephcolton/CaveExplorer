@@ -17,7 +17,7 @@ set(SDL_STATIC OFF CACHE BOOL "" FORCE)
 set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(SDL3
   GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-  GIT_TAG release-3.2.30
+  GIT_TAG release-3.4.8
   GIT_SHALLOW TRUE)
 
 FetchContent_Declare(json
@@ -37,7 +37,24 @@ FetchContent_Declare(SDL3_image
   GIT_TAG release-3.2.6
   GIT_SHALLOW TRUE)
 
-FetchContent_MakeAvailable(SDL3 json SDL3_image)
+# SDL_mixer: WAV, OGG (stb_vorbis), MP3 (dr_mp3), FLAC (dr_flac) only - all built in, no system libs.
+set(SDLMIXER_VENDORED OFF CACHE BOOL "" FORCE)
+set(SDLMIXER_TESTS OFF CACHE BOOL "" FORCE)
+set(SDLMIXER_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(SDLMIXER_FLAC_LIBFLAC OFF CACHE BOOL "" FORCE)
+set(SDLMIXER_GME OFF CACHE BOOL "" FORCE)
+set(SDLMIXER_MOD OFF CACHE BOOL "" FORCE)
+set(SDLMIXER_MP3_MPG123 OFF CACHE BOOL "" FORCE)
+set(SDLMIXER_MIDI OFF CACHE BOOL "" FORCE)
+set(SDLMIXER_OPUS OFF CACHE BOOL "" FORCE)
+set(SDLMIXER_VORBIS_VORBISFILE OFF CACHE BOOL "" FORCE)
+set(SDLMIXER_WAVPACK OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(SDL3_mixer
+  GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
+  GIT_TAG release-3.2.4
+  GIT_SHALLOW TRUE)
+
+FetchContent_MakeAvailable(SDL3 json SDL3_image SDL3_mixer)
 
 # --- Game logic without SDL (shared with the unit tests) ---------------------
 add_library(cave_logic STATIC
@@ -54,7 +71,7 @@ list(REMOVE_ITEM GAME_SOURCES
   ${CMAKE_SOURCE_DIR}/src/game/Inventory.cpp
   ${CMAKE_SOURCE_DIR}/src/game/WorldSave.cpp)
 add_executable(cave_explorer ${GAME_SOURCES})
-target_link_libraries(cave_explorer PRIVATE cave_logic SDL3::SDL3 SDL3_image::SDL3_image)
+target_link_libraries(cave_explorer PRIVATE cave_logic SDL3::SDL3 SDL3_image::SDL3_image SDL3_mixer::SDL3_mixer)
 
 if(MSVC)
   target_compile_options(cave_explorer PRIVATE /W4 /permissive-)

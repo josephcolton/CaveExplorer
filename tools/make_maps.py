@@ -99,8 +99,9 @@ def tileset_json():
 
 # ------------------------------------------------------------------------ maps
 class Map:
-    def __init__(self, area_id, w, h, display, bg, fill=".", backdrop=None):
+    def __init__(self, area_id, w, h, display, bg, fill=".", backdrop=None, music=""):
         self.id, self.w, self.h, self.display, self.bg = area_id, w, h, display, bg
+        self.music = music  # file in assets/music/
         self.backdrop = backdrop  # background tile drawn behind see-through ground tiles
         self.grid = [[fill] * w for _ in range(h)]
         self.objects = []
@@ -173,7 +174,8 @@ class Map:
             "renderorder": "right-down", "infinite": False, "width": self.w, "height": self.h,
             "tilewidth": T, "tileheight": T, "backgroundcolor": self.bg,
             "nextlayerid": 4, "nextobjectid": len(objects) + 1,
-            "properties": [{"name": "display_name", "type": "string", "value": self.display}],
+            "properties": [{"name": "display_name", "type": "string", "value": self.display},
+                           {"name": "music", "type": "string", "value": self.music}],
             "tilesets": [tileset_json()],
             "layers": [
                 tile_layer(1, "background", layers["background"], []),
@@ -206,7 +208,7 @@ def beach():
 
 
 def forest():
-    m = Map("forest", 48, 14, "The Forest", "#6fa8c8")
+    m = Map("forest", 48, 14, "The Forest", "#6fa8c8", music="forest.ogg")
     m.fill(0, 11, 47, 11, "G")
     m.fill(0, 12, 47, 13, "D")
     m.fill(20, 9, 26, 9, "G")

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/Assets.h"
+#include "core/Audio.h"
 #include "core/Input.h"
 #include "core/Scene.h"
 
@@ -37,6 +38,7 @@ public:
     SDL_Renderer* renderer() { return renderer_; }
     Input& input() { return input_; }
     Assets& assets() { return assets_; }
+    Audio& audio() { return audio_; }
 
     const Options& options() const { return options_; }
     bool debugDraw = false;
@@ -51,6 +53,7 @@ private:
     SDL_Renderer* renderer_ = nullptr;
     Input input_;
     Assets assets_;
+    Audio audio_;
     std::unique_ptr<Scene> scene_;
     bool running_ = false;
     bool fullscreen_ = false;

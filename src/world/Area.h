@@ -32,6 +32,7 @@ public:
 
     std::string id;
     std::string displayName;
+    std::string music;  // file in assets/music/, empty = silence
     SDL_Color background{0, 0, 0, 255};
     Tilemap map;
     std::vector<MapObject> objects;

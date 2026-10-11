@@ -12,8 +12,16 @@ the licenses below.
   props (`assets/sprites/nature.png`). CC-BY 3.0.
   https://opengameart.org/content/nature-tileset
 
+## Music
+
+- **"Approaching The Green Grass"** (`assets/music/forest.ogg`) — written and produced by
+  Ove Melaa (omsoftware@hotmail.com), -2013 Ove Melaa. CC-BY 3.0.
+  https://opengameart.org/content/oves-essential-game-audio-pack-collection-160-files-updated
+- **"Cave Theme"** (`assets/music/deep_cave.ogg`) by Brandon Morris (Brandon75689). CC0 / OGA-BY 3.0.
+  https://opengameart.org/content/cave-theme
+
 ## Libraries
 
-- SDL3 and SDL3_image — zlib license — https://libsdl.org
+- SDL3, SDL3_image and SDL3_mixer — zlib license — https://libsdl.org
 - nlohmann/json — MIT — https://github.com/nlohmann/json
 - doctest (tests only) — MIT — https://github.com/doctest/doctest

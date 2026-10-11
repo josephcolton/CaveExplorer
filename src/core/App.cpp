@@ -26,12 +26,14 @@ bool App::init(const Options& options) {
 
     input_.init();
     assets_.init(renderer_);
+    audio_.init();
     scene_ = std::make_unique<GameplayScene>(*this);
     return true;
 }
 
 void App::shutdown() {
     scene_.reset();
+    audio_.shutdown();
     assets_.clear();
     input_.shutdown();
     if (renderer_) SDL_DestroyRenderer(renderer_);

@@ -13,6 +13,7 @@ covers the design decisions so far and how to build the first playable version.
 - [x] 2. Tiled areas, player physics, camera
 - [x] 3. Beach → Forest → Cave 1 → Cave 2 with doors
 - [x] 4. Items, inventory (9 + 5 equipment slots), pickups, persistent chest, beach shop, coins
+- [x] Music: looping per-area tracks with crossfade (forest done; deep_cave.ogg reserved for a deep area)
 - [ ] 5. Combat  ·  6. Death loop  ·  7. Gated obstacle  ·  7b. Item abilities, NPCs/quests
 - [ ] 8. Shrine buff, hunger  ·  9. Menus/settings/saving  ·  10. Packaging
 
@@ -24,7 +25,7 @@ covers the design decisions so far and how to build the first playable version.
 - Still needed: animated side-view explorer, side-view ground/ledge tiles for beach, forest and caves.
 
 ## Decisions made
-- **Tech:** C++20, SDL3 (+ SDL3_image, SDL3_mixer, SDL3_ttf), CMake. Builds on Windows and Ubuntu.
+- **Tech:** C++20, SDL3 3.4 (+ SDL3_image, SDL3_mixer, later SDL3_ttf), CMake. Builds on Windows and Ubuntu.
 - **World:** hand-built areas made in the **Tiled** editor (.tmj JSON files). Only one area is loaded
   at a time.
 - **Area refresh:** every time an area loads, **everything in it resets** (enemies, loot, obstacles,

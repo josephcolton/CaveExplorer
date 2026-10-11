@@ -79,6 +79,8 @@ bool Area::load(const std::string& areaId, Assets& assets) {
     const auto mapProps = readProperties(doc);
     auto nameIt = mapProps.find("display_name");
     displayName = (nameIt != mapProps.end() && nameIt->second.is_string()) ? nameIt->second.get<std::string>() : areaId;
+    auto musicIt = mapProps.find("music");
+    music = (musicIt != mapProps.end() && musicIt->second.is_string()) ? musicIt->second.get<std::string>() : "";
 
     const std::filesystem::path mapDir = std::filesystem::path(path).parent_path();
 

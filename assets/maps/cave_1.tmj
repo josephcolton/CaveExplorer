@@ -17,6 +17,11 @@
    "name": "display_name",
    "type": "string",
    "value": "Upper Caves"
+  },
+  {
+   "name": "music",
+   "type": "string",
+   "value": ""
   }
  ],
  "tilesets": [
