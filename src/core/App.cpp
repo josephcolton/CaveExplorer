@@ -4,6 +4,8 @@
 #include "game/TitleScene.h"
 #include "ui/Ui.h"
 
+#include <SDL3_image/SDL_image.h>
+
 #include <algorithm>
 #include <sstream>
 
@@ -23,6 +25,10 @@ bool App::init(const Options& options) {
     if (!renderer_) {
         SDL_Log("SDL_CreateRenderer failed: %s", SDL_GetError());
         return false;
+    }
+    if (SDL_Surface* icon = IMG_Load(assetPath("sprites/icon.png").c_str())) {
+        SDL_SetWindowIcon(window_, icon);
+        SDL_DestroySurface(icon);
     }
     SDL_SetRenderVSync(renderer_, 1);
     SDL_SetRenderLogicalPresentation(renderer_, kViewWidth, kViewHeight, SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);

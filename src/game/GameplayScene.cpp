@@ -863,10 +863,11 @@ void GameplayScene::updateDialogue() {
 }
 
 void GameplayScene::restartArea(const std::string& reason) {
-    // Reload the area as if walking back in through the doorway we used. Health, items and
-    // quests are untouched; freebies already taken stay taken.
+    // Reload the area at its entrance from the surface side (the map's restart_spawn), or the
+    // doorway we came in by if the map doesn't say. Health, items and quests are untouched;
+    // freebies already taken stay taken.
     toast(reason);
-    requestTransition(area_.id, entrySpawn_);
+    requestTransition(area_.id, area_.restartSpawn.empty() ? entrySpawn_ : area_.restartSpawn);
 }
 
 void GameplayScene::updateObstaclePushing(float dt) {

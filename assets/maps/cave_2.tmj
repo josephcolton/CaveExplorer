@@ -22,6 +22,11 @@
    "name": "music",
    "type": "string",
    "value": ""
+  },
+  {
+   "name": "restart_spawn",
+   "type": "string",
+   "value": "from_cave_1"
   }
  ],
  "tilesets": [

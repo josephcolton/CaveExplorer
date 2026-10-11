@@ -31,7 +31,9 @@ covers the design decisions so far and how to build the first playable version.
 - [x] Music: beach (HitCtrl), Upper Caves (Spring Spring); boss_3 reserved
 - [x] 9. Sound effects (32 events, CC0 packs, data/sounds.json), sound volume setting
 - [x] Ladders; level fixes so everything is reachable (tools/check_reach.py); Shift quick move
-- [ ] 10. Packaging
+- [x] 10. Packaging: CPack zip (Windows) / tar.gz (Linux) with bundled SDL libraries, game icon,
+       no console window on Windows; GitHub Actions builds, tests and packages both on every push
+- [x] Restart area returns to each area's surface-side entrance (map property restart_spawn)
 
 ## Art sources
 - Item icons: Dungeon Crawl 32x32 tiles (CC0).

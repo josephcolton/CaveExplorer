@@ -7,6 +7,17 @@ they carried stays where they fell — for the next explorer to find.
 Built with C++20 and SDL3. Runs on Windows and Linux (Ubuntu). See [docs/DESIGN.md](docs/DESIGN.md)
 for the design and roadmap.
 
+## Download and play
+
+Ready-to-play builds for **Windows** (`.zip`) and **Linux** (`.tar.gz`) are produced for every
+change: open the repository's **Actions** tab, pick the latest successful "Build" run, and download
+`CaveExplorer-Windows` or `CaveExplorer-Linux` under *Artifacts*.
+
+- **Windows:** unzip anywhere and run `cave_explorer.exe`.
+- **Linux:** `tar xzf CaveExplorer-*.tar.gz`, then run `./cave_explorer` inside the folder.
+  The SDL libraries it needs are included. (`cave-explorer.desktop` is a starting point for a
+  menu entry; edit its `Exec=` and `Icon=` paths.)
+
 ## Building
 
 Requirements: CMake 3.25+, a C++20 compiler (GCC 11+, Clang 14+, or MSVC 2022), Git, and
@@ -28,6 +39,18 @@ cmake -S . -B build -G Ninja
 cmake --build build
 ./build/cave_explorer        # cave_explorer.exe on Windows
 ```
+
+To make a package like the downloadable ones:
+
+```sh
+cmake -S . -B build-release -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build-release
+cd build-release && cpack     # -> CaveExplorer-<version>-windows-x64.zip / -linux-x64.tar.gz
+```
+
+On Windows the game has no console window; configure with `-DCAVE_WINDOWS_CONSOLE=ON` to get one
+showing log messages while developing. The version number comes from `project(... VERSION ...)`
+in `CMakeLists.txt`.
 
 ## Controls (defaults)
 
@@ -54,7 +77,8 @@ button per action). Pause (Esc / Start) and the menu keys are fixed.
 ## Maps
 
 Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 32x32 tiles.
-- Map properties: `display_name` (shown on entry) and `music` (a file in `assets/soundtrack/`, looped
+- Map properties: `display_name` (shown on entry), `restart_spawn` (where Esc → Restart area puts
+  you: the spawn on the way back toward the surface) and `music` (a file in `assets/soundtrack/`, looped
   while in the area and crossfaded on area changes; empty = silence).
 - Tile layers: `background` (decoration) and `ground` (custom property `collides = true`).
   A layer with `foreground = true` is drawn in front of the player.
@@ -141,7 +165,7 @@ See [CREDITS.md](CREDITS.md) for art and library credits.
 - Bushes need something sharp (machete, hand axe); boulders need a pickaxe. Swing at them with
   the hand that holds the tool. Obstacles never trap you: from the far side you can push through
   (a bush scratches a little).
-- Stuck? **Esc → Restart area** puts you back at the doorway you came in by. Creatures and
+- Stuck? **Esc → Restart area** puts you back at the area's entrance from the surface side. Creatures and
   obstacles reset; your health, items and quests don't.
 - Some items help just by being carried (the Feather Charm), others when worn or held (boots,
   helmets, the buckler). Hover an item in the inventory to see its effects; hover an empty slot

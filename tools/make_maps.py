@@ -106,9 +106,10 @@ def tileset_json():
 
 # ------------------------------------------------------------------------ maps
 class Map:
-    def __init__(self, area_id, w, h, display, bg, fill=".", backdrop=None, music=""):
+    def __init__(self, area_id, w, h, display, bg, fill=".", backdrop=None, music="", restart="start"):
         self.id, self.w, self.h, self.display, self.bg = area_id, w, h, display, bg
         self.music = music  # file in assets/soundtrack/
+        self.restart = restart  # spawn used by "Restart area": the way back toward the surface
         self.backdrop = backdrop  # background tile drawn behind see-through ground tiles
         self.grid = [[fill] * w for _ in range(h)]
         self.objects = []
@@ -210,7 +211,8 @@ class Map:
             "tilewidth": T, "tileheight": T, "backgroundcolor": self.bg,
             "nextlayerid": 4, "nextobjectid": len(objects) + 1,
             "properties": [{"name": "display_name", "type": "string", "value": self.display},
-                           {"name": "music", "type": "string", "value": self.music}],
+                           {"name": "music", "type": "string", "value": self.music},
+                           {"name": "restart_spawn", "type": "string", "value": self.restart}],
             "tilesets": [tileset_json()],
             "layers": [
                 tile_layer(1, "background", layers["background"], []),
@@ -243,7 +245,7 @@ def beach():
 
 
 def forest():
-    m = Map("forest", 48, 14, "The Forest", "#6fa8c8", music="forest.ogg")
+    m = Map("forest", 48, 14, "The Forest", "#6fa8c8", music="forest.ogg", restart="from_beach")
     m.fill(0, 11, 47, 11, "G")
     m.fill(0, 12, 47, 13, "D")
     m.fill(20, 9, 26, 9, "G")
@@ -269,7 +271,8 @@ def forest():
 
 
 def cave_1():
-    m = Map("cave_1", 40, 30, "Upper Caves", "#0c0a10", fill="#", backdrop="b", music="upper_caves.ogg")
+    m = Map("cave_1", 40, 30, "Upper Caves", "#0c0a10", fill="#", backdrop="b", music="upper_caves.ogg",
+            restart="from_forest")
     m.fill(1, 1, 8, 4, "b")      # entrance chamber
     m.fill(8, 2, 25, 4, "b")     # tunnel east
     m.fill(22, 5, 25, 17, "b")   # shaft down
@@ -304,7 +307,7 @@ def cave_1():
 
 
 def cave_2():
-    m = Map("cave_2", 40, 20, "Mossy Hollow", "#0c0a10", fill="#", backdrop="b")
+    m = Map("cave_2", 40, 20, "Mossy Hollow", "#0c0a10", fill="#", backdrop="b", restart="from_cave_1")
     m.fill(0, 3, 38, 16, "b")
     m.fill(8, 15, 11, 16, "r")
     m.fill(12, 17, 31, 17, "m")  # slick moss floor

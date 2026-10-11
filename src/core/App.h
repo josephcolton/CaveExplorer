@@ -18,7 +18,11 @@ public:
     static constexpr int kViewWidth = 640;   // logical resolution: 20 x 11.25 tiles
     static constexpr int kViewHeight = 360;
     static constexpr float kTickRate = 60.0f;
-    static constexpr const char* kVersion = "0.2.0";
+#ifdef CAVE_VERSION
+    static constexpr const char* kVersion = CAVE_VERSION;  // from CMake's project(VERSION)
+#else
+    static constexpr const char* kVersion = "dev";
+#endif
 
     // Optional debug launch settings (from the command line). Any of startArea/giveItems/
     // openUi(gameplay screens) skip the title screen and start a throwaway game that never saves.

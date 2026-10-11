@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Cave Explorer
+Comment=A 2D cave-exploring platformer
+Exec=cave_explorer
+Icon=icon
+Terminal=false
+Categories=Game;

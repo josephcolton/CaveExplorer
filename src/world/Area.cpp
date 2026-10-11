@@ -81,6 +81,8 @@ bool Area::load(const std::string& areaId, Assets& assets) {
     displayName = (nameIt != mapProps.end() && nameIt->second.is_string()) ? nameIt->second.get<std::string>() : areaId;
     auto musicIt = mapProps.find("music");
     music = (musicIt != mapProps.end() && musicIt->second.is_string()) ? musicIt->second.get<std::string>() : "";
+    auto restartIt = mapProps.find("restart_spawn");
+    restartSpawn = (restartIt != mapProps.end() && restartIt->second.is_string()) ? restartIt->second.get<std::string>() : "";
 
     const std::filesystem::path mapDir = std::filesystem::path(path).parent_path();
 

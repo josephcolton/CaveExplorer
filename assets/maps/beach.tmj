@@ -22,6 +22,11 @@
    "name": "music",
    "type": "string",
    "value": "beach.ogg"
+  },
+  {
+   "name": "restart_spawn",
+   "type": "string",
+   "value": "start"
   }
  ],
  "tilesets": [

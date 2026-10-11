@@ -22,6 +22,11 @@
    "name": "music",
    "type": "string",
    "value": "upper_caves.ogg"
+  },
+  {
+   "name": "restart_spawn",
+   "type": "string",
+   "value": "from_forest"
   }
  ],
  "tilesets": [
