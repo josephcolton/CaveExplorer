@@ -12,7 +12,7 @@
  "tileheight": 32,
  "backgroundcolor": "#05050a",
  "nextlayerid": 5,
- "nextobjectid": 20,
+ "nextobjectid": 18,
  "properties": [
   {
    "name": "display_name",
@@ -3489,40 +3489,6 @@
     },
     {
      "id": 2,
-     "name": "light",
-     "type": "light",
-     "x": 368.0,
-     "y": 144.0,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true,
-     "properties": [
-      {
-       "name": "radius",
-       "type": "int",
-       "value": 55
-      },
-      {
-       "name": "color",
-       "type": "color",
-       "value": "#ff6ec8ff"
-      },
-      {
-       "name": "flicker",
-       "type": "bool",
-       "value": false
-      },
-      {
-       "name": "intensity",
-       "type": "float",
-       "value": 0.7
-      }
-     ]
-    },
-    {
-     "id": 3,
      "name": "crystal",
      "type": "pickup",
      "x": 592.0,
@@ -3547,41 +3513,7 @@
      ]
     },
     {
-     "id": 4,
-     "name": "light",
-     "type": "light",
-     "x": 592.0,
-     "y": 208.0,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true,
-     "properties": [
-      {
-       "name": "radius",
-       "type": "int",
-       "value": 55
-      },
-      {
-       "name": "color",
-       "type": "color",
-       "value": "#ff6ec8ff"
-      },
-      {
-       "name": "flicker",
-       "type": "bool",
-       "value": false
-      },
-      {
-       "name": "intensity",
-       "type": "float",
-       "value": 0.7
-      }
-     ]
-    },
-    {
-     "id": 5,
+     "id": 3,
      "name": "crystal",
      "type": "pickup",
      "x": 848.0,
@@ -3606,41 +3538,7 @@
      ]
     },
     {
-     "id": 6,
-     "name": "light",
-     "type": "light",
-     "x": 848.0,
-     "y": 272.0,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true,
-     "properties": [
-      {
-       "name": "radius",
-       "type": "int",
-       "value": 55
-      },
-      {
-       "name": "color",
-       "type": "color",
-       "value": "#ff6ec8ff"
-      },
-      {
-       "name": "flicker",
-       "type": "bool",
-       "value": false
-      },
-      {
-       "name": "intensity",
-       "type": "float",
-       "value": 0.7
-      }
-     ]
-    },
-    {
-     "id": 7,
+     "id": 4,
      "name": "crystal",
      "type": "pickup",
      "x": 1104.0,
@@ -3665,41 +3563,7 @@
      ]
     },
     {
-     "id": 8,
-     "name": "light",
-     "type": "light",
-     "x": 1104.0,
-     "y": 336.0,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true,
-     "properties": [
-      {
-       "name": "radius",
-       "type": "int",
-       "value": 55
-      },
-      {
-       "name": "color",
-       "type": "color",
-       "value": "#ff6ec8ff"
-      },
-      {
-       "name": "flicker",
-       "type": "bool",
-       "value": false
-      },
-      {
-       "name": "intensity",
-       "type": "float",
-       "value": 0.7
-      }
-     ]
-    },
-    {
-     "id": 9,
+     "id": 5,
      "name": "crystal",
      "type": "pickup",
      "x": 1328.0,
@@ -3724,11 +3588,11 @@
      ]
     },
     {
-     "id": 10,
+     "id": 6,
      "name": "light",
      "type": "light",
-     "x": 1328.0,
-     "y": 400.0,
+     "x": 304.0,
+     "y": 112.0,
      "width": 0,
      "height": 0,
      "rotation": 0,
@@ -3738,17 +3602,17 @@
       {
        "name": "radius",
        "type": "int",
-       "value": 55
+       "value": 70
       },
       {
        "name": "color",
        "type": "color",
-       "value": "#ff6ec8ff"
+       "value": "#ffffd9a0"
       },
       {
        "name": "flicker",
        "type": "bool",
-       "value": false
+       "value": true
       },
       {
        "name": "intensity",
@@ -3758,7 +3622,75 @@
      ]
     },
     {
-     "id": 11,
+     "id": 7,
+     "name": "light",
+     "type": "light",
+     "x": 816.0,
+     "y": 240.0,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "radius",
+       "type": "int",
+       "value": 70
+      },
+      {
+       "name": "color",
+       "type": "color",
+       "value": "#ffffd9a0"
+      },
+      {
+       "name": "flicker",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "intensity",
+       "type": "float",
+       "value": 0.7
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "light",
+     "type": "light",
+     "x": 1328.0,
+     "y": 368.0,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "radius",
+       "type": "int",
+       "value": 70
+      },
+      {
+       "name": "color",
+       "type": "color",
+       "value": "#ffffd9a0"
+      },
+      {
+       "name": "flicker",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "intensity",
+       "type": "float",
+       "value": 0.7
+      }
+     ]
+    },
+    {
+     "id": 9,
      "name": "helmet",
      "type": "pickup",
      "x": 1456.0,
@@ -3788,7 +3720,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 10,
      "name": "coins",
      "type": "pickup",
      "x": 1008.0,
@@ -3813,7 +3745,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 11,
      "name": "lamp_oil",
      "type": "pickup",
      "x": 656.0,
@@ -3838,7 +3770,7 @@
      ]
     },
     {
-     "id": 14,
+     "id": 12,
      "name": "beetle",
      "type": "enemy",
      "x": 816.0,
@@ -3858,7 +3790,7 @@
      ]
     },
     {
-     "id": 15,
+     "id": 13,
      "name": "rat",
      "type": "enemy",
      "x": 1136.0,
@@ -3878,7 +3810,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 14,
      "name": "beetle",
      "type": "enemy",
      "x": 1392.0,
@@ -3904,7 +3836,7 @@
      ]
     },
     {
-     "id": 17,
+     "id": 15,
      "name": "bat",
      "type": "enemy",
      "x": 976.0,
@@ -3924,7 +3856,7 @@
      ]
     },
     {
-     "id": 18,
+     "id": 16,
      "name": "from_cave_1",
      "type": "spawn",
      "x": 112.0,
@@ -3936,7 +3868,7 @@
      "point": true
     },
     {
-     "id": 19,
+     "id": 17,
      "name": "to_cave_1",
      "type": "door",
      "x": 0,

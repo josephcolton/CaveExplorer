@@ -12,7 +12,7 @@
  "tileheight": 32,
  "backgroundcolor": "#0c0a10",
  "nextlayerid": 5,
- "nextobjectid": 25,
+ "nextobjectid": 24,
  "properties": [
   {
    "name": "display_name",
@@ -3023,40 +3023,6 @@
     },
     {
      "id": 11,
-     "name": "light",
-     "type": "light",
-     "x": 144.0,
-     "y": 336.0,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true,
-     "properties": [
-      {
-       "name": "radius",
-       "type": "int",
-       "value": 40
-      },
-      {
-       "name": "color",
-       "type": "color",
-       "value": "#ffa0e0ff"
-      },
-      {
-       "name": "flicker",
-       "type": "bool",
-       "value": false
-      },
-      {
-       "name": "intensity",
-       "type": "float",
-       "value": 0.6
-      }
-     ]
-    },
-    {
-     "id": 12,
      "name": "ward",
      "type": "shrine",
      "x": 144.0,
@@ -3076,7 +3042,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 12,
      "name": "shadow",
      "type": "shrine",
      "x": 304.0,
@@ -3096,7 +3062,7 @@
      ]
     },
     {
-     "id": 14,
+     "id": 13,
      "name": "might",
      "type": "shrine",
      "x": 1008.0,
@@ -3116,7 +3082,7 @@
      ]
     },
     {
-     "id": 15,
+     "id": 14,
      "name": "crystal",
      "type": "pickup",
      "x": 1136.0,
@@ -3147,7 +3113,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 15,
      "name": "crystal",
      "type": "pickup",
      "x": 944.0,
@@ -3172,7 +3138,7 @@
      ]
     },
     {
-     "id": 17,
+     "id": 16,
      "name": "bone",
      "type": "pickup",
      "x": 560.0,
@@ -3197,7 +3163,7 @@
      ]
     },
     {
-     "id": 18,
+     "id": 17,
      "name": "coins",
      "type": "pickup",
      "x": 752.0,
@@ -3222,7 +3188,7 @@
      ]
     },
     {
-     "id": 19,
+     "id": 18,
      "name": "bat",
      "type": "enemy",
      "x": 400.0,
@@ -3242,7 +3208,7 @@
      ]
     },
     {
-     "id": 20,
+     "id": 19,
      "name": "bat",
      "type": "enemy",
      "x": 976.0,
@@ -3268,7 +3234,7 @@
      ]
     },
     {
-     "id": 21,
+     "id": 20,
      "name": "beetle",
      "type": "enemy",
      "x": 752.0,
@@ -3294,7 +3260,7 @@
      ]
     },
     {
-     "id": 22,
+     "id": 21,
      "name": "rat",
      "type": "enemy",
      "x": 208.0,
@@ -3314,7 +3280,7 @@
      ]
     },
     {
-     "id": 23,
+     "id": 22,
      "name": "from_cave_1",
      "type": "spawn",
      "x": 80.0,
@@ -3326,7 +3292,7 @@
      "point": true
     },
     {
-     "id": 24,
+     "id": 23,
      "name": "to_cave_1",
      "type": "door",
      "x": 0,

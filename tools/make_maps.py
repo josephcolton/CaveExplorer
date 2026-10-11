@@ -349,11 +349,9 @@ def cave_1():
     # The top tunnel continues east past a boulder -> Crystal Mine (needs a pickaxe).
     m.fill(26, 2, 39, 4, "b")
     m.obstacle("rock", 31, 2, 31, 4, passable_from="right")
-    m.light(36, 3, 45, "#6ec8ff", intensity=0.5)  # crystals glint beyond the boulder
+    m.light(36, 3, 45, "#ffd9a0", flicker=True, intensity=0.5)  # a miner's lamp beyond the boulder
     m.spawn("from_cave_5", 37, 5)
     m.door(39, 2, 39, 4, "cave_5", "from_cave_1", trigger="touch", gated_by="break")
-    m.light(30, 23, 70, "#6ec8ff", intensity=0.7)  # crystal seam above the east ledge
-    m.light(12, 23, 50, "#6ec8ff", intensity=0.5)
     m.light(22, 4, 60, "#ffd9a0", flicker=True, intensity=0.6)  # a candle stub at the top of the ladder
     m.fill(36, 23, 39, 26, "b")  # passage east
     m.pickup("stones", 6, 5, count=6)
@@ -400,7 +398,6 @@ def cave_2():
     # (Temporary home - it will move once more areas exist.)
     m.fill(3, 11, 6, 11, "r")
     m.pickup("breath_amulet", 4, 11, unique_id="hollow_amulet", gated_by="highjump")
-    m.light(4, 10, 40, "#a0e0ff", intensity=0.6)
     m.shrine("ward", 4, 17)
     m.shrine("shadow", 9, 15)  # on the rock step
     m.shrine("might", 31, 13)  # on the high ledge
@@ -479,7 +476,8 @@ def cave_5():
     m.fill(30, 7, 32, 7, "=")
     for x, top in ((11, 5), (18, 7), (26, 9), (34, 11), (41, 13)):
         m.pickup("crystal", x, top, count=2)
-        m.light(x, top - 1, 55, "#6ec8ff", intensity=0.7)
+    for x, y in ((9, 3), (25, 7), (41, 11)):  # old miners' lamps (the crystals glow on their own)
+        m.light(x, y, 70, "#ffd9a0", flicker=True, intensity=0.7)
     m.pickup("helmet", 45, 13, unique_id="mine_helmet")
     m.pickup("coins", 31, 7, count=15)
     m.pickup("lamp_oil", 20, 7, count=2)

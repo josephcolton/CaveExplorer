@@ -56,6 +56,7 @@ void InventoryScreen::buildLayout() {
 
 InventoryRequest InventoryScreen::update(const Input& input) {
     InventoryRequest req;
+    messageTime_ = std::max(0.0f, messageTime_ - 1.0f / 60.0f);  // called once per fixed tick
     cursor_ = ui::navigate(rects_, cursor_, input);
     const Slot& cur = slots_[static_cast<std::size_t>(cursor_)];
 
@@ -72,7 +73,7 @@ InventoryRequest InventoryScreen::update(const Input& input) {
         if (selected_ < 0) {
             if (!stackAt(cursor_).empty()) {
                 selected_ = cursor_;
-                message_.clear();
+                messageTime_ = 0.0f;
             }
         } else {
             const Slot& from = slots_[static_cast<std::size_t>(selected_)];
@@ -80,7 +81,7 @@ InventoryRequest InventoryScreen::update(const Input& input) {
                 selected_ = -1;
             } else if (transferStack(*db_, *from.container, from.index, *cur.container, cur.index)) {
                 selected_ = -1;
-                message_.clear();
+                messageTime_ = 0.0f;
                 ui::sound("item_move");
             } else {
                 setMessage("That doesn't fit there.", true);
@@ -187,7 +188,11 @@ void InventoryScreen::render(SDL_Renderer* r) const {
             y += ui::kLineH;
         }
     }
-    if (!message_.empty()) ui::text(r, info.x + 12, info.y + info.h - 34, message_, messageBad_ ? ui::kBad : ui::kGood);
+    if (!message_.empty() && messageTime_ > 0.0f) {
+        SDL_Color c = messageBad_ ? ui::kBad : ui::kGood;
+        c.a = static_cast<Uint8>(255.0f * std::min(1.0f, messageTime_));
+        ui::text(r, info.x + 12, info.y + info.h - 34, message_, c);
+    }
     ui::text(r, info.x + 12, info.y + info.h - 18,
              selected_ >= 0 ? hintPlacing_ : hintNormal_,
              ui::kDim);

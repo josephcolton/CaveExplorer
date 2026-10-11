@@ -37,7 +37,12 @@ public:
         hintPlacing_ = std::move(placing);
     }
 
-    void setMessage(const std::string& msg, bool bad = false) { message_ = msg; messageBad_ = bad; }
+    // Shows a short message that fades out after a couple of seconds.
+    void setMessage(const std::string& msg, bool bad = false) {
+        message_ = msg;
+        messageBad_ = bad;
+        messageTime_ = kMessageTime;
+    }
 
 private:
     struct Slot {
@@ -64,4 +69,6 @@ private:
     int selected_ = -1;
     std::string message_;
     bool messageBad_ = false;
+    float messageTime_ = 0.0f;
+    static constexpr float kMessageTime = 2.5f;  // seconds, the last one spent fading
 };

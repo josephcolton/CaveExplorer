@@ -18,8 +18,9 @@ void ShopScreen::open(const ItemDb& db, const SpriteDb& sprites, Inventory& inv,
     inv_ = &inv;
     shop_ = &shop;
     cursor_ = 0;
-    message_ = shop.greeting;
+    message_ = shop.greeting;  // the greeting stays until the first purchase
     messageBad_ = false;
+    messageTime_ = -1.0f;
 
     rects_.clear();
     for (std::size_t i = 0; i < shop.stock.size(); ++i) {
@@ -36,19 +37,16 @@ void ShopScreen::open(const ItemDb& db, const SpriteDb& sprites, Inventory& inv,
 void ShopScreen::buy(const std::string& id) {
     const ItemDef& def = db_->get(id);
     if (inv_->coins < def.value) {
-        message_ = "You can't afford the " + def.name + ".";
-        messageBad_ = true;
+        say("You can't afford the " + def.name + ".", true);
         ui::sound("error");
     } else if (inv_->backpack.roomFor(*db_, id) <= 0) {
-        message_ = "Your backpack is full.";
-        messageBad_ = true;
+        say("Your backpack is full.", true);
         ui::sound("error");
     } else {
         inv_->backpack.add(*db_, id, 1);
         inv_->coins -= def.value;
         ui::sound("buy");
-        message_ = "Bought " + def.name + " for " + std::to_string(def.value) + ".";
-        messageBad_ = false;
+        say("Bought " + def.name + " for " + std::to_string(def.value) + ".", false);
     }
 }
 
@@ -57,18 +55,23 @@ void ShopScreen::sell(std::size_t backpackIndex) {
     if (s.empty()) return;
     const ItemDef& def = db_->get(s.id);
     if (!def.sellable || def.sellPrice() <= 0) {
-        message_ = "\"I can't buy that from you.\"";
-        messageBad_ = true;
+        say("\"I can't buy that from you.\"", true);
         return;
     }
     ui::sound("buy");
     inv_->coins += def.sellPrice();
     inv_->backpack.takeFrom(backpackIndex, 1);
-    message_ = "Sold " + def.name + " for " + std::to_string(def.sellPrice()) + ".";
-    messageBad_ = false;
+    say("Sold " + def.name + " for " + std::to_string(def.sellPrice()) + ".", false);
+}
+
+void ShopScreen::say(std::string msg, bool bad) {
+    message_ = std::move(msg);
+    messageBad_ = bad;
+    messageTime_ = 2.5f;
 }
 
 bool ShopScreen::update(const Input& input) {
+    if (messageTime_ > 0.0f) messageTime_ = std::max(0.0f, messageTime_ - 1.0f / 60.0f);
     if (input.pressed(Action::Cancel) || input.pressed(Action::Interact)) return false;
     cursor_ = ui::navigate(rects_, cursor_, input);
     if (input.pressed(Action::Confirm)) {
@@ -116,6 +119,10 @@ void ShopScreen::render(SDL_Renderer* r) const {
         for (const std::string& e : effects) line += (line.empty() ? "" : "  ") + std::string("[") + e + "]";
         ui::text(r, kInfoPanel.x + 12, kInfoPanel.y + 24, line.substr(0, 74));
     }
-    ui::text(r, kInfoPanel.x + 12, kInfoPanel.y + 42, message_, messageBad_ ? ui::kBad : ui::kGood);
+    if (messageTime_ != 0.0f) {
+        SDL_Color c = messageBad_ ? ui::kBad : ui::kGood;
+        if (messageTime_ > 0.0f) c.a = static_cast<Uint8>(255.0f * std::min(1.0f, messageTime_));
+        ui::text(r, kInfoPanel.x + 12, kInfoPanel.y + 42, message_, c);
+    }
     ui::text(r, kInfoPanel.x + 12, kInfoPanel.y + 60, "Enter: buy / sell one   Esc: leave", ui::kDim);
 }

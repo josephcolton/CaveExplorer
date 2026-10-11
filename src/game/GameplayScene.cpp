@@ -1013,9 +1013,9 @@ void GameplayScene::renderLighting(SDL_Renderer* r, Vec2 cam) {
         if (p.coins > 0) continue;
         const ItemDef& def = data_.items.get(p.stack.id);
         if (def.glow[0] || def.glow[1] || def.glow[2]) {
-            lighting_.addLight(r, screen(p.box.center()), 34.0f,
+            lighting_.addLight(r, screen(p.box.center()), 58.0f,
                                {static_cast<Uint8>(def.glow[0]), static_cast<Uint8>(def.glow[1]),
-                                static_cast<Uint8>(def.glow[2]), 255}, 0.8f);
+                                static_cast<Uint8>(def.glow[2]), 255}, 0.9f);
         }
     }
     for (const Particle& p : particles_) {

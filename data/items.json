@@ -30,6 +30,6 @@
   {"id": "bone", "name": "Old Bone", "icon": "bone", "category": "valuable", "stack": 10, "value": 4, "description": "Someone collects these."},
   {"id": "horn", "name": "Beast Horn", "icon": "horn", "category": "valuable", "stack": 5, "value": 15, "description": "A trophy from a cave creature."},
   {"id": "feather_charm", "name": "Feather Charm", "icon": "feather_charm", "category": "charm", "value": 80, "unique": true, "tags": ["carried_jump"], "description": "While carried, you feel lighter - high enough to reach ledges you couldn't before.", "carried": {"jump": 1.35}},
-  {"id": "breath_amulet", "name": "Amulet of Deep Breathing", "icon": "breath_amulet", "category": "charm", "value": 150, "unique": true, "carried": {"air": 3.0}, "description": "While carried, you can hold your breath three times as long."}
+  {"id": "breath_amulet", "name": "Amulet of Deep Breathing", "icon": "breath_amulet", "category": "charm", "value": 150, "unique": true, "carried": {"air": 3.0}, "description": "While carried, you can hold your breath three times as long.", "glow": [150, 215, 255]}
  ]
 }

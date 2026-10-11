@@ -12,7 +12,7 @@
  "tileheight": 32,
  "backgroundcolor": "#0c0a10",
  "nextlayerid": 5,
- "nextobjectid": 32,
+ "nextobjectid": 30,
  "properties": [
   {
    "name": "display_name",
@@ -4074,12 +4074,12 @@
       {
        "name": "color",
        "type": "color",
-       "value": "#ff6ec8ff"
+       "value": "#ffffd9a0"
       },
       {
        "name": "flicker",
        "type": "bool",
-       "value": false
+       "value": true
       },
       {
        "name": "intensity",
@@ -4140,74 +4140,6 @@
      "id": 11,
      "name": "light",
      "type": "light",
-     "x": 976.0,
-     "y": 752.0,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true,
-     "properties": [
-      {
-       "name": "radius",
-       "type": "int",
-       "value": 70
-      },
-      {
-       "name": "color",
-       "type": "color",
-       "value": "#ff6ec8ff"
-      },
-      {
-       "name": "flicker",
-       "type": "bool",
-       "value": false
-      },
-      {
-       "name": "intensity",
-       "type": "float",
-       "value": 0.7
-      }
-     ]
-    },
-    {
-     "id": 12,
-     "name": "light",
-     "type": "light",
-     "x": 400.0,
-     "y": 752.0,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true,
-     "properties": [
-      {
-       "name": "radius",
-       "type": "int",
-       "value": 50
-      },
-      {
-       "name": "color",
-       "type": "color",
-       "value": "#ff6ec8ff"
-      },
-      {
-       "name": "flicker",
-       "type": "bool",
-       "value": false
-      },
-      {
-       "name": "intensity",
-       "type": "float",
-       "value": 0.5
-      }
-     ]
-    },
-    {
-     "id": 13,
-     "name": "light",
-     "type": "light",
      "x": 720.0,
      "y": 144.0,
      "width": 0,
@@ -4239,7 +4171,7 @@
      ]
     },
     {
-     "id": 14,
+     "id": 12,
      "name": "stones",
      "type": "pickup",
      "x": 208.0,
@@ -4264,7 +4196,7 @@
      ]
     },
     {
-     "id": 15,
+     "id": 13,
      "name": "hob",
      "type": "npc",
      "x": 240.0,
@@ -4284,7 +4216,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 14,
      "name": "swift",
      "type": "shrine",
      "x": 496.0,
@@ -4304,7 +4236,7 @@
      ]
     },
     {
-     "id": 17,
+     "id": 15,
      "name": "leap",
      "type": "shrine",
      "x": 240.0,
@@ -4324,7 +4256,7 @@
      ]
     },
     {
-     "id": 18,
+     "id": 16,
      "name": "bone",
      "type": "pickup",
      "x": 400.0,
@@ -4349,7 +4281,7 @@
      ]
     },
     {
-     "id": 19,
+     "id": 17,
      "name": "coins",
      "type": "pickup",
      "x": 656.0,
@@ -4374,7 +4306,7 @@
      ]
     },
     {
-     "id": 20,
+     "id": 18,
      "name": "crystal",
      "type": "pickup",
      "x": 976.0,
@@ -4399,7 +4331,7 @@
      ]
     },
     {
-     "id": 21,
+     "id": 19,
      "name": "machete",
      "type": "pickup",
      "x": 528.0,
@@ -4429,7 +4361,7 @@
      ]
     },
     {
-     "id": 22,
+     "id": 20,
      "name": "bush",
      "type": "obstacle",
      "x": 1184,
@@ -4454,7 +4386,7 @@
      ]
     },
     {
-     "id": 23,
+     "id": 21,
      "name": "bat",
      "type": "enemy",
      "x": 752.0,
@@ -4480,7 +4412,7 @@
      ]
     },
     {
-     "id": 24,
+     "id": 22,
      "name": "bat",
      "type": "enemy",
      "x": 592.0,
@@ -4500,7 +4432,7 @@
      ]
     },
     {
-     "id": 25,
+     "id": 23,
      "name": "rat",
      "type": "enemy",
      "x": 496.0,
@@ -4520,7 +4452,7 @@
      ]
     },
     {
-     "id": 26,
+     "id": 24,
      "name": "rat",
      "type": "enemy",
      "x": 848.0,
@@ -4546,7 +4478,7 @@
      ]
     },
     {
-     "id": 27,
+     "id": 25,
      "name": "none",
      "type": "enemy",
      "x": 1072.0,
@@ -4572,7 +4504,7 @@
      ]
     },
     {
-     "id": 28,
+     "id": 26,
      "name": "from_forest",
      "type": "spawn",
      "x": 144.0,
@@ -4584,7 +4516,7 @@
      "point": true
     },
     {
-     "id": 29,
+     "id": 27,
      "name": "from_cave_2",
      "type": "spawn",
      "x": 1168.0,
@@ -4596,7 +4528,7 @@
      "point": true
     },
     {
-     "id": 30,
+     "id": 28,
      "name": "to_forest",
      "type": "door",
      "x": 64,
@@ -4636,7 +4568,7 @@
      ]
     },
     {
-     "id": 31,
+     "id": 29,
      "name": "to_cave_2",
      "type": "door",
      "x": 1248,

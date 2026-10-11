@@ -39,4 +39,6 @@ private:
     int cursor_ = 0;
     std::string message_;
     bool messageBad_ = false;
+    float messageTime_ = -1.0f;  // < 0: stays (the greeting)
+    void say(std::string msg, bool bad);
 };
