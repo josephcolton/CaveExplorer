@@ -78,7 +78,8 @@ button per action). Pause (Esc / Start) and the menu keys are fixed.
 
 Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 32x32 tiles.
 - Map properties: `display_name` (shown on entry), `restart_spawn` (where Esc → Restart area puts
-  you: the spawn on the way back toward the surface) and `music` (a file in `assets/soundtrack/`, looped
+  you: the spawn on the way back toward the surface), `darkness` (0 = daylight, 1 = pitch black)
+  and `music` (a file in `assets/soundtrack/`, looped
   while in the area and crossfaded on area changes; empty = silence).
 - Tile layers: `background` (decoration) and `ground` (custom property `collides = true`).
   A layer with `foreground = true` is drawn in front of the player.
@@ -100,7 +101,7 @@ Objects also include `obstacle` (a rectangle covering whole tiles; `obstacle` ty
 `data/obstacles.json`, e.g. `bush` needs a tool tagged `cut`, `rock` needs `break`;
 `passable_from` = `left`/`right` lets players push through from that side), `npc` (point at the
 feet; `npc_id` from `data/npcs.json`), `shrine` (point at the feet; `shrine_id`), `ladder` (a one-tile-wide rectangle; its top can be
-stood on), `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
+stood on), `light` (point; `radius`, `color` `#rrggbb`, optional `intensity` and `flicker`), `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
 from `data/enemies.json`, optional `enemy_easy` / `enemy_hard` overrides where `none` removes it,
 and `hp_scale`), `pickup` (point; `item` id or `coins`, `count`, optional `unique_id` so it
 never respawns once taken), `chest` (the persistent storage chest), `shop` (`shop_id` from
@@ -173,6 +174,10 @@ See [CREDITS.md](CREDITS.md) for art and library credits.
 - Hunger drains slowly as you explore (a full belly lasts about 15 minutes). Below "Hungry" your
   wounds stop healing; when "Starving" you're slower and can't jump as high. Eat food (E in the
   inventory) to fill up; healing potions restore health.
+- The caves are dark. Hold a **lantern** to light your way; it burns **lamp oil** from your pack
+  (one flask lasts about four minutes, only while it's dark) and refills itself automatically.
+  Glowing moss, crystals, shrines and daylight at exits give some light too. If it's too dark to
+  play comfortably, raise **Settings → Cave brightness**.
 - Shrines (glowing altars) grant blessings: Leaping, Swiftness, Might, Warding (can't be hurt),
   Shadows (creatures can't see you) for a short time, or Vigor (+10 max health) until death.
   A shrine goes dormant once used and recharges when its area reloads.

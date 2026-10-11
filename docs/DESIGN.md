@@ -33,6 +33,8 @@ covers the design decisions so far and how to build the first playable version.
 - [x] Ladders; level fixes so everything is reachable (tools/check_reach.py); Shift quick move
 - [x] 10. Packaging: CPack zip (Windows) / tar.gz (Linux) with bundled SDL libraries, game icon,
        no console window on Windows; GitHub Actions builds, tests and packages both on every push
+- [x] Light and darkness: per-area darkness, light map with coloured glows (exits, shrines,
+       moss, crystals, Hob's lamp), lantern + lamp oil fuel, Cave brightness setting
 - [x] Restart area returns to each area's surface-side entrance (map property restart_spawn)
 
 ## Art sources

@@ -11,6 +11,7 @@ json SaveGame::toJson() const {
             {"abilities", abilities},
             {"quests", quests.toJson()},
             {"hunger", hunger},
+            {"lantern_fuel", lanternFuel},
             {"buffs", [&] {
                  json list = json::array();
                  for (const TimedBuff& b : buffs) list.push_back({{"ability", b.ability}, {"remaining", b.remaining}});
@@ -34,6 +35,7 @@ bool SaveGame::fromJson(const json& j) {
     abilities = j.value("abilities", std::vector<std::string>{});
     quests.fromJson(j.value("quests", json::object()));
     hunger = j.value("hunger", 100.0f);
+    lanternFuel = j.value("lantern_fuel", 0.0f);
     buffs.clear();
     for (const json& b : j.value("buffs", json::array())) {
         buffs.push_back({b.value("ability", ""), b.value("remaining", 0.0f)});

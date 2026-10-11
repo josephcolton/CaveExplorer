@@ -2,6 +2,7 @@
 
 #include "game/Inventory.h"
 
+#include <algorithm>
 #include <cmath>
 
 using nlohmann::json;
@@ -28,17 +29,20 @@ void Modifiers::combine(const Modifiers& o) {
     damage *= o.damage;
     defense *= o.defense;
     maxHealth += o.maxHealth;
+    lightRadius = std::max(lightRadius, o.lightRadius);
     flags.insert(o.flags.begin(), o.flags.end());
 }
 
 bool Modifiers::empty() const {
-    return runSpeed == 1.0f && jump == 1.0f && damage == 1.0f && defense == 1.0f && maxHealth == 0.0f && flags.empty();
+    return runSpeed == 1.0f && jump == 1.0f && damage == 1.0f && defense == 1.0f && maxHealth == 0.0f && lightRadius == 0.0f &&
+           flags.empty();
 }
 
 std::vector<std::string> Modifiers::describe() const {
     std::vector<std::string> out;
     if (maxHealth != 0.0f) out.push_back("Max health " + std::string(maxHealth > 0 ? "+" : "") +
                                          std::to_string(static_cast<int>(maxHealth)));
+    if (lightRadius > 0.0f) out.push_back("Lights the dark");
     if (runSpeed != 1.0f) out.push_back(percent("Speed", runSpeed));
     if (jump != 1.0f) out.push_back(percent("Jump", jump));
     if (damage != 1.0f) out.push_back(percent("Damage", damage));
@@ -57,6 +61,7 @@ Modifiers Modifiers::fromJson(const json& j) {
     m.damage = j.value("damage", 1.0f);
     m.defense = j.value("defense", 1.0f);
     m.maxHealth = j.value("max_health", 0.0f);
+    m.lightRadius = j.value("light", 0.0f);
     const auto flags = j.value("flags", std::vector<std::string>{});
     m.flags.insert(flags.begin(), flags.end());
     return m;

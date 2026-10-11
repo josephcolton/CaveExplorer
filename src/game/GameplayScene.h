@@ -19,6 +19,7 @@
 #include "ui/ShopScreen.h"
 #include "world/Area.h"
 #include "world/Camera.h"
+#include "world/Lighting.h"
 
 #include <random>
 #include <set>
@@ -97,6 +98,10 @@ private:
     bool useItem(const ItemStack& stack);
     void useShrine(std::size_t index);
     void updateSurvival(float dt);
+    // The equipped light that's actually shining (radius 0 = none), handling fuel.
+    const ItemDef* equippedFuelLight() const;
+    float carriedLightRadius() const;
+    void renderLighting(SDL_Renderer* r, Vec2 cam);
 
     void toast(const std::string& text);
     void renderWorldObjects(SDL_Renderer* r, Vec2 cam, bool foreground) const;
@@ -115,11 +120,14 @@ private:
     std::vector<std::string> abilities_;   // lasting abilities until death
     QuestLog quests_;
     float hunger_ = hunger::kMax;
+    float lanternFuel_ = 0.0f;  // seconds of oil left in a lit lantern
     std::vector<SaveGame::TimedBuff> buffs_;  // shrine blessings with time left
     double playSeconds_ = 0.0;
 
     // Current area
     Area area_;
+    Lighting lighting_;
+    float lightTime_ = 0.0f;  // drives flicker
     Player player_;
     Camera camera_;
     std::vector<Pickup> pickups_;

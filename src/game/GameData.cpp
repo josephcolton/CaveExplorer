@@ -53,7 +53,8 @@ void GameData::load(Assets& assets) {
     const json npcList = npcDoc.value("npcs", json::object());
     for (auto& [id, n] : npcList.items()) {
         npcs[id] = {id, n.value("name", id), n.value("icon", ""), n.value("shop", ""), n.value("greeting", ""),
-                    n.value("idle", "Safe travels."), n.value("quests", std::vector<std::string>{})};
+                    n.value("idle", "Safe travels."), n.value("quests", std::vector<std::string>{}),
+                    n.value("light", 0.0f)};
     }
 
     const json questDoc = loadJson("quests.json");

@@ -14,6 +14,7 @@ struct Settings {
     int soundVolume = 8;  // 0..10
     bool fullscreen = false;
     Difficulty difficulty = Difficulty::Normal;
+    int brightness = 1;  // 0 = dark (as designed), 1 = normal, 2 = bright: lifts the darkest shadows
     nlohmann::json bindings;  // control bindings (empty = defaults)
 
     void load();

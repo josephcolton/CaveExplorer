@@ -34,6 +34,9 @@ struct ItemDef {
     std::vector<std::string> tags;  // e.g. "cut" (clears bushes), "break" (breaks rocks)
     Modifiers carried;   // applies while the item is anywhere on the explorer
     Modifiers equipped;  // applies only while worn or held in an equipment slot
+    std::string fuelItem;       // light sources that burn something (lantern -> lamp oil)
+    float fuelSeconds = 0.0f;   // how long one unit of fuel lasts
+    int glow[3] = {0, 0, 0};    // lying on the ground, the item glows this colour (0 = no glow)
 
     bool hasTag(const std::string& tag) const;
     bool isRanged() const { return !ammo.empty(); }

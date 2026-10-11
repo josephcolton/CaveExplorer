@@ -81,6 +81,8 @@ bool Area::load(const std::string& areaId, Assets& assets) {
     displayName = (nameIt != mapProps.end() && nameIt->second.is_string()) ? nameIt->second.get<std::string>() : areaId;
     auto musicIt = mapProps.find("music");
     music = (musicIt != mapProps.end() && musicIt->second.is_string()) ? musicIt->second.get<std::string>() : "";
+    auto darkIt = mapProps.find("darkness");
+    darkness = (darkIt != mapProps.end() && darkIt->second.is_number()) ? darkIt->second.get<float>() : 0.0f;
     auto restartIt = mapProps.find("restart_spawn");
     restartSpawn = (restartIt != mapProps.end() && restartIt->second.is_string()) ? restartIt->second.get<std::string>() : "";
 

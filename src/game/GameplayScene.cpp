@@ -36,6 +36,7 @@ float difficultyHealthScale(Difficulty d) {
 GameplayScene::GameplayScene(App& app, int slot, bool newGame)
     : Scene(app), data_(app.data()), slot_(slot), rng_(std::random_device{}()) {
     player_.setAnimations(data_.anims.find("knight"));
+    lighting_.init(app.renderer(), App::kViewWidth, App::kViewHeight);
     pauseMenu_.setItems({"Resume", "Restart area", "Save game", "Settings", "Credits", "About", "Save & quit to title",
                          "Save & exit game"});
 
@@ -47,6 +48,7 @@ GameplayScene::GameplayScene(App& app, int slot, bool newGame)
         takenPickups_ = save.takenPickups;
         abilities_ = save.abilities;
         hunger_ = save.hunger;
+        lanternFuel_ = save.lanternFuel;
         buffs_ = save.buffs;
         quests_ = save.quests;
         playSeconds_ = save.playSeconds;
@@ -106,6 +108,7 @@ GameplayScene::GameplayScene(App& app, int slot, bool newGame)
 }
 
 GameplayScene::~GameplayScene() {
+    lighting_.shutdown();
     if (mode_ == Mode::Inventory) closeInventory();  // put corpse items back before saving
     saveGame();
 }
@@ -119,6 +122,7 @@ void GameplayScene::newExplorer() {
     quests_.clear();
     hunger_ = hunger::kMax;
     buffs_.clear();
+    lanternFuel_ = 0.0f;
     player_.health = 1.0f;  // refreshStats clamps; set full health after
     refreshStats();
     player_.health = player_.maxHealth;
@@ -134,6 +138,7 @@ void GameplayScene::saveGame() {
     s.abilities = abilities_;
     s.quests = quests_;
     s.hunger = hunger_;
+    s.lanternFuel = lanternFuel_;
     s.buffs = buffs_;
     s.health = player_.dead() ? player_.maxHealth : player_.health;
     s.area = area_.id;
@@ -370,6 +375,7 @@ void GameplayScene::update(float dt) {
 void GameplayScene::updatePlay(float dt) {
     if (fadeDirection_ == 1) return;  // freeze while the screen goes dark
     playSeconds_ += dt;
+    lightTime_ += dt;
     refreshStats();  // gear can change at any time (pickups, menus)
     bannerTimer_ = std::max(0.0f, bannerTimer_ - dt);
 
@@ -925,6 +931,101 @@ std::string GameplayScene::obstacleHint(const Obstacle& ob) const {
     return ob.def->hint;
 }
 
+const ItemDef* GameplayScene::equippedFuelLight() const {
+    for (std::size_t i = 0; i < inventory_.equipment.size(); ++i) {
+        const ItemStack& s = inventory_.equipment.at(i);
+        if (s.empty()) continue;
+        const ItemDef& def = data_.items.get(s.id);
+        if (def.equipped.lightRadius > 0.0f && !def.fuelItem.empty()) return &def;
+    }
+    return nullptr;
+}
+
+float GameplayScene::carriedLightRadius() const {
+    // Light from gear that needs no fuel, plus a fuelled lantern only while it has oil.
+    float radius = 0.0f;
+    for (std::size_t i = 0; i < inventory_.equipment.size(); ++i) {
+        const ItemStack& s = inventory_.equipment.at(i);
+        if (s.empty()) continue;
+        const ItemDef& def = data_.items.get(s.id);
+        if (def.equipped.lightRadius <= 0.0f) continue;
+        if (def.fuelItem.empty() || lanternFuel_ > 0.0f) radius = std::max(radius, def.equipped.lightRadius);
+    }
+    for (std::size_t i = 0; i < inventory_.backpack.size(); ++i) {
+        const ItemStack& s = inventory_.backpack.at(i);
+        if (!s.empty()) radius = std::max(radius, data_.items.get(s.id).carried.lightRadius);
+    }
+    for (const SaveGame::TimedBuff& b : buffs_) {
+        if (auto it = data_.abilities.find(b.ability); it != data_.abilities.end()) {
+            radius = std::max(radius, it->second.modifiers.lightRadius);
+        }
+    }
+    return radius;
+}
+
+void GameplayScene::renderLighting(SDL_Renderer* r, Vec2 cam) {
+    const float dark = std::clamp(area_.darkness, 0.0f, 1.0f);
+    if (dark <= 0.0f) return;
+    // Ambient: what you can see with no light at all. A cool tint keeps shadows from going flat
+    // grey; the brightness setting lifts them for players who find the caves too dark.
+    const float lift = 0.07f * static_cast<float>(app_.settings().brightness);
+    const float base = std::clamp(1.0f - dark + lift, 0.0f, 1.0f);
+    const SDL_Color ambient{static_cast<Uint8>(255 * base), static_cast<Uint8>(255 * base),
+                            static_cast<Uint8>(std::min(255.0f, 255 * base + 18 * dark)), 255};
+    lighting_.begin(r, ambient);
+
+    auto screen = [&](Vec2 world) { return world - cam; };
+    // The explorer always sees a little around themselves.
+    lighting_.addLight(r, screen(player_.box.center()), 46.0f, {200, 190, 170, 255}, 0.55f);
+    if (const float radius = carriedLightRadius(); radius > 0.0f) {
+        const float flicker = 1.0f + 0.03f * std::sin(lightTime_ * 13.0f) + 0.02f * std::sin(lightTime_ * 7.3f);
+        lighting_.addLight(r, screen(player_.box.center() + Vec2{0, -4}), radius * flicker, {255, 214, 150, 255});
+    }
+
+    for (const MapObject& o : area_.objects) {
+        if (o.type == "light") {
+            // Map lights: radius, color "#rrggbb", optional flicker.
+            SDL_Color c{255, 230, 180, 255};
+            const std::string hex = o.getString("color");
+            if (hex.size() == 7) {
+                const unsigned long v = std::stoul(hex.substr(1), nullptr, 16);
+                c = {static_cast<Uint8>(v >> 16), static_cast<Uint8>(v >> 8), static_cast<Uint8>(v), 255};
+            }
+            float radius = o.getFloat("radius", 80.0f);
+            if (o.getBool("flicker")) radius *= 1.0f + 0.05f * std::sin(lightTime_ * 9.0f + o.rect.x);
+            lighting_.addLight(r, screen({o.rect.x + o.rect.w * 0.5f, o.rect.y + o.rect.h * 0.5f}), radius, c,
+                               o.getFloat("intensity", 1.0f));
+        } else if (o.type == "door" && o.getString("glow").size() == 7) {
+            // Daylight spilling in through an exit.
+            const unsigned long v = std::stoul(o.getString("glow").substr(1), nullptr, 16);
+            lighting_.addLight(r, screen(o.rect.center()), std::max(o.rect.w, o.rect.h) * 2.2f,
+                               {static_cast<Uint8>(v >> 16), static_cast<Uint8>(v >> 8), static_cast<Uint8>(v), 255});
+        } else if (o.type == "npc") {
+            auto it = data_.npcs.find(o.getString("npc_id"));
+            if (it != data_.npcs.end() && it->second.light > 0.0f) {
+                lighting_.addLight(r, screen({o.rect.x, o.rect.y - 18.0f}), it->second.light, {255, 200, 130, 255});
+            }
+        }
+    }
+    for (const Shrine& sh : shrines_) {
+        lighting_.addLight(r, screen({sh.feet.x, sh.feet.y - 18.0f}), sh.used ? 30.0f : 75.0f, sh.def->glow,
+                           sh.used ? 0.5f : 0.9f);
+    }
+    for (const Pickup& p : pickups_) {
+        if (p.coins > 0) continue;
+        const ItemDef& def = data_.items.get(p.stack.id);
+        if (def.glow[0] || def.glow[1] || def.glow[2]) {
+            lighting_.addLight(r, screen(p.box.center()), 34.0f,
+                               {static_cast<Uint8>(def.glow[0]), static_cast<Uint8>(def.glow[1]),
+                                static_cast<Uint8>(def.glow[2]), 255}, 0.8f);
+        }
+    }
+    for (const Particle& p : particles_) {
+        lighting_.addLight(r, screen(p.pos), 10.0f, p.color, std::clamp(p.life * 2.0f, 0.0f, 0.6f));
+    }
+    lighting_.end(r);
+}
+
 // ============================================================================ menus
 
 void GameplayScene::openPause() {
@@ -1075,6 +1176,33 @@ void GameplayScene::updateSurvival(float dt) {
         app_.audio().play("warning");
         if (after == hunger::Level::Hungry) toast("You're getting hungry. Wounds won't heal until you eat.");
         if (after == hunger::Level::Starving) toast("You're starving! You feel weak and slow.");
+    }
+
+    // A lantern burns oil while it's lighting a dark place, and refills itself from the pack.
+    if (const ItemDef* lamp = equippedFuelLight(); lamp && area_.darkness > 0.2f) {
+        if (lanternFuel_ <= 0.0f) {
+            for (std::size_t i = 0; i < inventory_.backpack.size(); ++i) {
+                if (inventory_.backpack.at(i).id == lamp->fuelItem) {
+                    inventory_.backpack.takeFrom(i, 1);
+                    lanternFuel_ = lamp->fuelSeconds;
+                    toast("You fill the " + lamp->name + " with " + data_.items.get(lamp->fuelItem).name + ".");
+                    break;
+                }
+            }
+            if (lanternFuel_ <= 0.0f && messageCooldown_ <= 0.0f) {
+                toast("Your " + lamp->name + " is dry. You need " + data_.items.get(lamp->fuelItem).name + ".");
+                messageCooldown_ = 8.0f;
+            }
+        } else {
+            const float before = lanternFuel_;
+            lanternFuel_ = std::max(0.0f, lanternFuel_ - dt);
+            if (before > 30.0f && lanternFuel_ <= 30.0f &&
+                inventory_.backpack.countOf(lamp->fuelItem) == 0) {
+                toast("Your " + lamp->name + " is running low on oil.");
+                app_.audio().play("warning");
+            }
+            if (lanternFuel_ <= 0.0f) toast("Your " + lamp->name + " goes out.");
+        }
     }
 
     // Shrine blessings run out.
@@ -1229,8 +1357,16 @@ void GameplayScene::renderHud(SDL_Renderer* r) const {
     }
     data_.sprites.drawIcon(r, "coins", 86, 28, 20);
     ui::text(r, 110, 35, std::to_string(inventory_.coins), ui::kGold);
-    // Shrine blessings with time left.
     float by = 52.0f;
+    if (const ItemDef* lamp = equippedFuelLight()) {
+        const int secs = static_cast<int>(std::ceil(lanternFuel_));
+        char buf[64];
+        std::snprintf(buf, sizeof buf, "Oil %d:%02d  (+%d)", secs / 60, secs % 60,
+                      inventory_.backpack.countOf(lamp->fuelItem));
+        ui::text(r, 8, by, buf, lanternFuel_ > 30.0f ? ui::kGold : ui::kBad);
+        by += 11.0f;
+    }
+    // Shrine blessings with time left.
     for (const SaveGame::TimedBuff& b : buffs_) {
         auto it = data_.abilities.find(b.ability);
         if (it == data_.abilities.end()) continue;
@@ -1298,6 +1434,7 @@ void GameplayScene::render(SDL_Renderer* renderer, float alpha) {
     }
     area_.map.render(renderer, cam, true);
     renderWorldObjects(renderer, cam, true);
+    renderLighting(renderer, cam);
 
     if (mode_ == Mode::Play && fadeDirection_ == 0) {
         const Interactable it = findInteractable();

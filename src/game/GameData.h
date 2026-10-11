@@ -27,6 +27,7 @@ struct NpcDef {
     std::string greeting;
     std::string idle;      // what they say once you've done all their quests
     std::vector<std::string> quests;  // offered in order, one at a time
+    float light = 0.0f;               // radius of the lamp they carry (0 = none)
 };
 
 // A shrine that grants an ability when used (data/shrines.json).

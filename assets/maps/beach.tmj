@@ -27,6 +27,11 @@
    "name": "restart_spawn",
    "type": "string",
    "value": "start"
+  },
+  {
+   "name": "darkness",
+   "type": "float",
+   "value": 0.0
   }
  ],
  "tilesets": [

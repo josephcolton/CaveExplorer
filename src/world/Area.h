@@ -33,6 +33,7 @@ public:
     std::string id;
     std::string displayName;
     std::string music;  // file in assets/soundtrack/, empty = silence
+    float darkness = 0.0f;  // 0 = daylight, 1 = pitch black
     std::string restartSpawn;  // where "Restart area" puts you (the way back toward the surface)
     SDL_Color background{0, 0, 0, 255};
     Tilemap map;

@@ -63,6 +63,14 @@ bool ItemDb::loadFromJson(const std::string& text, std::string* error) {
         d.tags = j.value("tags", std::vector<std::string>{});
         d.carried = Modifiers::fromJson(j.value("carried", json::object()));
         d.equipped = Modifiers::fromJson(j.value("equipped", json::object()));
+        if (const json fuel = j.value("fuel", json::object()); fuel.is_object()) {
+            d.fuelItem = fuel.value("item", "");
+            d.fuelSeconds = fuel.value("seconds", 0.0f);
+        }
+        const auto glow = j.value("glow", std::vector<int>{});
+        if (glow.size() == 3) {
+            for (int c = 0; c < 3; ++c) d.glow[c] = glow[static_cast<std::size_t>(c)];
+        }
         items_[d.id] = std::move(d);
     }
     return true;

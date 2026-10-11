@@ -17,6 +17,7 @@ struct Modifiers {
     float damage = 1.0f;       // damage dealt
     float defense = 1.0f;      // damage taken (0.8 = take 20% less)
     float maxHealth = 0.0f;    // added to max health
+    float lightRadius = 0.0f;  // light carried with you (the biggest source wins)
     std::set<std::string> flags;  // e.g. "nonslip", "warm", "light"
 
     void combine(const Modifiers& o);

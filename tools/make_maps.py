@@ -25,7 +25,7 @@ TILES = {
     "D": (2, "ground", "solid", (120, 86, 56)),     # dirt
     "#": (3, "ground", "solid", (96, 92, 104)),     # cave rock
     "=": (4, "ground", "oneway", (150, 104, 60)),   # wooden one-way platform
-    "b": (5, "background", None, (44, 40, 52)),     # cave back wall
+    "b": (5, "background", None, (72, 64, 82)),     # cave back wall (light enough to show lamplight)
     "~": (6, "background", None, (60, 120, 200)),   # water (decor for now)
     "T": (7, "background", None, (100, 70, 44)),    # tree trunk
     "L": (8, "background", None, (50, 120, 50)),    # leaves
@@ -106,9 +106,11 @@ def tileset_json():
 
 # ------------------------------------------------------------------------ maps
 class Map:
-    def __init__(self, area_id, w, h, display, bg, fill=".", backdrop=None, music="", restart="start"):
+    def __init__(self, area_id, w, h, display, bg, fill=".", backdrop=None, music="", restart="start",
+                 darkness=0.0):
         self.id, self.w, self.h, self.display, self.bg = area_id, w, h, display, bg
         self.music = music  # file in assets/soundtrack/
+        self.darkness = darkness  # 0 = daylight, 1 = pitch black
         self.restart = restart  # spawn used by "Restart area": the way back toward the surface
         self.backdrop = backdrop  # background tile drawn behind see-through ground tiles
         self.grid = [[fill] * w for _ in range(h)]
@@ -168,6 +170,12 @@ class Map:
         self.obj("npc", tx * T + T / 2, row * T, 0, 0, name=npc_id, npc_id=npc_id)
         self.objects[-1]["point"] = True
 
+    def light(self, tx, ty, radius, color="#ffe6b4", flicker=False, intensity=1.0):
+        # A point light centred on tile (tx, ty).
+        self.obj("light", tx * T + T / 2, ty * T + T / 2, 0, 0, name="light", radius=radius, color=color,
+                 flicker=flicker, intensity=intensity)
+        self.objects[-1]["point"] = True
+
     def ladder(self, tx, top_row, bottom_row):
         # Climbable from top_row down to bottom_row; the top can be stood on.
         self.obj("ladder", tx * T, top_row * T, T, (bottom_row - top_row + 1) * T, name="ladder")
@@ -212,7 +220,8 @@ class Map:
             "nextlayerid": 4, "nextobjectid": len(objects) + 1,
             "properties": [{"name": "display_name", "type": "string", "value": self.display},
                            {"name": "music", "type": "string", "value": self.music},
-                           {"name": "restart_spawn", "type": "string", "value": self.restart}],
+                           {"name": "restart_spawn", "type": "string", "value": self.restart},
+                           {"name": "darkness", "type": "float", "value": self.darkness}],
             "tilesets": [tileset_json()],
             "layers": [
                 tile_layer(1, "background", layers["background"], []),
@@ -272,7 +281,7 @@ def forest():
 
 def cave_1():
     m = Map("cave_1", 40, 30, "Upper Caves", "#0c0a10", fill="#", backdrop="b", music="upper_caves.ogg",
-            restart="from_forest")
+            restart="from_forest", darkness=0.85)
     m.fill(1, 1, 8, 4, "b")      # entrance chamber
     m.fill(8, 2, 25, 4, "b")     # tunnel east
     m.fill(22, 5, 25, 17, "b")   # shaft down
@@ -284,6 +293,9 @@ def cave_1():
     m.fill(15, 23, 17, 23, "=")  # machete ledge, reached from the step
     m.fill(29, 25, 32, 25, "=")
     m.ladder(22, 5, 26)          # from the chamber floor up the shaft to the tunnel
+    m.light(30, 23, 70, "#6ec8ff", intensity=0.7)  # crystal seam above the east ledge
+    m.light(12, 23, 50, "#6ec8ff", intensity=0.5)
+    m.light(22, 4, 60, "#ffd9a0", flicker=True, intensity=0.6)  # a candle stub at the top of the ladder
     m.fill(36, 23, 39, 26, "b")  # passage east
     m.pickup("stones", 6, 5, count=6)
     m.npc("hob", 7, 5)  # Old Hob, trader and quest giver
@@ -307,10 +319,15 @@ def cave_1():
 
 
 def cave_2():
-    m = Map("cave_2", 40, 20, "Mossy Hollow", "#0c0a10", fill="#", backdrop="b", restart="from_cave_1")
+    m = Map("cave_2", 40, 20, "Mossy Hollow", "#0c0a10", fill="#", backdrop="b", restart="from_cave_1",
+            darkness=0.93)
     m.fill(0, 3, 38, 16, "b")
     m.fill(8, 15, 11, 16, "r")
     m.fill(12, 17, 31, 17, "m")  # slick moss floor
+    for x in (14, 20, 26, 31):  # the moss glows faintly
+        m.light(x, 16, 55, "#5ad296", intensity=0.55)
+    m.light(23, 14, 45, "#5ad296", intensity=0.45)
+    m.light(36, 15, 60, "#a0c8ff", intensity=0.6)  # the alcove
     m.fill(20, 15, 26, 15, "m")
     m.fill(14, 13, 17, 13, "=")
     m.fill(20, 15, 26, 16, "r")

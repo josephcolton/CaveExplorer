@@ -49,3 +49,4 @@ shrine_might    dc-dngn/altars/dngn_altar_trog.png
 shrine_ward     dc-dngn/altars/dngn_altar_shining_one.png
 shrine_shadow   dc-dngn/altars/dngn_altar_sif_muna.png
 shrine_vigor    dc-dngn/altars/dngn_altar_zin.png
+lamp_oil        item/misc/misc_bottle.png

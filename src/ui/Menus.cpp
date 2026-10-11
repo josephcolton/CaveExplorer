@@ -41,8 +41,8 @@ void Menu::render(SDL_Renderer* r, float centerX, float top) const {
 // ---------------------------------------------------------------------------- Settings
 
 namespace {
-enum Row { MusicRow, SoundRow, FullscreenRow, DifficultyRow, ControlsRow, BackRow, RowCount };
-constexpr SDL_FRect kSettingsPanel{150, 60, 340, 240};
+enum Row { MusicRow, SoundRow, FullscreenRow, BrightnessRow, DifficultyRow, ControlsRow, BackRow, RowCount };
+constexpr SDL_FRect kSettingsPanel{150, 50, 340, 262};
 }  // namespace
 
 void SettingsScreen::open(App& app) {
@@ -74,6 +74,12 @@ SettingsScreen::Result SettingsScreen::update() {
         break;
     case FullscreenRow:
         if (delta || confirm) { s.fullscreen = !s.fullscreen; changed = true; }
+        break;
+    case BrightnessRow:
+        if (delta || confirm) {
+            s.brightness = (s.brightness + (delta ? delta : 1) + 3) % 3;
+            changed = true;
+        }
         break;
     case DifficultyRow:
         if (delta || confirm) {
@@ -122,6 +128,7 @@ void SettingsScreen::render(SDL_Renderer* r) const {
         {"Music volume", "< " + bar(s.musicVolume) + " >"},
         {"Sound volume", "< " + bar(s.soundVolume) + " >"},
         {"Fullscreen", s.fullscreen ? "< On >" : "< Off >"},
+        {"Cave brightness", s.brightness == 0 ? "< Dark >" : s.brightness == 1 ? "< Normal >" : "< Bright >"},
         {"Difficulty", std::string("< ") + difficultyName(s.difficulty) + " >"},
         {"Controls...", ""},
         {"Back", ""},
