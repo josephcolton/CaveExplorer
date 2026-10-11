@@ -11,7 +11,7 @@
  "tileheight": 32,
  "backgroundcolor": "#0c0a10",
  "nextlayerid": 4,
- "nextobjectid": 17,
+ "nextobjectid": 19,
  "properties": [
   {
    "name": "display_name",
@@ -21,7 +21,7 @@
   {
    "name": "music",
    "type": "string",
-   "value": ""
+   "value": "upper_caves.ogg"
   }
  ],
  "tilesets": [
@@ -2702,6 +2702,44 @@
     },
     {
      "id": 3,
+     "name": "swift",
+     "type": "shrine",
+     "x": 496.0,
+     "y": 160,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "shrine_id",
+       "type": "string",
+       "value": "swift"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "leap",
+     "type": "shrine",
+     "x": 240.0,
+     "y": 864,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "shrine_id",
+       "type": "string",
+       "value": "leap"
+      }
+     ]
+    },
+    {
+     "id": 5,
      "name": "bone",
      "type": "pickup",
      "x": 400.0,
@@ -2725,7 +2763,7 @@
      ]
     },
     {
-     "id": 4,
+     "id": 6,
      "name": "coins",
      "type": "pickup",
      "x": 656.0,
@@ -2749,7 +2787,7 @@
      ]
     },
     {
-     "id": 5,
+     "id": 7,
      "name": "crystal",
      "type": "pickup",
      "x": 976.0,
@@ -2773,7 +2811,7 @@
      ]
     },
     {
-     "id": 6,
+     "id": 8,
      "name": "machete",
      "type": "pickup",
      "x": 560.0,
@@ -2802,7 +2840,7 @@
      ]
     },
     {
-     "id": 7,
+     "id": 9,
      "name": "bush",
      "type": "obstacle",
      "x": 1184,
@@ -2825,7 +2863,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 10,
      "name": "bat",
      "type": "enemy",
      "x": 752.0,
@@ -2849,7 +2887,7 @@
      ]
     },
     {
-     "id": 9,
+     "id": 11,
      "name": "bat",
      "type": "enemy",
      "x": 592.0,
@@ -2868,7 +2906,7 @@
      ]
     },
     {
-     "id": 10,
+     "id": 12,
      "name": "rat",
      "type": "enemy",
      "x": 496.0,
@@ -2887,7 +2925,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 13,
      "name": "rat",
      "type": "enemy",
      "x": 848.0,
@@ -2911,7 +2949,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 14,
      "name": "none",
      "type": "enemy",
      "x": 1072.0,
@@ -2935,7 +2973,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 15,
      "name": "from_forest",
      "type": "spawn",
      "x": 144.0,
@@ -2947,7 +2985,7 @@
      "point": true
     },
     {
-     "id": 14,
+     "id": 16,
      "name": "from_cave_2",
      "type": "spawn",
      "x": 1168.0,
@@ -2959,7 +2997,7 @@
      "point": true
     },
     {
-     "id": 15,
+     "id": 17,
      "name": "to_forest",
      "type": "door",
      "x": 64,
@@ -2997,7 +3035,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 18,
      "name": "to_cave_2",
      "type": "door",
      "x": 1248,

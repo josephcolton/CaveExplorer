@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
         else if (arg == "--debug") options.debug = true;
         else if (arg == "--give") options.giveItems = next();
         else if (arg == "--ui") options.openUi = next();
+        else if (arg == "--hunger") options.hunger = std::stof(next());
     }
 
     App app;

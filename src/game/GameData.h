@@ -29,6 +29,16 @@ struct NpcDef {
     std::vector<std::string> quests;  // offered in order, one at a time
 };
 
+// A shrine that grants an ability when used (data/shrines.json).
+struct ShrineDef {
+    std::string id;
+    std::string name;
+    std::string icon;
+    std::string ability;
+    float duration = 60.0f;  // seconds; 0 = until the explorer dies
+    SDL_Color glow{255, 255, 255, 255};
+};
+
 // Static game content loaded once at startup from data/ and assets/.
 struct GameData {
     ItemDb items;
@@ -37,6 +47,7 @@ struct GameData {
     std::unordered_map<std::string, ObstacleDef> obstacles;
     std::unordered_map<std::string, AbilityDef> abilities;
     std::unordered_map<std::string, NpcDef> npcs;
+    std::unordered_map<std::string, ShrineDef> shrines;
     std::map<std::string, QuestDef> quests;
     nlohmann::json characterConfig;
     SpriteDb sprites;

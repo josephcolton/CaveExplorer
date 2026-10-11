@@ -26,7 +26,9 @@ covers the design decisions so far and how to build the first playable version.
        (trader, two quests: kill 3 rats -> non-slip boots; bring 3 bones -> Miner's Grit)
 - [x] Quality: Restart area (Esc menu), push through obstacles from the far side, visible cave
        doorways, control rebinding (keys, mouse, gamepad) with closer defaults, clearer hints
-- [ ] 8. Shrine buff, hunger
+- [x] 8. Shrines (Leaping, Swiftness, Might, Warding, Shadows: timed; Vigor: until death) placed
+       in both caves; hunger with healing gate and starving penalties; food fills hunger
+- [x] Music: beach (HitCtrl), Upper Caves (Spring Spring); boss_3 reserved
 - [ ] 9 (rest). Control rebinding, sound effects  ·  10. Packaging
 
 ## Art sources
@@ -171,7 +173,8 @@ Key mechanisms:
   per-character `RunState` that sits next to the persistent `WorldSave`.
 - **Boss arenas:** bosses live in their own small areas (mini-areas just for the fight), each with
   its own music. `boss_1.ogg` ("Gloomey") and `boss_2.ogg` ("Infection By Chewing"), both by Ove Melaa,
-  are reserved for the first two bosses.
+  are reserved for the first two bosses; `boss_3.mp3`
+  ("JRPG End Dungeon", HydroGene, CC0) for a third.
 - **Underground city:** a deep, inhabited area (traders, quest givers). Music: `underground_city.mp3`
   ("Hero Within", Ove Melaa).
 - **Freebies don't respawn:** placed coins/items, once taken, stay gone for the rest of that

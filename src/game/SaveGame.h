@@ -25,6 +25,12 @@ struct SaveGame {
     std::set<std::string> takenPickups;
     std::vector<std::string> abilities;  // lasting abilities (until death)
     QuestLog quests;                     // this explorer's quests
+    float hunger = 100.0f;               // 100 = well fed
+    struct TimedBuff {
+        std::string ability;
+        float remaining = 0.0f;  // seconds
+    };
+    std::vector<TimedBuff> buffs;        // shrine blessings still running
 
     float health = 100.0f;
     std::string area = "beach";

@@ -10,6 +10,12 @@ json SaveGame::toJson() const {
             {"taken_pickups", takenPickups},
             {"abilities", abilities},
             {"quests", quests.toJson()},
+            {"hunger", hunger},
+            {"buffs", [&] {
+                 json list = json::array();
+                 for (const TimedBuff& b : buffs) list.push_back({{"ability", b.ability}, {"remaining", b.remaining}});
+                 return list;
+             }()},
             {"health", health},
             {"area", area},
             {"area_name", areaName},
@@ -27,6 +33,11 @@ bool SaveGame::fromJson(const json& j) {
     takenPickups = j.value("taken_pickups", std::set<std::string>{});
     abilities = j.value("abilities", std::vector<std::string>{});
     quests.fromJson(j.value("quests", json::object()));
+    hunger = j.value("hunger", 100.0f);
+    buffs.clear();
+    for (const json& b : j.value("buffs", json::array())) {
+        buffs.push_back({b.value("ability", ""), b.value("remaining", 0.0f)});
+    }
     health = j.value("health", character.maxHealth);
     area = j.value("area", "beach");
     areaName = j.value("area_name", area);

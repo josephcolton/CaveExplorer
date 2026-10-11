@@ -101,8 +101,9 @@ InventoryRequest InventoryScreen::update(const Input& input) {
         if (def.food > 0.0f || def.heal > 0.0f) {
             req.kind = InventoryRequest::Kind::Use;
             req.stack = {stack.id, 1};
-            cur.container->takeFrom(cur.index, 1);
-            if (stackAt(cursor_).empty() && selected_ == cursor_) selected_ = -1;
+            req.container = cur.container;
+            req.index = cur.index;
+            selected_ = -1;
         } else {
             setMessage("You can't use that directly.", true);
         }

@@ -1,11 +1,57 @@
 {
- "_comment": "Lasting abilities (until the explorer dies), granted by quests and later shrines. modifiers: speed, jump, damage, defense (damage taken multiplier), max_health (added), flags.",
+ "_comment": "Abilities granted by quests (lasting until death) and shrines (timed, or lasting). modifiers: speed, jump, damage, defense (damage taken multiplier), max_health (added), flags (nonslip, warm, light, invincible, invisible).",
  "abilities": {
   "miners_grit": {
    "name": "Miner's Grit",
    "description": "Hob's breathing trick. You can take more punishment.",
    "modifiers": {
     "max_health": 15
+   }
+  },
+  "leap": {
+   "name": "Leaping",
+   "description": "Your legs feel like springs.",
+   "modifiers": {
+    "jump": 1.35
+   }
+  },
+  "swift": {
+   "name": "Swiftness",
+   "description": "The world seems to slow around you.",
+   "modifiers": {
+    "speed": 1.35
+   }
+  },
+  "might": {
+   "name": "Might",
+   "description": "Your blows land like hammers.",
+   "modifiers": {
+    "damage": 1.75
+   }
+  },
+  "ward": {
+   "name": "Divine Ward",
+   "description": "Nothing can harm you.",
+   "modifiers": {
+    "flags": [
+     "invincible"
+    ]
+   }
+  },
+  "shadow": {
+   "name": "Shadow Veil",
+   "description": "Creatures cannot see you.",
+   "modifiers": {
+    "flags": [
+     "invisible"
+    ]
+   }
+  },
+  "vigor": {
+   "name": "Vigor",
+   "description": "A lasting warmth in your chest.",
+   "modifiers": {
+    "max_health": 10
    }
   }
  }

@@ -60,6 +60,15 @@ void GameData::load(Assets& assets) {
     const json questList = questDoc.value("quests", json::object());
     for (auto& [id, q] : questList.items()) quests[id] = QuestDef::fromJson(id, q);
 
+    const json shrineDoc = loadJson("shrines.json");
+    const json shrineList = shrineDoc.value("shrines", json::object());
+    for (auto& [id, sh] : shrineList.items()) {
+        ShrineDef d{id, sh.value("name", id), sh.value("icon", ""), sh.value("ability", ""), sh.value("duration", 60.0f)};
+        const auto g = sh.value("glow", std::vector<int>{255, 255, 255});
+        if (g.size() == 3) d.glow = {static_cast<Uint8>(g[0]), static_cast<Uint8>(g[1]), static_cast<Uint8>(g[2]), 255};
+        shrines[id] = d;
+    }
+
     characterConfig = loadJson("characters.json");
     sprites.load(assets);
     anims.load(assets);

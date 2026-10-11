@@ -13,10 +13,13 @@ ART
 
 MUSIC
   "Beach Town Guitar Theme" - HitCtrl (CC-BY 3.0).
+  "A Raindrop Gentle (Kymi's Theme)" - Spring Spring,
+    Spring/Spring Enterprises (Rasmus Damsgaard) (CC-BY 4.0).
   "Approaching The Green Grass", "Hero Within", "Gloomey" and
   "Infection By Chewing" - written and produced by
   Ove Melaa (omsoftware@hotmail.com), -2013 Ove Melaa (CC-BY 3.0).
   "Cave Theme" - Brandon Morris (CC0).
+  "JRPG End Dungeon" - HydroGene (CC0).
 
 LIBRARIES
   SDL3, SDL3_image, SDL3_mixer (zlib) - libsdl.org

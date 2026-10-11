@@ -1,0 +1,71 @@
+{
+ "_comment": "Shrines grant an ability from abilities.json when used (Interact). duration in seconds; 0 = lasts until the explorer dies. A used shrine is dormant until its area reloads. Place in Tiled as 'shrine' point objects (feet) with property shrine_id.",
+ "shrines": {
+  "leap": {
+   "name": "Shrine of Leaping",
+   "icon": "shrine_leap",
+   "ability": "leap",
+   "duration": 60,
+   "glow": [
+    170,
+    210,
+    255
+   ]
+  },
+  "swift": {
+   "name": "Shrine of Swiftness",
+   "icon": "shrine_swift",
+   "ability": "swift",
+   "duration": 45,
+   "glow": [
+    210,
+    240,
+    255
+   ]
+  },
+  "might": {
+   "name": "Shrine of Might",
+   "icon": "shrine_might",
+   "ability": "might",
+   "duration": 45,
+   "glow": [
+    255,
+    120,
+    90
+   ]
+  },
+  "ward": {
+   "name": "Shrine of Warding",
+   "icon": "shrine_ward",
+   "ability": "ward",
+   "duration": 20,
+   "glow": [
+    255,
+    220,
+    110
+   ]
+  },
+  "shadow": {
+   "name": "Shrine of Shadows",
+   "icon": "shrine_shadow",
+   "ability": "shadow",
+   "duration": 30,
+   "glow": [
+    120,
+    140,
+    255
+   ]
+  },
+  "vigor": {
+   "name": "Shrine of Vigor",
+   "icon": "shrine_vigor",
+   "ability": "vigor",
+   "duration": 0,
+   "glow": [
+    240,
+    250,
+    255
+   ]
+  }
+ }
+}

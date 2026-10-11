@@ -14,7 +14,9 @@ class SpriteDb;
 // What the inventory screen asks the game to do (it doesn't touch the world itself).
 struct InventoryRequest {
     enum class Kind { None, Close, Drop, Use } kind = Kind::None;
-    ItemStack stack;  // for Drop/Use: what was removed from the inventory
+    ItemStack stack;  // Drop: what was removed. Use: the item to use (not yet removed)
+    Container* container = nullptr;  // Use: where it is, so the game can consume it
+    std::size_t index = 0;
 };
 
 // Backpack + equipment ("paper doll"), optionally side by side with a storage chest.

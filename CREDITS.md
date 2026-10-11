@@ -19,6 +19,9 @@ the licenses below.
 
 - **"Beach Town Guitar Theme"** (`assets/soundtrack/beach.ogg`) by HitCtrl. CC-BY 3.0.
   https://opengameart.org/content/beach-town-guitar-theme
+- **"A Raindrop Gentle (Kymi's Theme)"** (`assets/soundtrack/upper_caves.ogg`) by Spring Spring,
+  Spring/Spring Enterprises (Rasmus Damsgaard). CC-BY 4.0.
+  https://opengameart.org/content/a-raindrop-gentle-kymis-theme
 - **"Approaching The Green Grass"** (`assets/soundtrack/forest.ogg`) — written and produced by
   Ove Melaa (omsoftware@hotmail.com), -2013 Ove Melaa. CC-BY 3.0.
   https://opengameart.org/content/oves-essential-game-audio-pack-collection-160-files-updated
@@ -28,6 +31,8 @@ the licenses below.
   (omsoftware@hotmail.com), -2013 Ove Melaa. CC-BY 3.0. Same pack as above.
 - **"Infection By Chewing"** (`assets/soundtrack/boss_2.ogg`) — written and produced by Ove Melaa
   (omsoftware@hotmail.com), -2013 Ove Melaa. CC-BY 3.0. Same pack as above.
+- **"JRPG End Dungeon"** (`assets/soundtrack/boss_3.mp3`) by HydroGene. CC0.
+  https://opengameart.org/content/jrpg-end-dungeon
 - **"Cave Theme"** (`assets/soundtrack/deep_cave.ogg`) by Brandon Morris (Brandon75689). CC0 / OGA-BY 3.0.
   https://opengameart.org/content/cave-theme
 

@@ -11,7 +11,7 @@
  "tileheight": 32,
  "backgroundcolor": "#0c0a10",
  "nextlayerid": 4,
- "nextobjectid": 13,
+ "nextobjectid": 17,
  "properties": [
   {
    "name": "display_name",
@@ -1911,6 +1911,82 @@
     },
     {
      "id": 3,
+     "name": "vigor",
+     "type": "shrine",
+     "x": 1200.0,
+     "y": 544,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "shrine_id",
+       "type": "string",
+       "value": "vigor"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "ward",
+     "type": "shrine",
+     "x": 144.0,
+     "y": 544,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "shrine_id",
+       "type": "string",
+       "value": "ward"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "shadow",
+     "type": "shrine",
+     "x": 304.0,
+     "y": 448,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "shrine_id",
+       "type": "string",
+       "value": "shadow"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "might",
+     "type": "shrine",
+     "x": 1008.0,
+     "y": 320,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "shrine_id",
+       "type": "string",
+       "value": "might"
+      }
+     ]
+    },
+    {
+     "id": 7,
      "name": "crystal",
      "type": "pickup",
      "x": 1136.0,
@@ -1934,7 +2010,7 @@
      ]
     },
     {
-     "id": 4,
+     "id": 8,
      "name": "crystal",
      "type": "pickup",
      "x": 944.0,
@@ -1958,7 +2034,7 @@
      ]
     },
     {
-     "id": 5,
+     "id": 9,
      "name": "bone",
      "type": "pickup",
      "x": 560.0,
@@ -1982,7 +2058,7 @@
      ]
     },
     {
-     "id": 6,
+     "id": 10,
      "name": "coins",
      "type": "pickup",
      "x": 752.0,
@@ -2006,7 +2082,7 @@
      ]
     },
     {
-     "id": 7,
+     "id": 11,
      "name": "bat",
      "type": "enemy",
      "x": 400.0,
@@ -2025,7 +2101,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 12,
      "name": "bat",
      "type": "enemy",
      "x": 976.0,
@@ -2049,7 +2125,7 @@
      ]
     },
     {
-     "id": 9,
+     "id": 13,
      "name": "beetle",
      "type": "enemy",
      "x": 752.0,
@@ -2073,7 +2149,7 @@
      ]
     },
     {
-     "id": 10,
+     "id": 14,
      "name": "rat",
      "type": "enemy",
      "x": 208.0,
@@ -2092,7 +2168,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 15,
      "name": "from_cave_1",
      "type": "spawn",
      "x": 80.0,
@@ -2104,7 +2180,7 @@
      "point": true
     },
     {
-     "id": 12,
+     "id": 16,
      "name": "to_cave_1",
      "type": "door",
      "x": 0,

@@ -17,7 +17,6 @@ constexpr float kDeathTime = 2.5f;
 constexpr float kBannerTime = 6.0f;
 constexpr float kRegenPerSecond = 0.4f;   // slow natural healing (hunger will gate this later)
 constexpr float kRegenDelay = 5.0f;       // seconds after being hurt before healing starts
-constexpr float kFoodHealFactor = 0.25f;  // until hunger exists, food heals a little
 constexpr const char* kStartArea = "beach";
 constexpr const char* kStartSpawn = "start";
 constexpr float T = static_cast<float>(Tilemap::kTileSize);
@@ -47,6 +46,8 @@ GameplayScene::GameplayScene(App& app, int slot, bool newGame)
         inventory_ = save.inventory;
         takenPickups_ = save.takenPickups;
         abilities_ = save.abilities;
+        hunger_ = save.hunger;
+        buffs_ = save.buffs;
         quests_ = save.quests;
         playSeconds_ = save.playSeconds;
         refreshStats();
@@ -88,6 +89,7 @@ GameplayScene::GameplayScene(App& app, int slot, bool newGame)
             }
         }
     }
+    if (slot_ == kDevSlot && opt.hunger >= 0.0f) hunger_ = std::min(hunger::kMax, opt.hunger);
     const bool devStart = slot_ == kDevSlot && !opt.startArea.empty();
     enterArea(devStart ? opt.startArea : kStartArea, devStart ? opt.startSpawn : kStartSpawn);
     banner_ = {character_.name + " arrives at the beach.",
@@ -115,6 +117,8 @@ void GameplayScene::newExplorer() {
     takenPickups_.clear();  // freebies return for the new explorer
     abilities_.clear();     // abilities and quest progress die with the explorer
     quests_.clear();
+    hunger_ = hunger::kMax;
+    buffs_.clear();
     player_.health = 1.0f;  // refreshStats clamps; set full health after
     refreshStats();
     player_.health = player_.maxHealth;
@@ -129,6 +133,8 @@ void GameplayScene::saveGame() {
     s.takenPickups = takenPickups_;
     s.abilities = abilities_;
     s.quests = quests_;
+    s.hunger = hunger_;
+    s.buffs = buffs_;
     s.health = player_.dead() ? player_.maxHealth : player_.health;
     s.area = area_.id;
     s.areaName = area_.displayName;
@@ -222,6 +228,7 @@ void GameplayScene::spawnAreaObjects() {
     enemies_.clear();
     projectiles_.clear();
     obstacles_.clear();
+    shrines_.clear();
     particles_.clear();
     const Difficulty diff = app_.settings().difficulty;
 
@@ -245,6 +252,13 @@ void GameplayScene::spawnAreaObjects() {
             // Point objects mark the bottom-centre; rectangles use their bottom edge.
             p.placeAt({o.rect.x + o.rect.w * 0.5f, o.rect.y + o.rect.h});
             pickups_.push_back(std::move(p));
+        } else if (o.type == "shrine") {
+            auto it = data_.shrines.find(o.getString("shrine_id"));
+            if (it == data_.shrines.end()) {
+                SDL_Log("%s: shrine %d has unknown shrine_id", area_.id.c_str(), o.id);
+                continue;
+            }
+            shrines_.push_back({&it->second, {o.rect.x, o.rect.y + o.rect.h}});
         } else if (o.type == "obstacle") {
             auto it = data_.obstacles.find(o.getString("obstacle", o.name));
             if (it == data_.obstacles.end()) {
@@ -313,7 +327,9 @@ void GameplayScene::update(float dt) {
         const InventoryRequest req = inventoryScreen_.update(in);
         if (req.kind == InventoryRequest::Kind::Close) closeInventory();
         else if (req.kind == InventoryRequest::Kind::Drop) dropStack(req.stack);
-        else if (req.kind == InventoryRequest::Kind::Use) useItem(req.stack);
+        else if (req.kind == InventoryRequest::Kind::Use && useItem(req.stack) && req.container) {
+            req.container->takeFrom(req.index, 1);
+        }
         return;  // the world is paused while a menu is open
     }
     case Mode::Shop:
@@ -383,7 +399,8 @@ void GameplayScene::updatePlay(float dt) {
     // Slow natural healing once you've been out of danger for a while.
     if (player_.health < healthBefore) regenDelay_ = kRegenDelay;
     regenDelay_ = std::max(0.0f, regenDelay_ - dt);
-    if (regenDelay_ <= 0.0f && !player_.dead()) {
+    updateSurvival(dt);
+    if (regenDelay_ <= 0.0f && !player_.dead() && hunger::canHeal(hunger_)) {
         player_.health = std::min(player_.maxHealth, player_.health + kRegenPerSecond * dt);
     }
 
@@ -511,9 +528,12 @@ void GameplayScene::updateProjectiles(float dt) {
 
 void GameplayScene::updateEnemies(float dt) {
     const float damageScale = difficultyDamageScale(app_.settings().difficulty) * currentModifiers().defense;
+    const Modifiers mods = currentModifiers();
+    const bool invisible = mods.has("invisible");
+    const bool invincible = mods.has("invincible");
     for (Enemy& e : enemies_) {
-        e.update(dt, area_.map, player_.box, !player_.dead());
-        if (!e.dead && e.touchCooldown <= 0.0f && e.box.overlaps(player_.box) && mode_ == Mode::Play) {
+        e.update(dt, area_.map, player_.box, !player_.dead() && !invisible);
+        if (!e.dead && !invincible && e.touchCooldown <= 0.0f && e.box.overlaps(player_.box) && mode_ == Mode::Play) {
             if (player_.hurt(e.def->damage * damageScale, e.box.center().x)) {
                 e.touchedPlayer();
                 if (app_.debugDraw) SDL_Log("%s hit the explorer: health %.0f", e.def->name.c_str(), player_.health);
@@ -591,6 +611,15 @@ GameplayScene::Interactable GameplayScene::findInteractable() const {
             return found;
         }
     }
+    for (std::size_t i = 0; i < shrines_.size(); ++i) {
+        const Shrine& sh = shrines_[i];
+        const Rect near{sh.feet.x - 20.0f, sh.feet.y - 36.0f, 40.0f, 36.0f};
+        if (near.overlaps(player_.box)) {
+            found.kind = Interactable::Kind::Shrine;
+            found.corpse = static_cast<int>(i);  // index into shrines_
+            return found;
+        }
+    }
     for (const MapObject& o : area_.objects) {
         using K = Interactable::Kind;
         if (o.type == "npc") {
@@ -635,6 +664,9 @@ void GameplayScene::handleInteraction() {
     case K::Corpse:
         if (pressed) openCorpse(it.corpse);
         break;
+    case K::Shrine:
+        if (pressed) useShrine(static_cast<std::size_t>(it.corpse));
+        break;
     case K::Npc:
         if (pressed) talkTo(data_.npcs.at(it.object->getString("npc_id")));
         break;
@@ -647,6 +679,10 @@ void GameplayScene::handleInteraction() {
 
 Modifiers GameplayScene::currentModifiers() const {
     Modifiers m = gearModifiers(inventory_, data_.items);
+    for (const SaveGame::TimedBuff& b : buffs_) {
+        if (auto it = data_.abilities.find(b.ability); it != data_.abilities.end()) m.combine(it->second.modifiers);
+    }
+    m.combine(hunger::penalty(hunger_));
     for (const std::string& id : abilities_) {
         if (auto it = data_.abilities.find(id); it != data_.abilities.end()) m.combine(it->second.modifiers);
     }
@@ -670,7 +706,16 @@ std::vector<std::string> GameplayScene::statsSummary() const {
         std::snprintf(buf, sizeof buf, "Damage taken %d%%", static_cast<int>(std::lround(m.defense * 100.0f)));
         out.emplace_back(buf);
     }
+    const char* hungerWord = hunger::level(hunger_) == hunger::Level::Starving ? "starving"
+                             : hunger::level(hunger_) == hunger::Level::Hungry ? "hungry" : "fed";
+    out.push_back("Hunger " + std::to_string(static_cast<int>(hunger_)) + " / 100 (" + hungerWord + ")");
     std::vector<std::string> effects;
+    for (const SaveGame::TimedBuff& b : buffs_) {
+        if (auto it = data_.abilities.find(b.ability); it != data_.abilities.end()) {
+            effects.push_back(it->second.name + " (" + std::to_string(static_cast<int>(std::ceil(b.remaining))) + "s)");
+        }
+    }
+    if (hunger::level(hunger_) == hunger::Level::Starving) effects.emplace_back("Starving: slower, weaker jumps");
     for (const std::string& id : abilities_) {
         if (auto it = data_.abilities.find(id); it != data_.abilities.end()) effects.push_back(it->second.name);
     }
@@ -960,11 +1005,78 @@ void GameplayScene::dropStack(const ItemStack& stack) {
     inventoryScreen_.setMessage("Dropped. Items left behind are lost when you leave the area.");
 }
 
-void GameplayScene::useItem(const ItemStack& stack) {
+bool GameplayScene::useItem(const ItemStack& stack) {
     const ItemDef& def = data_.items.get(stack.id);
-    const float heal = def.heal + def.food * kFoodHealFactor;
-    player_.health = std::min(player_.maxHealth, player_.health + heal);
-    inventoryScreen_.setMessage((def.food > 0.0f ? "You eat the " : "You drink the ") + def.name + ".");
+    if (def.food > 0.0f) {
+        if (hunger_ >= hunger::kMax - 1.0f) {
+            inventoryScreen_.setMessage("You're not hungry.", true);
+            return false;
+        }
+        const int before = static_cast<int>(hunger_);
+        hunger_ = std::min(hunger::kMax, hunger_ + def.food);
+        inventoryScreen_.setMessage("You eat the " + def.name + ". Hunger " + std::to_string(before) + " -> " +
+                                    std::to_string(static_cast<int>(hunger_)) + ".");
+    }
+    if (def.heal > 0.0f) {
+        if (def.food <= 0.0f && player_.health >= player_.maxHealth) {
+            inventoryScreen_.setMessage("You're already in good health.", true);
+            return false;
+        }
+        player_.health = std::min(player_.maxHealth, player_.health + def.heal);
+        if (def.food <= 0.0f) inventoryScreen_.setMessage("You drink the " + def.name + ".");
+    }
+    return true;
+}
+
+void GameplayScene::updateSurvival(float dt) {
+    // Hunger drains while exploring; crossing a threshold gets a warning.
+    const hunger::Level before = hunger::level(hunger_);
+    hunger_ = std::max(0.0f, hunger_ - hunger::kDrainPerSecond * dt);
+    const hunger::Level after = hunger::level(hunger_);
+    if (after != before) {
+        if (after == hunger::Level::Hungry) toast("You're getting hungry. Wounds won't heal until you eat.");
+        if (after == hunger::Level::Starving) toast("You're starving! You feel weak and slow.");
+    }
+
+    // Shrine blessings run out.
+    for (SaveGame::TimedBuff& b : buffs_) {
+        b.remaining -= dt;
+        if (b.remaining <= 0.0f) {
+            auto it = data_.abilities.find(b.ability);
+            toast((it != data_.abilities.end() ? it->second.name : b.ability) + " wears off.");
+        }
+    }
+    std::erase_if(buffs_, [](const SaveGame::TimedBuff& b) { return b.remaining <= 0.0f; });
+}
+
+void GameplayScene::useShrine(std::size_t index) {
+    Shrine& sh = shrines_[index];
+    auto it = data_.abilities.find(sh.def->ability);
+    if (it == data_.abilities.end()) return;
+    const AbilityDef& ability = it->second;
+    if (sh.used) {
+        toast("The shrine is dormant. Perhaps another day.");
+        return;
+    }
+    if (sh.def->duration <= 0.0f) {
+        // Lasting blessings don't stack.
+        if (std::find(abilities_.begin(), abilities_.end(), ability.id) != abilities_.end()) {
+            toast("You already carry this blessing.");
+            return;
+        }
+        abilities_.push_back(ability.id);
+        toast(ability.description + " (" + ability.name + ", until death)");
+        saveGame();
+    } else {
+        // Using the same kind again just refreshes the timer.
+        auto b = std::find_if(buffs_.begin(), buffs_.end(), [&](const auto& x) { return x.ability == ability.id; });
+        if (b != buffs_.end()) b->remaining = sh.def->duration;
+        else buffs_.push_back({ability.id, sh.def->duration});
+        toast(ability.description + " (" + ability.name + ", " + std::to_string(static_cast<int>(sh.def->duration)) + "s)");
+    }
+    sh.used = true;
+    burst({sh.feet.x, sh.feet.y - 18.0f}, sh.def->glow, 24);
+    refreshStats();
 }
 
 void GameplayScene::toast(const std::string& text) {
@@ -1010,6 +1122,20 @@ void GameplayScene::renderWorldObjects(SDL_Renderer* r, Vec2 cam, bool foregroun
         data_.sprites.draw(r, sprite, o.rect.x - cam.x, o.rect.y + o.rect.h - size.y - cam.y, o.getBool("flip"));
     }
     if (foreground) return;
+    const float pulse = 0.5f + 0.5f * std::sin(static_cast<float>(SDL_GetTicks()) * 0.004f);
+    for (const Shrine& sh : shrines_) {
+        const float cx = sh.feet.x - cam.x, cy = sh.feet.y - 16.0f - cam.y;
+        if (!sh.used) {
+            for (int i = 0; i < 4; ++i) {
+                const float s = 20.0f + static_cast<float>(i) * 7.0f + pulse * 4.0f;
+                const SDL_FRect g{cx - s * 0.5f, cy - s * 0.5f - 4.0f, s, s + 4.0f};
+                SDL_SetRenderDrawColor(r, sh.def->glow.r, sh.def->glow.g, sh.def->glow.b, static_cast<Uint8>(34 - i * 7));
+                SDL_RenderFillRect(r, &g);
+            }
+        }
+        const Uint8 shade = sh.used ? 110 : 255;
+        data_.sprites.drawIcon(r, sh.def->icon, cx - 16.0f, cy - 16.0f, 32.0f, false, {shade, shade, shade, 255});
+    }
     for (const CorpsePile& c : world_.corpses) {
         if (c.area != area_.id) continue;
         data_.sprites.drawIcon(r, "remains", c.x - 16.0f - cam.x, c.y - 30.0f - cam.y);
@@ -1043,8 +1169,33 @@ void GameplayScene::renderHud(SDL_Renderer* r) const {
              std::to_string(static_cast<int>(std::ceil(player_.health))) + "/" +
                  std::to_string(static_cast<int>(player_.maxHealth)));
 
-    data_.sprites.drawIcon(r, "coins", 86, 20, 24);
-    ui::text(r, 112, 30, std::to_string(inventory_.coins), ui::kGold);
+    // Hunger bar under the health bar.
+    const SDL_FRect foodBack{88, 21, 120, 6};
+    SDL_SetRenderDrawColor(r, 30, 20, 10, 255);
+    SDL_RenderFillRect(r, &foodBack);
+    const float full = std::clamp(hunger_ / hunger::kMax, 0.0f, 1.0f);
+    const SDL_FRect food{foodBack.x + 1, foodBack.y + 1, (foodBack.w - 2) * full, foodBack.h - 2};
+    SDL_SetRenderDrawColor(r, 220, static_cast<Uint8>(120 + 60 * full), 40, 255);
+    SDL_RenderFillRect(r, &food);
+    SDL_SetRenderDrawColor(r, 120, 98, 70, 255);
+    SDL_RenderRect(r, &foodBack);
+    if (hunger::level(hunger_) != hunger::Level::Fed) {
+        const bool starving = hunger::level(hunger_) == hunger::Level::Starving;
+        ui::text(r, foodBack.x + foodBack.w + 6, foodBack.y - 1, starving ? "Starving!" : "Hungry",
+                 starving ? ui::kBad : ui::kGold);
+    }
+    data_.sprites.drawIcon(r, "coins", 86, 28, 20);
+    ui::text(r, 110, 35, std::to_string(inventory_.coins), ui::kGold);
+    // Shrine blessings with time left.
+    float by = 52.0f;
+    for (const SaveGame::TimedBuff& b : buffs_) {
+        auto it = data_.abilities.find(b.ability);
+        if (it == data_.abilities.end()) continue;
+        const int secs = static_cast<int>(std::ceil(b.remaining));
+        const bool ending = b.remaining < 5.0f && static_cast<int>(b.remaining * 4.0f) % 2 == 0;
+        ui::text(r, 8, by, it->second.name + " " + std::to_string(secs) + "s", ending ? ui::kDim : ui::kGood);
+        by += 11.0f;
+    }
     ui::text(r, App::kViewWidth - 8 - ui::textWidth(character_.name), 8, character_.name, ui::kDim);
     // Active tasks under the name.
     float qy = 22.0f;
@@ -1116,6 +1267,10 @@ void GameplayScene::render(SDL_Renderer* renderer, float alpha) {
         else if (it.kind == K::Door) prompt = "[" + keys.keyName(Action::Up) + "] " + it.object->getString("label", "Enter");
         else if (it.kind == K::Corpse) prompt = use + "Search " + world_.corpses[static_cast<std::size_t>(it.corpse)].explorer;
         else if (it.kind == K::Npc) prompt = use + "Talk to " + data_.npcs.at(it.object->getString("npc_id")).name;
+        else if (it.kind == K::Shrine) {
+            const Shrine& sh = shrines_[static_cast<std::size_t>(it.corpse)];
+            prompt = sh.used ? sh.def->name + " (dormant)" : use + "Pray at the " + sh.def->name;
+        }
         if (prompt.empty()) {
             if (const Obstacle* ob = obstacleNearPlayer()) {
                 // Suggest the hand holding a suitable tool, or just name the obstacle.

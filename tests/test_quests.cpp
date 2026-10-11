@@ -111,3 +111,18 @@ TEST_CASE("quest logs round-trip and text is filled in") {
     CHECK(copy.status("b") == QuestState::Status::NotStarted);
     CHECK(fillQuestText("Rats: {n} of {count}.", 1, 3) == "Rats: 1 of 3.");
 }
+
+#include "game/Hunger.h"
+
+TEST_CASE("hunger levels gate healing and slow starving explorers") {
+    CHECK(hunger::level(100) == hunger::Level::Fed);
+    CHECK(hunger::canHeal(40));
+    CHECK(hunger::level(30) == hunger::Level::Hungry);
+    CHECK_FALSE(hunger::canHeal(30));
+    CHECK(hunger::level(10) == hunger::Level::Starving);
+    CHECK(hunger::penalty(10).runSpeed < 1.0f);
+    CHECK(hunger::penalty(10).jump < 1.0f);
+    CHECK(hunger::penalty(50).empty());
+    // A full belly lasts roughly fifteen minutes.
+    CHECK(hunger::kMax / hunger::kDrainPerSecond == doctest::Approx(900.0f));
+}

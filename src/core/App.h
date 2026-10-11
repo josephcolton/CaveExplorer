@@ -31,6 +31,7 @@ public:
         std::string giveItems;       // comma-separated item ids added to the backpack
         std::string openUi;          // inventory | chest | shop | pause (in game) or slots | settings | credits | about (title)
         std::string script;          // scripted input: "Right:0-120,UseRight:130" (ticks)
+        float hunger = -1.0f;        // dev game: starting hunger (0-100)
         bool devGame() const {
             return !startArea.empty() || !giveItems.empty() || openUi == "inventory" || openUi == "chest" ||
                    openUi == "shop" || openUi == "pause";

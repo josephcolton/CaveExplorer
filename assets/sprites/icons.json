@@ -41,6 +41,12 @@
   "remains": 36,
   "obstacle_bush": 37,
   "npc_miner": 38,
-  "npc_halfling": 39
+  "npc_halfling": 39,
+  "shrine_leap": 40,
+  "shrine_swift": 41,
+  "shrine_might": 42,
+  "shrine_ward": 43,
+  "shrine_shadow": 44,
+  "shrine_vigor": 45
  }
 }

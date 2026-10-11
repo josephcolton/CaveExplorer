@@ -8,7 +8,9 @@
 #include "entity/Projectile.h"
 #include "game/Character.h"
 #include "game/Inventory.h"
+#include "game/Hunger.h"
 #include "game/Modifiers.h"
+#include "game/SaveGame.h"
 #include "game/Quests.h"
 #include "game/WorldSave.h"
 #include "ui/DialogueScreen.h"
@@ -25,6 +27,7 @@
 
 struct GameData;
 struct NpcDef;
+struct ShrineDef;
 
 class GameplayScene : public Scene {
 public:
@@ -41,7 +44,7 @@ private:
     enum class Mode { Play, Inventory, Shop, Pause, Settings, Text, Dialogue, Dead };
 
     struct Interactable {
-        enum class Kind { None, Door, TouchDoor, Chest, Shop, Corpse, Npc } kind = Kind::None;
+        enum class Kind { None, Door, TouchDoor, Chest, Shop, Corpse, Npc, Shrine } kind = Kind::None;
         const MapObject* object = nullptr;
         int corpse = -1;
     };
@@ -90,7 +93,10 @@ private:
     void closeInventory();
     void openShop(const std::string& shopId);
     void dropStack(const ItemStack& stack);
-    void useItem(const ItemStack& stack);
+    // Returns true if the item was used up.
+    bool useItem(const ItemStack& stack);
+    void useShrine(std::size_t index);
+    void updateSurvival(float dt);
 
     void toast(const std::string& text);
     void renderWorldObjects(SDL_Renderer* r, Vec2 cam, bool foreground) const;
@@ -108,6 +114,8 @@ private:
     std::set<std::string> takenPickups_;  // this explorer's collected freebies
     std::vector<std::string> abilities_;   // lasting abilities until death
     QuestLog quests_;
+    float hunger_ = hunger::kMax;
+    std::vector<SaveGame::TimedBuff> buffs_;  // shrine blessings with time left
     double playSeconds_ = 0.0;
 
     // Current area
@@ -118,6 +126,12 @@ private:
     std::vector<Enemy> enemies_;
     std::vector<Projectile> projectiles_;
     std::vector<Obstacle> obstacles_;
+    struct Shrine {
+        const ShrineDef* def;
+        Vec2 feet;
+        bool used = false;  // dormant until the area reloads
+    };
+    std::vector<Shrine> shrines_;
     struct Particle {
         Vec2 pos;
         Vec2 vel;

@@ -70,7 +70,7 @@ existing maps unless run with `--force`. Edit the maps in Tiled from here on.
 Objects also include `obstacle` (a rectangle covering whole tiles; `obstacle` type from
 `data/obstacles.json`, e.g. `bush` needs a tool tagged `cut`, `rock` needs `break`;
 `passable_from` = `left`/`right` lets players push through from that side), `npc` (point at the
-feet; `npc_id` from `data/npcs.json`), `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
+feet; `npc_id` from `data/npcs.json`), `shrine` (point at the feet; `shrine_id`), `enemy` (point at the feet of a walker or the centre of a flyer; `enemy` type
 from `data/enemies.json`, optional `enemy_easy` / `enemy_hard` overrides where `none` removes it,
 and `hp_scale`), `pickup` (point; `item` id or `coins`, `count`, optional `unique_id` so it
 never respawns once taken), `chest` (the persistent storage chest), `shop` (`shop_id` from
@@ -79,8 +79,9 @@ never respawns once taken), `chest` (the persistent storage chest), `shop` (`sho
 ## Music
 
 Tracks the game uses live in `assets/soundtrack/`. `assets/music/` is ignored by git and is a
-scratch area for auditioning downloads. Current tracks: `beach.ogg` (The Beach), `forest.ogg` (The Forest) and `deep_cave.ogg`
-(reserved for a deep cave area) `boss_1.ogg` / `boss_2.ogg` (the first two boss arenas) and
+scratch area for auditioning downloads. Current tracks: `beach.ogg` (The Beach), `forest.ogg` (The Forest), `upper_caves.ogg`
+(Upper Caves) and `deep_cave.ogg`
+(reserved for a deep cave area) `boss_1.ogg` / `boss_2.ogg` / `boss_3.mp3` (boss arenas) and
 `underground_city.mp3` (reserved for the underground city).
 
 ## Game data
@@ -92,6 +93,7 @@ scratch area for auditioning downloads. Current tracks: `beach.ogg` (The Beach),
 - `data/enemies.json` — creatures: behaviour (walker/flyer), health, damage, speed, drops.
 - `data/characters.json` — names and stat ranges for newly rolled explorers.
 - `data/obstacles.json` — bushes, boulders and other blockers: required tool tag, hits, art, hint.
+- `data/shrines.json` — shrines: which ability they grant and for how long (0 = until death).
 - `data/npcs.json`, `data/quests.json`, `data/abilities.json` — people, their jobs, and the lasting
   abilities jobs can teach. Items get effects through `carried` / `equipped` in `items.json`.
 - `data/credits.txt` — the in-game credits page.
@@ -113,6 +115,7 @@ See [CREDITS.md](CREDITS.md) for art and library credits.
 --give <id,id,...>           start with these items (weapons go into empty hands)
 --ui inventory|chest|shop|pause      open an in-game screen immediately
 --ui slots|settings|credits|about    open a title-screen page immediately
+--hunger <0-100>             dev game: start this hungry
 ```
 `--area`, `--give` and the in-game `--ui` pages start a throwaway "dev game" that never saves.
 
@@ -136,6 +139,12 @@ See [CREDITS.md](CREDITS.md) for art and library credits.
 - Some items help just by being carried (the Feather Charm), others when worn or held (boots,
   helmets, the buckler). Hover an item in the inventory to see its effects; hover an empty slot
   for your explorer's stats.
+- Hunger drains slowly as you explore (a full belly lasts about 15 minutes). Below "Hungry" your
+  wounds stop healing; when "Starving" you're slower and can't jump as high. Eat food (E in the
+  inventory) to fill up; healing potions restore health.
+- Shrines (glowing altars) grant blessings: Leaping, Swiftness, Might, Warding (can't be hurt),
+  Shadows (creatures can't see you) for a short time, or Vigor (+10 max health) until death.
+  A shrine goes dormant once used and recharges when its area reloads.
 - People in the caves trade and hand out small jobs. Jobs and the abilities they teach last until
   the explorer dies.
 - When an explorer dies, everything they carried stays where they fell (search it with E), and a

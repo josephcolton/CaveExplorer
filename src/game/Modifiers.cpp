@@ -16,6 +16,8 @@ const char* flagText(const std::string& flag) {
     if (flag == "nonslip") return "Sure footing on slick rock";
     if (flag == "warm") return "Keeps out the cold";
     if (flag == "light") return "Gives light";
+    if (flag == "invincible") return "Nothing can hurt you";
+    if (flag == "invisible") return "Creatures can't see you";
     return nullptr;
 }
 }  // namespace

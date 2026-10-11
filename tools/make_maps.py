@@ -167,6 +167,10 @@ class Map:
         self.obj("npc", tx * T + T / 2, row * T, 0, 0, name=npc_id, npc_id=npc_id)
         self.objects[-1]["point"] = True
 
+    def shrine(self, shrine_id, tx, row):
+        self.obj("shrine", tx * T + T / 2, row * T, 0, 0, name=shrine_id, shrine_id=shrine_id)
+        self.objects[-1]["point"] = True
+
     def enemy(self, kind, tx, row, flying=False, **props):
         # Walkers: point = feet on top of tile row `row`. Flyers: point = centre of that tile.
         y = row * T + (T / 2 if flying else 0)
@@ -261,7 +265,7 @@ def forest():
 
 
 def cave_1():
-    m = Map("cave_1", 40, 30, "Upper Caves", "#0c0a10", fill="#", backdrop="b")
+    m = Map("cave_1", 40, 30, "Upper Caves", "#0c0a10", fill="#", backdrop="b", music="upper_caves.ogg")
     m.fill(1, 1, 8, 4, "b")      # entrance chamber
     m.fill(8, 2, 25, 4, "b")     # tunnel east
     m.fill(22, 5, 25, 17, "b")   # shaft down
@@ -275,6 +279,8 @@ def cave_1():
     m.fill(36, 23, 39, 26, "b")  # passage east
     m.pickup("stones", 6, 5, count=6)
     m.npc("hob", 7, 5)  # Old Hob, trader and quest giver
+    m.shrine("swift", 15, 5)   # in the tunnel east
+    m.shrine("leap", 7, 27)    # big chamber floor
     m.pickup("bone", 12, 24)
     m.pickup("coins", 20, 27, count=8)
     m.pickup("crystal", 30, 22)
@@ -305,6 +311,10 @@ def cave_2():
     m.fill(33, 3, 33, 14, "#")
     m.obstacle("rock", 33, 15, 33, 16, passable_from="right")
     m.pickup("feather_charm", 36, 17, unique_id="cave2_charm")
+    m.shrine("vigor", 37, 17)  # lasting blessing, behind the boulder
+    m.shrine("ward", 4, 17)
+    m.shrine("shadow", 9, 14)  # on the rock step
+    m.shrine("might", 31, 10)  # on the high ledge
     m.pickup("crystal", 35, 17, count=2)
     m.pickup("crystal", 29, 10)
     m.pickup("bone", 17, 17)

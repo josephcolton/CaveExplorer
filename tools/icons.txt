@@ -43,3 +43,9 @@ remains         item/armour/animal_skin1.png
 obstacle_bush   dc-mon/fungi_plants/plant.png
 npc_miner       dc-mon/dwarf.png
 npc_halfling    dc-mon/halfling.png
+shrine_leap     dc-dngn/altars/dngn_altar_elyvilon.png
+shrine_swift    dc-dngn/altars/dngn_altar_vehumet.png
+shrine_might    dc-dngn/altars/dngn_altar_trog.png
+shrine_ward     dc-dngn/altars/dngn_altar_shining_one.png
+shrine_shadow   dc-dngn/altars/dngn_altar_sif_muna.png
+shrine_vigor    dc-dngn/altars/dngn_altar_zin.png
