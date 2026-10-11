@@ -292,7 +292,7 @@ void GameplayScene::spawnAreaObjects() {
             // Per-difficulty overrides: a different creature, or "none" to leave it out.
             std::string type = o.getString("enemy", o.name);
             const char* key = diff == Difficulty::Easy ? "enemy_easy" : diff == Difficulty::Hard ? "enemy_hard" : nullptr;
-            if (key && !o.getString(key).empty()) type = o.getString(key);
+            if (key && !o.getString(key).empty() && o.getString(key) != "same") type = o.getString(key);
             if (type.empty() || type == "none") continue;
             auto it = data_.enemies.find(type);
             if (it == data_.enemies.end()) {
@@ -989,22 +989,15 @@ void GameplayScene::renderLighting(SDL_Renderer* r, Vec2 cam) {
 
     for (const MapObject& o : area_.objects) {
         if (o.type == "light") {
-            // Map lights: radius, color "#rrggbb", optional flicker.
-            SDL_Color c{255, 230, 180, 255};
-            const std::string hex = o.getString("color");
-            if (hex.size() == 7) {
-                const unsigned long v = std::stoul(hex.substr(1), nullptr, 16);
-                c = {static_cast<Uint8>(v >> 16), static_cast<Uint8>(v >> 8), static_cast<Uint8>(v), 255};
-            }
+            // Map lights: radius, color, intensity, optional flicker.
+            const SDL_Color c = o.getColor("color").value_or(SDL_Color{255, 230, 180, 255});
             float radius = o.getFloat("radius", 80.0f);
             if (o.getBool("flicker")) radius *= 1.0f + 0.05f * std::sin(lightTime_ * 9.0f + o.rect.x);
             lighting_.addLight(r, screen({o.rect.x + o.rect.w * 0.5f, o.rect.y + o.rect.h * 0.5f}), radius, c,
                                o.getFloat("intensity", 1.0f));
-        } else if (o.type == "door" && o.getString("glow").size() == 7) {
+        } else if (o.type == "door" && o.getColor("glow")) {
             // Daylight spilling in through an exit.
-            const unsigned long v = std::stoul(o.getString("glow").substr(1), nullptr, 16);
-            lighting_.addLight(r, screen(o.rect.center()), std::max(o.rect.w, o.rect.h) * 2.2f,
-                               {static_cast<Uint8>(v >> 16), static_cast<Uint8>(v >> 8), static_cast<Uint8>(v), 255});
+            lighting_.addLight(r, screen(o.rect.center()), std::max(o.rect.w, o.rect.h) * 2.2f, *o.getColor("glow"));
         } else if (o.type == "npc") {
             auto it = data_.npcs.find(o.getString("npc_id"));
             if (it != data_.npcs.end() && it->second.light > 0.0f) {
@@ -1289,10 +1282,8 @@ void GameplayScene::renderWorldObjects(SDL_Renderer* r, Vec2 cam, bool foregroun
         else if (o.type == "chest") sprite = "chest";
         if (o.type == "door" && !foreground && o.getString("trigger", "interact") != "touch") {
             // Make doorways easy to spot: optional light spilling through, and a bobbing arrow.
-            const std::string glow = o.getString("glow");
-            if (glow.size() == 7) {
-                const unsigned long c = std::stoul(glow.substr(1), nullptr, 16);
-                const auto cr = static_cast<Uint8>(c >> 16), cg = static_cast<Uint8>(c >> 8), cb = static_cast<Uint8>(c);
+            if (const auto glow = o.getColor("glow")) {
+                const Uint8 cr = glow->r, cg = glow->g, cb = glow->b;
                 for (int i = 0; i < 6; ++i) {
                     const float inset = static_cast<float>(i) * 3.0f;
                     const SDL_FRect g{o.rect.x + inset - cam.x, o.rect.y + inset - cam.y, o.rect.w - inset * 2, o.rect.h - inset};

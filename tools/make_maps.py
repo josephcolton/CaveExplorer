@@ -12,6 +12,8 @@ import struct
 import sys
 from pathlib import Path
 
+from make_tiled_project import COLOR_PROPS, ENUM_PROPS
+
 ROOT = Path(__file__).resolve().parent.parent
 TILES_DIR = ROOT / "assets" / "tiles"
 MAPS_DIR = ROOT / "assets" / "maps"
@@ -151,7 +153,7 @@ class Map:
         if props:
             o["properties"] = [
                 {"name": k, "type": "bool" if isinstance(v, bool) else
-                 ("int" if isinstance(v, int) else "string"), "value": v}
+                 ("int" if isinstance(v, int) else ("float" if isinstance(v, float) else "string")), "value": v}
                 for k, v in props.items()]
         self.objects.append(o)
 
@@ -223,15 +225,19 @@ class Map:
             return {"id": lid, "name": name, "type": "tilelayer", "x": 0, "y": 0, "width": self.w,
                     "height": self.h, "opacity": opacity, "visible": True, "data": data, "properties": props}
 
+        objects = [typed(o) for o in objects]
+        map_props = [typed_prop(p) for p in [
+            {"name": "display_name", "type": "string", "value": self.display},
+            {"name": "music", "type": "string", "value": self.music or "none"},
+            {"name": "restart_spawn", "type": "string", "value": self.restart},
+            {"name": "darkness", "type": "float", "value": self.darkness}]]
         return {
-            "type": "map", "version": "1.10", "tiledversion": "1.10.2", "orientation": "orthogonal",
+            "type": "map",
+            "class": "area", "version": "1.10", "tiledversion": "1.10.2", "orientation": "orthogonal",
             "renderorder": "right-down", "infinite": False, "width": self.w, "height": self.h,
             "tilewidth": T, "tileheight": T, "backgroundcolor": self.bg,
             "nextlayerid": 5, "nextobjectid": len(objects) + 1,
-            "properties": [{"name": "display_name", "type": "string", "value": self.display},
-                           {"name": "music", "type": "string", "value": self.music},
-                           {"name": "restart_spawn", "type": "string", "value": self.restart},
-                           {"name": "darkness", "type": "float", "value": self.darkness}],
+            "properties": map_props,
             "tilesets": [tileset_json()],
             "layers": [
                 tile_layer(1, "background", layers["background"], []),
@@ -244,6 +250,25 @@ class Map:
                  "x": 0, "y": 0, "opacity": 1, "visible": True, "objects": objects},
             ],
         }
+
+
+def typed_prop(p):
+    """Mark properties with the Tiled project's types so Tiled shows dropdowns / colour pickers."""
+    p = dict(p)
+    if p["name"] in ENUM_PROPS:
+        p["propertytype"] = ENUM_PROPS[p["name"]]
+        p["type"] = "string"
+    if p["name"] in COLOR_PROPS and isinstance(p["value"], str):
+        p["type"] = "color"
+        if len(p["value"]) == 7:
+            p["value"] = "#ff" + p["value"][1:]  # Tiled stores colours as #aarrggbb
+    return p
+
+
+def typed(o):
+    if "properties" in o:
+        o = dict(o, properties=[typed_prop(p) for p in o["properties"]])
+    return o
 
 
 def beach():

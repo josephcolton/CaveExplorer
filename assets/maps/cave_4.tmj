@@ -1,5 +1,6 @@
 {
  "type": "map",
+ "class": "area",
  "version": "1.10",
  "tiledversion": "1.10.2",
  "orientation": "orthogonal",
@@ -21,7 +22,8 @@
   {
    "name": "music",
    "type": "string",
-   "value": "upper_caves.ogg"
+   "value": "upper_caves.ogg",
+   "propertytype": "Music"
   },
   {
    "name": "restart_spawn",
@@ -3763,7 +3765,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "warm_cloak"
+       "value": "warm_cloak",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3792,7 +3795,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "crystal"
+       "value": "crystal",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3816,7 +3820,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "coins"
+       "value": "coins",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3840,7 +3845,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "coins"
+       "value": "coins",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3864,7 +3870,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "coins"
+       "value": "coins",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3888,7 +3895,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "coins"
+       "value": "coins",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3916,8 +3924,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#ffd9a0"
+       "type": "color",
+       "value": "#ffffd9a0"
       },
       {
        "name": "flicker",
@@ -3926,7 +3934,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.6
       }
      ]
@@ -3946,7 +3954,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -3965,7 +3974,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -3984,7 +3994,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -4003,7 +4014,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -4022,7 +4034,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -4041,17 +4054,20 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       },
       {
        "name": "enemy_hard",
        "type": "string",
-       "value": "giant_bat"
+       "value": "giant_bat",
+       "propertytype": "EnemyVariant"
       },
       {
        "name": "enemy_easy",
        "type": "string",
-       "value": "none"
+       "value": "none",
+       "propertytype": "EnemyVariant"
       }
      ]
     },
@@ -4070,7 +4086,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "rat"
+       "value": "rat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -4100,7 +4117,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "cave_1"
+       "value": "cave_1",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -4110,7 +4128,8 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "touch"
+       "value": "touch",
+       "propertytype": "Trigger"
       }
      ]
     }

@@ -1,5 +1,6 @@
 {
  "type": "map",
+ "class": "area",
  "version": "1.10",
  "tiledversion": "1.10.2",
  "orientation": "orthogonal",
@@ -21,7 +22,8 @@
   {
    "name": "music",
    "type": "string",
-   "value": ""
+   "value": "none",
+   "propertytype": "Music"
   },
   {
    "name": "restart_spawn",
@@ -2711,8 +2713,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#5ad296"
+       "type": "color",
+       "value": "#ff5ad296"
       },
       {
        "name": "flicker",
@@ -2721,7 +2723,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.55
       }
      ]
@@ -2745,8 +2747,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#5ad296"
+       "type": "color",
+       "value": "#ff5ad296"
       },
       {
        "name": "flicker",
@@ -2755,7 +2757,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.55
       }
      ]
@@ -2779,8 +2781,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#5ad296"
+       "type": "color",
+       "value": "#ff5ad296"
       },
       {
        "name": "flicker",
@@ -2789,7 +2791,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.55
       }
      ]
@@ -2813,8 +2815,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#5ad296"
+       "type": "color",
+       "value": "#ff5ad296"
       },
       {
        "name": "flicker",
@@ -2823,7 +2825,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.55
       }
      ]
@@ -2847,8 +2849,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#5ad296"
+       "type": "color",
+       "value": "#ff5ad296"
       },
       {
        "name": "flicker",
@@ -2857,7 +2859,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.45
       }
      ]
@@ -2881,8 +2883,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#a0c8ff"
+       "type": "color",
+       "value": "#ffa0c8ff"
       },
       {
        "name": "flicker",
@@ -2891,7 +2893,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.6
       }
      ]
@@ -2910,12 +2912,14 @@
       {
        "name": "obstacle",
        "type": "string",
-       "value": "rock"
+       "value": "rock",
+       "propertytype": "Obstacle"
       },
       {
        "name": "passable_from",
        "type": "string",
-       "value": "right"
+       "value": "right",
+       "propertytype": "Side"
       }
      ]
     },
@@ -2934,7 +2938,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "feather_charm"
+       "value": "feather_charm",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -2944,7 +2949,8 @@
       {
        "name": "gated_by",
        "type": "string",
-       "value": "break"
+       "value": "break",
+       "propertytype": "Ability"
       },
       {
        "name": "unique_id",
@@ -2968,12 +2974,14 @@
       {
        "name": "shrine_id",
        "type": "string",
-       "value": "vigor"
+       "value": "vigor",
+       "propertytype": "Shrine"
       },
       {
        "name": "gated_by",
        "type": "string",
-       "value": "break"
+       "value": "break",
+       "propertytype": "Ability"
       }
      ]
     },
@@ -2992,7 +3000,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "breath_amulet"
+       "value": "breath_amulet",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3002,7 +3011,8 @@
       {
        "name": "gated_by",
        "type": "string",
-       "value": "highjump"
+       "value": "highjump",
+       "propertytype": "Ability"
       },
       {
        "name": "unique_id",
@@ -3030,8 +3040,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#a0e0ff"
+       "type": "color",
+       "value": "#ffa0e0ff"
       },
       {
        "name": "flicker",
@@ -3040,7 +3050,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.6
       }
      ]
@@ -3060,7 +3070,8 @@
       {
        "name": "shrine_id",
        "type": "string",
-       "value": "ward"
+       "value": "ward",
+       "propertytype": "Shrine"
       }
      ]
     },
@@ -3079,7 +3090,8 @@
       {
        "name": "shrine_id",
        "type": "string",
-       "value": "shadow"
+       "value": "shadow",
+       "propertytype": "Shrine"
       }
      ]
     },
@@ -3098,7 +3110,8 @@
       {
        "name": "shrine_id",
        "type": "string",
-       "value": "might"
+       "value": "might",
+       "propertytype": "Shrine"
       }
      ]
     },
@@ -3117,7 +3130,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "crystal"
+       "value": "crystal",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3127,7 +3141,8 @@
       {
        "name": "gated_by",
        "type": "string",
-       "value": "break"
+       "value": "break",
+       "propertytype": "Ability"
       }
      ]
     },
@@ -3146,7 +3161,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "crystal"
+       "value": "crystal",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3170,7 +3186,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "bone"
+       "value": "bone",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3194,7 +3211,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "coins"
+       "value": "coins",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3218,7 +3236,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -3237,12 +3256,14 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       },
       {
        "name": "enemy_hard",
        "type": "string",
-       "value": "giant_bat"
+       "value": "giant_bat",
+       "propertytype": "EnemyVariant"
       }
      ]
     },
@@ -3261,12 +3282,14 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "beetle"
+       "value": "beetle",
+       "propertytype": "Enemy"
       },
       {
        "name": "enemy_easy",
        "type": "string",
-       "value": "rat"
+       "value": "rat",
+       "propertytype": "EnemyVariant"
       }
      ]
     },
@@ -3285,7 +3308,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "rat"
+       "value": "rat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -3315,7 +3339,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "cave_1"
+       "value": "cave_1",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -3325,7 +3350,8 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "touch"
+       "value": "touch",
+       "propertytype": "Trigger"
       }
      ]
     }

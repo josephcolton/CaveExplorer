@@ -2,6 +2,7 @@
 
 #include "core/Assets.h"
 
+#include <cstdlib>
 #include <filesystem>
 
 using nlohmann::json;
@@ -16,9 +17,12 @@ std::unordered_map<std::string, json> readProperties(const json& node) {
     return props;
 }
 
+}  // namespace
+
 // Tiled colors are "#rrggbb" or "#aarrggbb".
-std::optional<SDL_Color> parseColor(const std::string& s) {
+std::optional<SDL_Color> parseHexColor(const std::string& s) {
     if (s.size() != 7 && s.size() != 9) return std::nullopt;
+    if (s[0] != '#' || s.find_first_not_of("0123456789abcdefABCDEF", 1) != std::string::npos) return std::nullopt;
     const unsigned long v = std::stoul(s.substr(1), nullptr, 16);
     SDL_Color c;
     c.r = static_cast<Uint8>((v >> 16) & 0xFF);
@@ -28,6 +32,8 @@ std::optional<SDL_Color> parseColor(const std::string& s) {
     return c;
 }
 
+namespace {
+
 TileCollision parseCollision(const std::string& s) {
     if (s == "solid") return TileCollision::Solid;
     if (s == "oneway") return TileCollision::OneWay;
@@ -36,6 +42,10 @@ TileCollision parseCollision(const std::string& s) {
 
 }  // namespace
 
+std::optional<SDL_Color> MapObject::getColor(const std::string& key) const {
+    return parseHexColor(getString(key));
+}
+
 std::string MapObject::getString(const std::string& key, const std::string& fallback) const {
     auto it = properties.find(key);
     return (it != properties.end() && it->second.is_string()) ? it->second.get<std::string>() : fallback;
@@ -43,7 +53,16 @@ std::string MapObject::getString(const std::string& key, const std::string& fall
 
 float MapObject::getFloat(const std::string& key, float fallback) const {
     auto it = properties.find(key);
-    return (it != properties.end() && it->second.is_number()) ? it->second.get<float>() : fallback;
+    if (it == properties.end()) return fallback;
+    if (it->second.is_number()) return it->second.get<float>();
+    if (it->second.is_string()) {
+        // Hand-edited maps sometimes store numbers as text.
+        const std::string& s = it->second.get_ref<const std::string&>();
+        char* end = nullptr;
+        const float v = std::strtof(s.c_str(), &end);
+        if (end && end != s.c_str() && *end == '\0') return v;
+    }
+    return fallback;
 }
 
 bool MapObject::getBool(const std::string& key, bool fallback) const {
@@ -74,13 +93,14 @@ bool Area::load(const std::string& areaId, Assets& assets) {
     objects.clear();
     map.width = doc.value("width", 0);
     map.height = doc.value("height", 0);
-    if (auto c = parseColor(doc.value("backgroundcolor", ""))) background = *c;
+    if (auto c = parseHexColor(doc.value("backgroundcolor", ""))) background = *c;
 
     const auto mapProps = readProperties(doc);
     auto nameIt = mapProps.find("display_name");
     displayName = (nameIt != mapProps.end() && nameIt->second.is_string()) ? nameIt->second.get<std::string>() : areaId;
     auto musicIt = mapProps.find("music");
     music = (musicIt != mapProps.end() && musicIt->second.is_string()) ? musicIt->second.get<std::string>() : "";
+    if (music == "none") music.clear();
     auto darkIt = mapProps.find("darkness");
     darkness = (darkIt != mapProps.end() && darkIt->second.is_number()) ? darkIt->second.get<float>() : 0.0f;
     auto restartIt = mapProps.find("restart_spawn");
@@ -104,7 +124,7 @@ bool Area::load(const std::string& areaId, Assets& assets) {
         ts.liquid.assign(static_cast<std::size_t>(ts.tileCount), false);
 
         const std::string image = (mapDir / tsj.value("image", "")).string();
-        ts.texture = assets.texture(image, parseColor(tsj.value("transparentcolor", "")));
+        ts.texture = assets.texture(image, parseHexColor(tsj.value("transparentcolor", "")));
 
         for (const json& tile : tsj.value("tiles", json::array())) {
             const int localId = tile.value("id", -1);

@@ -40,7 +40,8 @@ covers the design decisions so far and how to build the first playable version.
 - [x] Hub expansion: Upper Caves now has four gated exits - Mossy Hollow (cut), Drowned Tunnel /
        Sunken Grotto (breath: Amulet of Deep Breathing), Bat Roost (high jump: Feather Charm +35%),
        Crystal Mine (break: pickaxe). Gates verified by tools/check_reach.py. Forest has more trees.
-- [ ] Map editing: Tiled is the editor; consider custom Tiled object types / a project file
+- [x] Map editing: Tiled project (CaveExplorer.tiled-project) with our object classes and dropdowns,
+       generated from data/ by tools/make_tiled_project.py; maps round-trip through Tiled 1.12 cleanly
 - [x] Restart area returns to each area's surface-side entrance (map property restart_spawn)
 
 ## Art sources

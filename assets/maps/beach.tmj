@@ -1,5 +1,6 @@
 {
  "type": "map",
+ "class": "area",
  "version": "1.10",
  "tiledversion": "1.10.2",
  "orientation": "orthogonal",
@@ -21,7 +22,8 @@
   {
    "name": "music",
    "type": "string",
-   "value": "beach.ogg"
+   "value": "beach.ogg",
+   "propertytype": "Music"
   },
   {
    "name": "restart_spawn",
@@ -2322,7 +2324,8 @@
       {
        "name": "shop_id",
        "type": "string",
-       "value": "beach_shop"
+       "value": "beach_shop",
+       "propertytype": "Shop"
       }
      ]
     },
@@ -2340,7 +2343,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "lamp_post"
+       "value": "lamp_post",
+       "propertytype": "Sprite"
       }
      ]
     },
@@ -2358,7 +2362,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "signpost"
+       "value": "signpost",
+       "propertytype": "Sprite"
       }
      ]
     },
@@ -2377,7 +2382,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "coins"
+       "value": "coins",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -2401,7 +2407,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "coins"
+       "value": "coins",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -2425,7 +2432,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "banana"
+       "value": "banana",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -2449,7 +2457,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "coins"
+       "value": "coins",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -2473,7 +2482,8 @@
       {
        "name": "shrine_id",
        "type": "string",
-       "value": "breath"
+       "value": "breath",
+       "propertytype": "Shrine"
       }
      ]
     },
@@ -2515,7 +2525,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "forest"
+       "value": "forest",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -2525,7 +2536,8 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "touch"
+       "value": "touch",
+       "propertytype": "Trigger"
       }
      ]
     }

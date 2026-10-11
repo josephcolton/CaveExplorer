@@ -5,11 +5,15 @@
 
 #include <nlohmann/json.hpp>
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 class Assets;
+
+// Parses "#rrggbb" or "#aarrggbb" (as Tiled writes colours).
+std::optional<SDL_Color> parseHexColor(const std::string& s);
 
 // An object placed in the Tiled "objects" layer (spawn points, doors, enemies, ...).
 struct MapObject {
@@ -22,6 +26,8 @@ struct MapObject {
     std::string getString(const std::string& key, const std::string& fallback = "") const;
     float getFloat(const std::string& key, float fallback = 0.0f) const;
     bool getBool(const std::string& key, bool fallback = false) const;
+    // A colour property, "#rrggbb" or Tiled's "#aarrggbb".
+    std::optional<SDL_Color> getColor(const std::string& key) const;
 };
 
 // One loaded area of the world (beach, forest, cave_1, ...). Loaded fresh from its

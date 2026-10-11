@@ -91,16 +91,26 @@ the Amulet of Deep Breathing (its temporary home until deeper areas exist).
 ## Editing maps with Tiled
 
 1. Install Tiled (free): https://www.mapeditor.org
-2. Open any `assets/maps/*.tmj`. Each map has a `background` layer (decoration), a `ground` layer
+2. **Open the project first:** *File → Open File or Project…* → `CaveExplorer.tiled-project` in
+   the repository root. The Project panel then lists the maps; double-click one to open it.
+   The project teaches Tiled our object types, so properties show as fill-in fields with
+   dropdowns (items, creatures, shrines, areas, music...) instead of free text.
+3. Each map has a `background` layer (decoration), a `ground` layer
    (anything that collides), a see-through `water` layer, and an `objects` layer for spawns,
    doors, pickups, creatures, shrines, people, ladders, lights and obstacles (the kinds and their
    properties are listed below).
-3. Paint tiles from the `placeholder` tileset; select objects to see and edit their properties in
+4. **Adding an object:** pick the rectangle tool (or the point tool for spawns, pickups, creatures,
+   shrines, people and lights), draw it, then set its **Class** in the Properties panel (door,
+   pickup, enemy...). Its fields appear with defaults; change what you need.
+5. Paint tiles from the `placeholder` tileset; select objects to see and edit their properties in
    the Properties panel. Map-wide settings (name, music, darkness...) are under *Map → Map
    Properties*.
-4. Save, rebuild (`cmake --build build`, which copies the maps), and play. Then run
+6. Save, rebuild (`cmake --build build`, which copies the maps), and play. Then run
    `python tools/check_reach.py` to make sure nothing became unreachable, no spawn is a trap,
    and no gate leaks.
+
+When you add items, creatures, shrines, people, shops, sprites, music or new maps, run
+`python tools/make_tiled_project.py` to refresh the project's dropdown lists.
 
 **Important:** `tools/make_maps.py` generated the starting maps. Once you edit a map in Tiled,
 don't run `make_maps.py --force`, or it will overwrite your changes.

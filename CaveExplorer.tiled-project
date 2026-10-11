@@ -1,0 +1,545 @@
+{
+ "automappingRulesFile": "",
+ "commands": [],
+ "compatibilityVersion": 1100,
+ "extensionsPath": "tiled-extensions",
+ "folders": [
+  "assets/maps"
+ ],
+ "properties": [],
+ "propertyTypes": [
+  {
+   "id": 1,
+   "name": "Trigger",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "interact",
+    "touch"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 2,
+   "name": "Ability",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "cut",
+    "break",
+    "highjump",
+    "breath"
+   ],
+   "valuesAsFlags": true
+  },
+  {
+   "id": 3,
+   "name": "Area",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "beach",
+    "cave_1",
+    "cave_2",
+    "cave_3",
+    "cave_4",
+    "cave_5",
+    "forest"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 4,
+   "name": "Item",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "coins",
+    "dagger",
+    "short_sword",
+    "machete",
+    "club",
+    "hand_axe",
+    "pickaxe",
+    "sling",
+    "bow",
+    "stones",
+    "buckler",
+    "lantern",
+    "lamp_oil",
+    "leather_boots",
+    "nonslip_boots",
+    "leather_jacket",
+    "warm_cloak",
+    "leather_cap",
+    "helmet",
+    "wizard_hat",
+    "apple",
+    "bread",
+    "meat",
+    "cheese",
+    "banana",
+    "jerky",
+    "healing_potion",
+    "crystal",
+    "bone",
+    "horn",
+    "feather_charm",
+    "breath_amulet"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 5,
+   "name": "Enemy",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "bat",
+    "beetle",
+    "giant_bat",
+    "rat"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 6,
+   "name": "EnemyVariant",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "same",
+    "none",
+    "bat",
+    "beetle",
+    "giant_bat",
+    "rat"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 7,
+   "name": "Shrine",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "breath",
+    "leap",
+    "might",
+    "shadow",
+    "swift",
+    "vigor",
+    "ward"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 8,
+   "name": "Npc",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "hob"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 9,
+   "name": "Shop",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "beach_shop",
+    "miner_shop"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 10,
+   "name": "Obstacle",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "bush",
+    "rock"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 11,
+   "name": "Side",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "never",
+    "left",
+    "right"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 12,
+   "name": "Sprite",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "boulder",
+    "chest",
+    "fence",
+    "flowers",
+    "ladder",
+    "ladder_segment",
+    "lamp_post",
+    "mound",
+    "sign_left",
+    "sign_right",
+    "signpost",
+    "tree",
+    "vines"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 13,
+   "name": "Music",
+   "type": "enum",
+   "storageType": "string",
+   "values": [
+    "none",
+    "beach.ogg",
+    "boss_1.ogg",
+    "boss_2.ogg",
+    "boss_3.mp3",
+    "deep_cave.ogg",
+    "forest.ogg",
+    "underground_city.mp3",
+    "upper_caves.ogg"
+   ],
+   "valuesAsFlags": false
+  },
+  {
+   "id": 14,
+   "name": "spawn",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ff43a047",
+   "drawFill": true,
+   "members": []
+  },
+  {
+   "id": 15,
+   "name": "door",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ffd81b60",
+   "drawFill": true,
+   "members": [
+    {
+     "name": "target_area",
+     "type": "string",
+     "value": "beach",
+     "propertyType": "Area"
+    },
+    {
+     "name": "target_spawn",
+     "type": "string",
+     "value": "start"
+    },
+    {
+     "name": "trigger",
+     "type": "string",
+     "value": "interact",
+     "propertyType": "Trigger"
+    },
+    {
+     "name": "label",
+     "type": "string",
+     "value": "Enter"
+    },
+    {
+     "name": "glow",
+     "type": "color",
+     "value": ""
+    },
+    {
+     "name": "gated_by",
+     "type": "string",
+     "value": "",
+     "propertyType": "Ability"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "name": "pickup",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#fffdd835",
+   "drawFill": true,
+   "members": [
+    {
+     "name": "item",
+     "type": "string",
+     "value": "coins",
+     "propertyType": "Item"
+    },
+    {
+     "name": "count",
+     "type": "int",
+     "value": 1
+    },
+    {
+     "name": "unique_id",
+     "type": "string",
+     "value": ""
+    },
+    {
+     "name": "gated_by",
+     "type": "string",
+     "value": "",
+     "propertyType": "Ability"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "name": "enemy",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ffe53935",
+   "drawFill": true,
+   "members": [
+    {
+     "name": "enemy",
+     "type": "string",
+     "value": "rat",
+     "propertyType": "Enemy"
+    },
+    {
+     "name": "enemy_easy",
+     "type": "string",
+     "value": "same",
+     "propertyType": "EnemyVariant"
+    },
+    {
+     "name": "enemy_hard",
+     "type": "string",
+     "value": "same",
+     "propertyType": "EnemyVariant"
+    },
+    {
+     "name": "hp_scale",
+     "type": "float",
+     "value": 1.0
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "name": "shrine",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ff8e24aa",
+   "drawFill": true,
+   "members": [
+    {
+     "name": "shrine_id",
+     "type": "string",
+     "value": "leap",
+     "propertyType": "Shrine"
+    },
+    {
+     "name": "gated_by",
+     "type": "string",
+     "value": "",
+     "propertyType": "Ability"
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "name": "npc",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ff00acc1",
+   "drawFill": true,
+   "members": [
+    {
+     "name": "npc_id",
+     "type": "string",
+     "value": "hob",
+     "propertyType": "Npc"
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "name": "shop",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ff00897b",
+   "drawFill": true,
+   "members": [
+    {
+     "name": "shop_id",
+     "type": "string",
+     "value": "beach_shop",
+     "propertyType": "Shop"
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "name": "chest",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ff6d4c41",
+   "drawFill": true,
+   "members": []
+  },
+  {
+   "id": 22,
+   "name": "obstacle",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ff757575",
+   "drawFill": true,
+   "members": [
+    {
+     "name": "obstacle",
+     "type": "string",
+     "value": "bush",
+     "propertyType": "Obstacle"
+    },
+    {
+     "name": "passable_from",
+     "type": "string",
+     "value": "never",
+     "propertyType": "Side"
+    }
+   ]
+  },
+  {
+   "id": 23,
+   "name": "ladder",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ff8d6e63",
+   "drawFill": true,
+   "members": []
+  },
+  {
+   "id": 24,
+   "name": "light",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ffffca28",
+   "drawFill": true,
+   "members": [
+    {
+     "name": "radius",
+     "type": "float",
+     "value": 80.0
+    },
+    {
+     "name": "color",
+     "type": "color",
+     "value": "#ffffe6b4"
+    },
+    {
+     "name": "intensity",
+     "type": "float",
+     "value": 1.0
+    },
+    {
+     "name": "flicker",
+     "type": "bool",
+     "value": false
+    }
+   ]
+  },
+  {
+   "id": 25,
+   "name": "decor",
+   "type": "class",
+   "useAs": [
+    "object"
+   ],
+   "color": "#ff9ccc65",
+   "drawFill": true,
+   "members": [
+    {
+     "name": "sprite",
+     "type": "string",
+     "value": "tree",
+     "propertyType": "Sprite"
+    },
+    {
+     "name": "flip",
+     "type": "bool",
+     "value": false
+    },
+    {
+     "name": "foreground",
+     "type": "bool",
+     "value": false
+    }
+   ]
+  },
+  {
+   "id": 26,
+   "name": "area",
+   "type": "class",
+   "useAs": [
+    "map"
+   ],
+   "color": "#ff607d8b",
+   "drawFill": true,
+   "members": [
+    {
+     "name": "display_name",
+     "type": "string",
+     "value": "New Area"
+    },
+    {
+     "name": "music",
+     "type": "string",
+     "value": "none",
+     "propertyType": "Music"
+    },
+    {
+     "name": "darkness",
+     "type": "float",
+     "value": 0.0
+    },
+    {
+     "name": "restart_spawn",
+     "type": "string",
+     "value": "start"
+    }
+   ]
+  }
+ ]
+}

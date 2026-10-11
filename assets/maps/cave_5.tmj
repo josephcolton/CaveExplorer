@@ -1,5 +1,6 @@
 {
  "type": "map",
+ "class": "area",
  "version": "1.10",
  "tiledversion": "1.10.2",
  "orientation": "orthogonal",
@@ -21,7 +22,8 @@
   {
    "name": "music",
    "type": "string",
-   "value": ""
+   "value": "none",
+   "propertytype": "Music"
   },
   {
    "name": "restart_spawn",
@@ -3475,7 +3477,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "crystal"
+       "value": "crystal",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3503,8 +3506,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#6ec8ff"
+       "type": "color",
+       "value": "#ff6ec8ff"
       },
       {
        "name": "flicker",
@@ -3513,7 +3516,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.7
       }
      ]
@@ -3533,7 +3536,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "crystal"
+       "value": "crystal",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3561,8 +3565,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#6ec8ff"
+       "type": "color",
+       "value": "#ff6ec8ff"
       },
       {
        "name": "flicker",
@@ -3571,7 +3575,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.7
       }
      ]
@@ -3591,7 +3595,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "crystal"
+       "value": "crystal",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3619,8 +3624,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#6ec8ff"
+       "type": "color",
+       "value": "#ff6ec8ff"
       },
       {
        "name": "flicker",
@@ -3629,7 +3634,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.7
       }
      ]
@@ -3649,7 +3654,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "crystal"
+       "value": "crystal",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3677,8 +3683,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#6ec8ff"
+       "type": "color",
+       "value": "#ff6ec8ff"
       },
       {
        "name": "flicker",
@@ -3687,7 +3693,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.7
       }
      ]
@@ -3707,7 +3713,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "crystal"
+       "value": "crystal",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3735,8 +3742,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#6ec8ff"
+       "type": "color",
+       "value": "#ff6ec8ff"
       },
       {
        "name": "flicker",
@@ -3745,7 +3752,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.7
       }
      ]
@@ -3765,7 +3772,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "helmet"
+       "value": "helmet",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3794,7 +3802,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "coins"
+       "value": "coins",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3818,7 +3827,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "lamp_oil"
+       "value": "lamp_oil",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -3842,7 +3852,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "beetle"
+       "value": "beetle",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -3861,7 +3872,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "rat"
+       "value": "rat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -3880,12 +3892,14 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "beetle"
+       "value": "beetle",
+       "propertytype": "Enemy"
       },
       {
        "name": "enemy_easy",
        "type": "string",
-       "value": "rat"
+       "value": "rat",
+       "propertytype": "EnemyVariant"
       }
      ]
     },
@@ -3904,7 +3918,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -3934,7 +3949,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "cave_1"
+       "value": "cave_1",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -3944,7 +3960,8 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "touch"
+       "value": "touch",
+       "propertytype": "Trigger"
       }
      ]
     }

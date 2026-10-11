@@ -1,5 +1,6 @@
 {
  "type": "map",
+ "class": "area",
  "version": "1.10",
  "tiledversion": "1.10.2",
  "orientation": "orthogonal",
@@ -21,7 +22,8 @@
   {
    "name": "music",
    "type": "string",
-   "value": "upper_caves.ogg"
+   "value": "upper_caves.ogg",
+   "propertytype": "Music"
   },
   {
    "name": "restart_spawn",
@@ -3929,7 +3931,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "cave_3"
+       "value": "cave_3",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -3939,7 +3942,8 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "touch"
+       "value": "touch",
+       "propertytype": "Trigger"
       }
      ]
     },
@@ -3962,8 +3966,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#c8dcff"
+       "type": "color",
+       "value": "#ffc8dcff"
       },
       {
        "name": "flicker",
@@ -3972,7 +3976,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.5
       }
      ]
@@ -4003,7 +4007,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "cave_4"
+       "value": "cave_4",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -4013,12 +4018,14 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "touch"
+       "value": "touch",
+       "propertytype": "Trigger"
       },
       {
        "name": "gated_by",
        "type": "string",
-       "value": "highjump"
+       "value": "highjump",
+       "propertytype": "Ability"
       }
      ]
     },
@@ -4036,12 +4043,14 @@
       {
        "name": "obstacle",
        "type": "string",
-       "value": "rock"
+       "value": "rock",
+       "propertytype": "Obstacle"
       },
       {
        "name": "passable_from",
        "type": "string",
-       "value": "right"
+       "value": "right",
+       "propertytype": "Side"
       }
      ]
     },
@@ -4064,8 +4073,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#6ec8ff"
+       "type": "color",
+       "value": "#ff6ec8ff"
       },
       {
        "name": "flicker",
@@ -4074,7 +4083,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.5
       }
      ]
@@ -4105,7 +4114,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "cave_5"
+       "value": "cave_5",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -4115,12 +4125,14 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "touch"
+       "value": "touch",
+       "propertytype": "Trigger"
       },
       {
        "name": "gated_by",
        "type": "string",
-       "value": "break"
+       "value": "break",
+       "propertytype": "Ability"
       }
      ]
     },
@@ -4143,8 +4155,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#6ec8ff"
+       "type": "color",
+       "value": "#ff6ec8ff"
       },
       {
        "name": "flicker",
@@ -4153,7 +4165,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.7
       }
      ]
@@ -4177,8 +4189,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#6ec8ff"
+       "type": "color",
+       "value": "#ff6ec8ff"
       },
       {
        "name": "flicker",
@@ -4187,7 +4199,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.5
       }
      ]
@@ -4211,8 +4223,8 @@
       },
       {
        "name": "color",
-       "type": "string",
-       "value": "#ffd9a0"
+       "type": "color",
+       "value": "#ffffd9a0"
       },
       {
        "name": "flicker",
@@ -4221,7 +4233,7 @@
       },
       {
        "name": "intensity",
-       "type": "string",
+       "type": "float",
        "value": 0.6
       }
      ]
@@ -4241,7 +4253,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "stones"
+       "value": "stones",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -4265,7 +4278,8 @@
       {
        "name": "npc_id",
        "type": "string",
-       "value": "hob"
+       "value": "hob",
+       "propertytype": "Npc"
       }
      ]
     },
@@ -4284,7 +4298,8 @@
       {
        "name": "shrine_id",
        "type": "string",
-       "value": "swift"
+       "value": "swift",
+       "propertytype": "Shrine"
       }
      ]
     },
@@ -4303,7 +4318,8 @@
       {
        "name": "shrine_id",
        "type": "string",
-       "value": "leap"
+       "value": "leap",
+       "propertytype": "Shrine"
       }
      ]
     },
@@ -4322,7 +4338,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "bone"
+       "value": "bone",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -4346,7 +4363,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "coins"
+       "value": "coins",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -4370,7 +4388,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "crystal"
+       "value": "crystal",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -4394,7 +4413,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "machete"
+       "value": "machete",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -4422,12 +4442,14 @@
       {
        "name": "obstacle",
        "type": "string",
-       "value": "bush"
+       "value": "bush",
+       "propertytype": "Obstacle"
       },
       {
        "name": "passable_from",
        "type": "string",
-       "value": "right"
+       "value": "right",
+       "propertytype": "Side"
       }
      ]
     },
@@ -4446,12 +4468,14 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       },
       {
        "name": "enemy_easy",
        "type": "string",
-       "value": "none"
+       "value": "none",
+       "propertytype": "EnemyVariant"
       }
      ]
     },
@@ -4470,7 +4494,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "bat"
+       "value": "bat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -4489,7 +4514,8 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "rat"
+       "value": "rat",
+       "propertytype": "Enemy"
       }
      ]
     },
@@ -4508,12 +4534,14 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "rat"
+       "value": "rat",
+       "propertytype": "Enemy"
       },
       {
        "name": "enemy_easy",
        "type": "string",
-       "value": "none"
+       "value": "none",
+       "propertytype": "EnemyVariant"
       }
      ]
     },
@@ -4532,12 +4560,14 @@
       {
        "name": "enemy",
        "type": "string",
-       "value": "none"
+       "value": "none",
+       "propertytype": "Enemy"
       },
       {
        "name": "enemy_hard",
        "type": "string",
-       "value": "beetle"
+       "value": "beetle",
+       "propertytype": "EnemyVariant"
       }
      ]
     },
@@ -4579,7 +4609,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "forest"
+       "value": "forest",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -4589,7 +4620,8 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "interact"
+       "value": "interact",
+       "propertytype": "Trigger"
       },
       {
        "name": "label",
@@ -4598,8 +4630,8 @@
       },
       {
        "name": "glow",
-       "type": "string",
-       "value": "#fff0c0"
+       "type": "color",
+       "value": "#fffff0c0"
       }
      ]
     },
@@ -4617,7 +4649,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "cave_2"
+       "value": "cave_2",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -4627,12 +4660,14 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "touch"
+       "value": "touch",
+       "propertytype": "Trigger"
       },
       {
        "name": "gated_by",
        "type": "string",
-       "value": "cut"
+       "value": "cut",
+       "propertytype": "Ability"
       }
      ]
     }

@@ -1,5 +1,6 @@
 {
  "type": "map",
+ "class": "area",
  "version": "1.10",
  "tiledversion": "1.10.2",
  "orientation": "orthogonal",
@@ -21,7 +22,8 @@
   {
    "name": "music",
    "type": "string",
-   "value": "forest.ogg"
+   "value": "forest.ogg",
+   "propertytype": "Music"
   },
   {
    "name": "restart_spawn",
@@ -2322,7 +2324,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2345,7 +2348,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2368,7 +2372,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2391,7 +2396,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2414,7 +2420,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2437,7 +2444,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2460,7 +2468,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2483,7 +2492,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2506,7 +2516,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2529,7 +2540,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2552,7 +2564,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2575,7 +2588,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       },
       {
        "name": "flip",
@@ -2598,7 +2612,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "tree"
+       "value": "tree",
+       "propertytype": "Sprite"
       }
      ]
     },
@@ -2616,7 +2631,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "flowers"
+       "value": "flowers",
+       "propertytype": "Sprite"
       }
      ]
     },
@@ -2634,7 +2650,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "flowers"
+       "value": "flowers",
+       "propertytype": "Sprite"
       }
      ]
     },
@@ -2652,7 +2669,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "fence"
+       "value": "fence",
+       "propertytype": "Sprite"
       }
      ]
     },
@@ -2670,7 +2688,8 @@
       {
        "name": "sprite",
        "type": "string",
-       "value": "signpost"
+       "value": "signpost",
+       "propertytype": "Sprite"
       }
      ]
     },
@@ -2700,7 +2719,8 @@
       {
        "name": "item",
        "type": "string",
-       "value": "apple"
+       "value": "apple",
+       "propertytype": "Item"
       },
       {
        "name": "count",
@@ -2747,7 +2767,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "beach"
+       "value": "beach",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -2757,7 +2778,8 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "touch"
+       "value": "touch",
+       "propertytype": "Trigger"
       }
      ]
     },
@@ -2775,7 +2797,8 @@
       {
        "name": "target_area",
        "type": "string",
-       "value": "cave_1"
+       "value": "cave_1",
+       "propertytype": "Area"
       },
       {
        "name": "target_spawn",
@@ -2785,7 +2808,8 @@
       {
        "name": "trigger",
        "type": "string",
-       "value": "interact"
+       "value": "interact",
+       "propertytype": "Trigger"
       },
       {
        "name": "label",
