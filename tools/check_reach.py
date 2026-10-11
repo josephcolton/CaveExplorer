@@ -32,12 +32,16 @@ class Level:
         self.name = path.stem
         self.w, self.h = doc["width"], doc["height"]
         coll = {}
+        liquid = set()
         for ts in doc["tilesets"]:
             for tile in ts.get("tiles", []):
                 for p in tile.get("properties", []):
                     if p["name"] == "collision":
                         coll[ts["firstgid"] + tile["id"]] = p["value"]
+                    if p["name"] == "liquid":
+                        liquid.add(ts["firstgid"] + tile["id"])
         self.grid = [["none"] * self.w for _ in range(self.h)]
+        self.water = set()
         self.objects = []
         for layer in doc["layers"]:
             if layer["type"] == "tilelayer" and any(
@@ -46,7 +50,11 @@ class Level:
                     c = coll.get(gid & 0x0FFFFFFF)
                     if c:
                         self.grid[i // self.w][i % self.w] = c
-            elif layer["type"] == "objectgroup":
+            if layer["type"] == "tilelayer":
+                for i, gid in enumerate(layer["data"]):
+                    if (gid & 0x0FFFFFFF) in liquid:
+                        self.water.add((i % self.w, i // self.w))
+            if layer["type"] == "objectgroup":
                 self.objects = layer["objects"]
         self.ladders = set()
         for o in self.objects:
@@ -70,14 +78,14 @@ class Level:
         return self.at(x, y) != "solid"
 
     def standable(self, x, y):
-        return self.open(x, y) and (self.at(x, y + 1) in ("solid", "oneway") or (x, y) in self.ladders)
+        return self.open(x, y) and ((x, y) in self.water or self.at(x, y + 1) in ("solid", "oneway") or (x, y) in self.ladders)
 
     def fall(self, x, y, through_oneway=False):
         """Drop from (x, y) until landing. Returns the landing cell or None."""
         first = True
         while y < self.h:
             below = self.at(x, y + 1)
-            if (x, y) in self.ladders:
+            if (x, y) in self.ladders or (x, y) in self.water:
                 return (x, y)
             if below == "solid" or (below == "oneway" and not (through_oneway and first)):
                 return (x, y) if self.open(x, y) else None
@@ -98,6 +106,11 @@ class Level:
             land = self.fall(x, y + 1, through_oneway=False)
             if land:
                 out.append(land)
+        # Swim in any direction through water (and climb out at the surface with a jump).
+        if (x, y) in self.water:
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                if self.open(x + dx, y + dy):
+                    out.append((x + dx, y + dy) if (x + dx, y + dy) in self.water else (self.fall(x + dx, y + dy) or (x, y)))
         # Climb ladders.
         if (x, y) in self.ladders or (x, y + 1) in self.ladders:
             for dy in (-1, 1):

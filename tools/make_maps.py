@@ -26,7 +26,7 @@ TILES = {
     "#": (3, "ground", "solid", (96, 92, 104)),     # cave rock
     "=": (4, "ground", "oneway", (150, 104, 60)),   # wooden one-way platform
     "b": (5, "background", None, (72, 64, 82)),     # cave back wall (light enough to show lamplight)
-    "~": (6, "background", None, (60, 120, 200)),   # water (decor for now)
+    "~": (6, "water", None, (60, 120, 200)),        # water (swimmable)
     "T": (7, "background", None, (100, 70, 44)),    # tree trunk
     "L": (8, "background", None, (50, 120, 50)),    # leaves
     "H": (9, "background", None, (170, 120, 80)),   # hut wall
@@ -36,6 +36,7 @@ TILES = {
 }
 COLUMNS, ROWS = 8, 2
 SLIPPERY = {"m"}
+LIQUID = {"~"}
 
 
 # --------------------------------------------------------------------- tileset
@@ -93,6 +94,8 @@ def tileset_json():
         props = [{"name": "char", "type": "string", "value": ch}]
         if coll:
             props.append({"name": "collision", "type": "string", "value": coll})
+        if ch in LIQUID:
+            props.append({"name": "liquid", "type": "string", "value": "water"})
         if ch in SLIPPERY:
             props.append({"name": "surface", "type": "string", "value": "slippery"})
         tiles.append({"id": tid, "properties": props})
@@ -191,7 +194,7 @@ class Map:
         self.objects[-1]["point"] = True
 
     def to_tmj(self):
-        layers = {"background": [], "ground": []}
+        layers = {"background": [], "ground": [], "water": []}
         for row in self.grid:
             for ch in row:
                 t = TILES.get(ch)
@@ -209,15 +212,15 @@ class Map:
                 obj["properties"] = o["properties"]
             objects.append(obj)
 
-        def tile_layer(lid, name, data, props):
+        def tile_layer(lid, name, data, props, opacity=1):
             return {"id": lid, "name": name, "type": "tilelayer", "x": 0, "y": 0, "width": self.w,
-                    "height": self.h, "opacity": 1, "visible": True, "data": data, "properties": props}
+                    "height": self.h, "opacity": opacity, "visible": True, "data": data, "properties": props}
 
         return {
             "type": "map", "version": "1.10", "tiledversion": "1.10.2", "orientation": "orthogonal",
             "renderorder": "right-down", "infinite": False, "width": self.w, "height": self.h,
             "tilewidth": T, "tileheight": T, "backgroundcolor": self.bg,
-            "nextlayerid": 4, "nextobjectid": len(objects) + 1,
+            "nextlayerid": 5, "nextobjectid": len(objects) + 1,
             "properties": [{"name": "display_name", "type": "string", "value": self.display},
                            {"name": "music", "type": "string", "value": self.music},
                            {"name": "restart_spawn", "type": "string", "value": self.restart},
@@ -227,6 +230,9 @@ class Map:
                 tile_layer(1, "background", layers["background"], []),
                 tile_layer(2, "ground", layers["ground"],
                            [{"name": "collides", "type": "bool", "value": True}]),
+                # Water is drawn in front of the explorer, see-through.
+                tile_layer(4, "water", layers["water"],
+                           [{"name": "foreground", "type": "bool", "value": True}], opacity=0.65),
                 {"id": 3, "name": "objects", "type": "objectgroup", "draworder": "topdown",
                  "x": 0, "y": 0, "opacity": 1, "visible": True, "objects": objects},
             ],
@@ -235,8 +241,8 @@ class Map:
 
 def beach():
     m = Map("beach", 48, 14, "The Beach", "#8ecdf0", music="beach.ogg")
-    m.fill(0, 9, 7, 10, "~")
     m.fill(0, 11, 47, 13, "S")
+    m.fill(0, 11, 7, 12, "~")    # the sea: a pool two tiles deep, sand below
     m.fill(14, 10, 18, 10, "S")
     m.fill(16, 9, 17, 9, "S")
     m.fill(24, 9, 27, 9, "=")
@@ -247,6 +253,8 @@ def beach():
     m.pickup("coins", 12, 11, count=5)
     m.pickup("coins", 25, 9, count=10)
     m.pickup("banana", 16, 9)
+    m.pickup("coins", 2, 13, count=15)  # on the seabed
+    m.shrine("breath", 21, 11)
     m.spawn("start", 10, 11)
     m.spawn("from_forest", 44, 11)
     m.door(47, 8, 47, 10, "forest", "from_beach", trigger="touch")

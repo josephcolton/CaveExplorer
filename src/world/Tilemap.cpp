@@ -19,8 +19,19 @@ void Tilemap::buildCollision() {
     collision_.assign(static_cast<std::size_t>(width * height), TileCollision::None);
     blocked_.assign(static_cast<std::size_t>(width * height), false);
     slippery_.assign(static_cast<std::size_t>(width * height), false);
+    water_.assign(static_cast<std::size_t>(width * height), false);
     extraOneWay_.assign(static_cast<std::size_t>(width * height), false);
     for (const TileLayer& layer : layers) {
+        // Water can live on any layer.
+        for (std::size_t i = 0; i < layer.gids.size() && i < water_.size(); ++i) {
+            const std::uint32_t gid = layer.gids[i] & kGidMask;
+            if (gid == 0) continue;
+            const Tileset* ts = tilesetFor(gid);
+            const int local = ts ? static_cast<int>(gid) - ts->firstGid : -1;
+            if (ts && local >= 0 && static_cast<std::size_t>(local) < ts->liquid.size() && ts->liquid[static_cast<std::size_t>(local)]) {
+                water_[i] = true;
+            }
+        }
         if (!layer.collides) continue;
         for (std::size_t i = 0; i < layer.gids.size() && i < collision_.size(); ++i) {
             const std::uint32_t gid = layer.gids[i] & kGidMask;
@@ -48,6 +59,15 @@ TileCollision Tilemap::collisionAt(int tx, int ty) const {
     return collision_[i];
 }
 
+bool Tilemap::isWater(int tx, int ty) const {
+    if (tx < 0 || ty < 0 || tx >= width || ty >= height) return false;
+    return water_[static_cast<std::size_t>(ty * width + tx)];
+}
+
+bool Tilemap::isWaterAt(float x, float y) const {
+    return isWater(static_cast<int>(std::floor(x / kTileSize)), static_cast<int>(std::floor(y / kTileSize)));
+}
+
 bool Tilemap::isSlippery(int tx, int ty) const {
     if (tx < 0 || ty < 0 || tx >= width || ty >= height) return false;
     return slippery_[static_cast<std::size_t>(ty * width + tx)];
@@ -71,6 +91,7 @@ void Tilemap::render(SDL_Renderer* renderer, Vec2 camera, bool foreground) const
 
     for (const TileLayer& layer : layers) {
         if (!layer.visible || layer.foreground != foreground) continue;
+        const auto alpha = static_cast<Uint8>(255.0f * std::clamp(layer.opacity, 0.0f, 1.0f));
         for (int ty = y0; ty <= y1; ++ty) {
             for (int tx = x0; tx <= x1; ++tx) {
                 const std::uint32_t gid = layer.gids[static_cast<std::size_t>(ty * width + tx)] & kGidMask;
@@ -85,7 +106,9 @@ void Tilemap::render(SDL_Renderer* renderer, Vec2 camera, bool foreground) const
                 const SDL_FRect dst{static_cast<float>(tx * kTileSize) - camera.x,
                                     static_cast<float>((ty + 1) * kTileSize - ts->tileHeight) - camera.y,
                                     static_cast<float>(ts->tileWidth), static_cast<float>(ts->tileHeight)};
+                SDL_SetTextureAlphaMod(ts->texture, alpha);
                 SDL_RenderTexture(renderer, ts->texture, &src, &dst);
+                SDL_SetTextureAlphaMod(ts->texture, 255);
             }
         }
     }

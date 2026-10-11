@@ -23,6 +23,7 @@ struct Tileset {
     SDL_Texture* texture = nullptr;
     std::vector<TileCollision> collision;  // indexed by local tile id
     std::vector<bool> slippery;            // surface = slippery (mossy/wet/icy)
+    std::vector<bool> liquid;              // liquid = water (swim in it)
 };
 
 struct TileLayer {
@@ -31,6 +32,7 @@ struct TileLayer {
     bool collides = false;             // tiles in this layer are tested for collision
     bool foreground = false;           // drawn in front of entities
     bool visible = true;
+    float opacity = 1.0f;              // e.g. water drawn see-through over the explorer
 };
 
 class Tilemap {
@@ -55,6 +57,9 @@ public:
 
     // Slick ground (moss, ice): little grip unless wearing non-slip boots.
     bool isSlippery(int tx, int ty) const;
+    bool isWater(int tx, int ty) const;
+    // Water at a point in world pixels.
+    bool isWaterAt(float x, float y) const;
 
     // Runtime blockers (obstacles such as bushes and boulders) make tiles solid until cleared.
     void setBlocked(int tx, int ty, bool blocked);
@@ -66,5 +71,6 @@ private:
     std::vector<TileCollision> collision_;
     std::vector<bool> blocked_;
     std::vector<bool> slippery_;
+    std::vector<bool> water_;
     std::vector<bool> extraOneWay_;
 };

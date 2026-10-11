@@ -102,6 +102,7 @@ private:
     const ItemDef* equippedFuelLight() const;
     float carriedLightRadius() const;
     void renderLighting(SDL_Renderer* r, Vec2 cam);
+    float maxAir() const;
 
     void toast(const std::string& text);
     void renderWorldObjects(SDL_Renderer* r, Vec2 cam, bool foreground) const;
@@ -121,6 +122,8 @@ private:
     QuestLog quests_;
     float hunger_ = hunger::kMax;
     float lanternFuel_ = 0.0f;  // seconds of oil left in a lit lantern
+    float air_ = 10.0f;         // seconds of breath left (refills at the surface)
+    float drownTick_ = 0.0f;
     std::vector<SaveGame::TimedBuff> buffs_;  // shrine blessings with time left
     double playSeconds_ = 0.0;
 

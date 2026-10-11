@@ -101,6 +101,7 @@ bool Area::load(const std::string& areaId, Assets& assets) {
         ts.tileHeight = tsj.value("tileheight", Tilemap::kTileSize);
         ts.collision.assign(static_cast<std::size_t>(ts.tileCount), TileCollision::None);
         ts.slippery.assign(static_cast<std::size_t>(ts.tileCount), false);
+        ts.liquid.assign(static_cast<std::size_t>(ts.tileCount), false);
 
         const std::string image = (mapDir / tsj.value("image", "")).string();
         ts.texture = assets.texture(image, parseColor(tsj.value("transparentcolor", "")));
@@ -111,6 +112,9 @@ bool Area::load(const std::string& areaId, Assets& assets) {
             const auto props = readProperties(tile);
             if (auto it = props.find("collision"); it != props.end() && it->second.is_string()) {
                 ts.collision[static_cast<std::size_t>(localId)] = parseCollision(it->second.get<std::string>());
+            }
+            if (auto it = props.find("liquid"); it != props.end() && it->second == "water") {
+                ts.liquid[static_cast<std::size_t>(localId)] = true;
             }
             if (auto it = props.find("surface"); it != props.end() && it->second == "slippery") {
                 ts.slippery[static_cast<std::size_t>(localId)] = true;
@@ -133,6 +137,7 @@ bool Area::load(const std::string& areaId, Assets& assets) {
             tl.visible = layer.value("visible", true);
             tl.collides = boolProp("collides");
             tl.foreground = boolProp("foreground");
+            tl.opacity = layer.value("opacity", 1.0f);
             tl.gids = layer.value("data", std::vector<std::uint32_t>{});
             tl.gids.resize(static_cast<std::size_t>(map.width * map.height), 0);
             map.layers.push_back(std::move(tl));

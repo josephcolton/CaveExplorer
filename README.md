@@ -84,7 +84,9 @@ Areas are [Tiled](https://www.mapeditor.org) maps in `assets/maps/*.tmj` using 3
 - Tile layers: `background` (decoration) and `ground` (custom property `collides = true`).
   A layer with `foreground = true` is drawn in front of the player.
 - Tile collision comes from the tileset tile property `collision` = `solid` or `oneway`;
-  `surface` = `slippery` makes slick ground (moss) that only non-slip boots grip.
+  `surface` = `slippery` makes slick ground (moss) that only non-slip boots grip;
+  `liquid` = `water` makes swimmable water (put water tiles on a see-through `water` layer with
+  `foreground = true` so they draw over the explorer).
 - Object layer `objects`:
   - `spawn` (point, named) — where the player appears.
   - `door` (rectangle) with `target_area`, `target_spawn`, and `trigger` = `touch` (area edge)
@@ -174,6 +176,10 @@ See [CREDITS.md](CREDITS.md) for art and library credits.
 - Hunger drains slowly as you explore (a full belly lasts about 15 minutes). Below "Hungry" your
   wounds stop healing; when "Starving" you're slower and can't jump as high. Eat food (E in the
   inventory) to fill up; healing potions restore health.
+- Water: you float and tread water at the surface. Hold Down to dive, Up or Jump to swim up,
+  and Jump at the surface (or swim into a low shore) to climb out. Underwater you have 10
+  seconds of air (the bar over your head); after that you start drowning. The Shrine of Deep
+  Breath on the beach doubles your air for three minutes.
 - The caves are dark. Hold a **lantern** to light your way; it burns **lamp oil** from your pack
   (one flask lasts about four minutes, only while it's dark) and refills itself automatically.
   Glowing moss, crystals, shrines and daylight at exits give some light too. If it's too dark to

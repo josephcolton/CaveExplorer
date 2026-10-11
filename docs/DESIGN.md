@@ -35,6 +35,8 @@ covers the design decisions so far and how to build the first playable version.
        no console window on Windows; GitHub Actions builds, tests and packages both on every push
 - [x] Light and darkness: per-area darkness, light map with coloured glows (exits, shrines,
        moss, crystals, Hob's lamp), lantern + lamp oil fuel, Cave brightness setting
+- [x] Water: swimming (buoyant, dive with Down), 10 s of air then drowning, air bar, Shrine of
+       Deep Breath (air x2 for 3 min); beach sea lowered into a two-tile-deep pool with seabed coins
 - [x] Restart area returns to each area's surface-side entrance (map property restart_spawn)
 
 ## Art sources

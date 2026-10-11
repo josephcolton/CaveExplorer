@@ -66,6 +66,17 @@
     250,
     255
    ]
+  },
+  "breath": {
+   "name": "Shrine of Deep Breath",
+   "icon": "shrine_breath",
+   "ability": "deep_breath",
+   "duration": 180,
+   "glow": [
+    140,
+    210,
+    255
+   ]
   }
  }
 }

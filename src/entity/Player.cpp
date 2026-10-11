@@ -83,6 +83,43 @@ void Player::update(float dt, const Input& input, const Tilemap& map) {
     const bool control = hurtTimer_ <= 0.0f && !dead();
     if (updateClimbing(dt, input, map, control)) return;
 
+    // --- Water: slow sinking, Jump strokes upward (or leaps out at the surface), Up/Down swim.
+    const bool wasInWater = inWater_;
+    inWater_ = map.isWaterAt(box.center().x, box.center().y);
+    headUnder_ = map.isWaterAt(box.center().x, box.top() + 4.0f);
+    if (inWater_ && !wasInWater && velocity.y > 150.0f) events |= Splash;
+    if (inWater_) {
+        float sdir = 0.0f;
+        if (control) sdir = (input.down(Action::Right) ? 1.0f : 0.0f) - (input.down(Action::Left) ? 1.0f : 0.0f);
+        if (sdir != 0.0f && swingTime_ < 0.0f) facing = sdir > 0.0f ? 1 : -1;
+        velocity.x = approach(velocity.x, sdir * stats.runSpeed * 0.6f, 700.0f * dt);
+        // Near the surface = the water stops within half a tile above your head.
+        const bool nearSurface = !map.isWaterAt(box.center().x, box.top() - 16.0f);
+        if (control && input.pressed(Action::Jump)) {
+            // Near the surface a jump carries you out; deeper down it's a swim stroke.
+            velocity.y = nearSurface ? -stats.jumpVelocity * 0.85f : -200.0f;
+            events |= nearSurface ? Jumped : SwimStroke;
+        } else if (control && input.down(Action::Down)) {
+            velocity.y = approach(velocity.y, 130.0f, 500.0f * dt);  // dive
+        } else if (control && input.down(Action::Up) && headUnder_) {
+            velocity.y = approach(velocity.y, -130.0f, 500.0f * dt);
+        } else if (nearSurface && !headUnder_ && sdir != 0.0f &&
+                   ((sdir > 0.0f && contact.hitWallRight) || (sdir < 0.0f && contact.hitWallLeft))) {
+            velocity.y = -stats.jumpVelocity * 0.7f;  // swimming into a low shore climbs out
+        } else if (headUnder_) {
+            velocity.y = approach(velocity.y, -55.0f, 400.0f * dt);  // you float back up
+        } else {
+            velocity.y = approach(velocity.y, 0.0f, 600.0f * dt);    // treading water at the surface
+        }
+        jumping_ = false;
+        coyoteTimer_ = 0.0f;
+        contact = moveAndCollide(map, box, velocity, dt, false);
+        chooseAnimation();
+        anim_.speed = 0.6f;
+        anim_.update(dt);
+        return;
+    }
+
     // --- Horizontal: accelerate toward the target speed instead of snapping to it.
     float dir = 0.0f;
     if (control) dir = (input.down(Action::Right) ? 1.0f : 0.0f) - (input.down(Action::Left) ? 1.0f : 0.0f);
@@ -208,6 +245,7 @@ void Player::chooseAnimation() {
     if (dead()) anim_.play("dead");
     else if (hurtTimer_ > 0.0f) anim_.play("hurt");
     else if (attackAnimTime_ > 0.0f) anim_.play("attack");
+    else if (inWater_ && !contact.onGround) anim_.play("fall");
     else if (!contact.onGround) anim_.play(velocity.y < 0.0f ? "jump" : "fall");
     else if (std::fabs(velocity.x) > 12.0f) anim_.play("run");
     else anim_.play("idle");

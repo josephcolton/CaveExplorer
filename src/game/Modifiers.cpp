@@ -30,11 +30,12 @@ void Modifiers::combine(const Modifiers& o) {
     defense *= o.defense;
     maxHealth += o.maxHealth;
     lightRadius = std::max(lightRadius, o.lightRadius);
+    air *= o.air;
     flags.insert(o.flags.begin(), o.flags.end());
 }
 
 bool Modifiers::empty() const {
-    return runSpeed == 1.0f && jump == 1.0f && damage == 1.0f && defense == 1.0f && maxHealth == 0.0f && lightRadius == 0.0f &&
+    return runSpeed == 1.0f && jump == 1.0f && damage == 1.0f && defense == 1.0f && maxHealth == 0.0f && lightRadius == 0.0f && air == 1.0f &&
            flags.empty();
 }
 
@@ -43,6 +44,7 @@ std::vector<std::string> Modifiers::describe() const {
     if (maxHealth != 0.0f) out.push_back("Max health " + std::string(maxHealth > 0 ? "+" : "") +
                                          std::to_string(static_cast<int>(maxHealth)));
     if (lightRadius > 0.0f) out.push_back("Lights the dark");
+    if (air != 1.0f) out.push_back(percent("Air", air));
     if (runSpeed != 1.0f) out.push_back(percent("Speed", runSpeed));
     if (jump != 1.0f) out.push_back(percent("Jump", jump));
     if (damage != 1.0f) out.push_back(percent("Damage", damage));
@@ -62,6 +64,7 @@ Modifiers Modifiers::fromJson(const json& j) {
     m.defense = j.value("defense", 1.0f);
     m.maxHealth = j.value("max_health", 0.0f);
     m.lightRadius = j.value("light", 0.0f);
+    m.air = j.value("air", 1.0f);
     const auto flags = j.value("flags", std::vector<std::string>{});
     m.flags.insert(flags.begin(), flags.end());
     return m;

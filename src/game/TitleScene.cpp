@@ -30,7 +30,7 @@ void TitleScene::refreshSlots() {
     }
     items.push_back("Back");
     slotMenu_.setItems(items, slotMenu_.cursor());
-    slotMenu_.lineHeight = 46.0f;
+    slotMenu_.lineHeight = 54.0f;
 }
 
 void TitleScene::openSlots() {
@@ -129,11 +129,11 @@ void TitleScene::render(SDL_Renderer* r, float) {
     case Page::Slots:
     case Page::SlotActions:
     case Page::ConfirmDelete: {
-        const SDL_FRect panel{120, 110, 400, 220};
+        const SDL_FRect panel{110, 102, 420, 240};
         ui::panel(r, panel, "Choose a save slot");
         for (int i = 0; i < SaveGame::kSlotCount; ++i) {
             const bool sel = slotMenu_.cursor() == i;
-            const SDL_FRect row{panel.x + 10, panel.y + 26 + static_cast<float>(i) * 46.0f, panel.w - 20, 40};
+            const SDL_FRect row{panel.x + 10, panel.y + 26 + static_cast<float>(i) * 54.0f, panel.w - 20, 48};
             SDL_SetRenderDrawColor(r, sel ? 80 : 40, sel ? 62 : 34, sel ? 36 : 40, 255);
             SDL_RenderFillRect(r, &row);
             const auto& slot = slots_[static_cast<std::size_t>(i)];
@@ -142,12 +142,13 @@ void TitleScene::render(SDL_Renderer* r, float) {
             if (slot) {
                 ui::text(r, row.x + 80, row.y + 6,
                          slot->character.name + " (explorer #" + std::to_string(slot->character.number) + ")", c);
-                ui::text(r, row.x + 80, row.y + 20,
-                         slot->areaName + "  -  " + saveslots::formatPlayTime(slot->playSeconds) + "  -  " +
-                             std::to_string(slot->world.explorersLost) + " lost  -  " + slot->savedAt,
+                ui::text(r, row.x + 80, row.y + 19,
+                         slot->areaName + "  -  played " + saveslots::formatPlayTime(slot->playSeconds) + "  -  " +
+                             std::to_string(slot->world.explorersLost) + " lost",
                          ui::kDim);
+                ui::text(r, row.x + 80, row.y + 32, "Saved " + slot->savedAt, ui::kDim);
             } else {
-                ui::text(r, row.x + 80, row.y + 13, "Empty - start a new expedition", ui::kDim);
+                ui::text(r, row.x + 80, row.y + 19, "Empty - start a new expedition", ui::kDim);
             }
         }
         const bool backSel = slotMenu_.cursor() == SaveGame::kSlotCount;

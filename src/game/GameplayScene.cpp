@@ -223,6 +223,7 @@ void GameplayScene::enterArea(const std::string& areaId, const std::string& spaw
     camera_.snapTo(player_.box.center(), area_.map.pixelWidth(), area_.map.pixelHeight(), App::kViewWidth,
                    App::kViewHeight);
     areaTitleTimer_ = kAreaTitleTime;
+    air_ = maxAir();
     app_.audio().playMusic(area_.music);
     spawnAreaObjects();
     saveGame();  // autosave on every area change
@@ -390,6 +391,8 @@ void GameplayScene::updatePlay(float dt) {
     if (player_.events & Player::Jumped) app_.audio().play("jump");
     if (player_.events & Player::Landed) app_.audio().play("land");
     if (player_.events & Player::ClimbStep) app_.audio().play("ladder");
+    if (player_.events & Player::Splash) app_.audio().play("splash");
+    if (player_.events & Player::SwimStroke) app_.audio().play("swim");
     updateAttacks();
     updateProjectiles(dt);
     updateEnemies(dt);
@@ -941,6 +944,8 @@ const ItemDef* GameplayScene::equippedFuelLight() const {
     return nullptr;
 }
 
+float GameplayScene::maxAir() const { return 10.0f * currentModifiers().air; }
+
 float GameplayScene::carriedLightRadius() const {
     // Light from gear that needs no fuel, plus a fuelled lantern only while it has oil.
     float radius = 0.0f;
@@ -1205,6 +1210,29 @@ void GameplayScene::updateSurvival(float dt) {
         }
     }
 
+    // Breath: drains while your head is underwater, refills quickly at the surface.
+    // Out of air, you start to drown.
+    const float airCap = maxAir();
+    if (player_.headUnderwater() && !player_.dead()) {
+        air_ = std::max(0.0f, air_ - dt);
+        if (air_ <= 0.0f) {
+            player_.health = std::max(0.0f, player_.health - 10.0f * dt);
+            regenDelay_ = kRegenDelay;
+            drownTick_ -= dt;
+            if (drownTick_ <= 0.0f) {
+                drownTick_ = 1.0f;
+                app_.audio().play("hurt");
+                if (messageCooldown_ <= 0.0f) {
+                    toast("You're drowning! Swim up!");
+                    messageCooldown_ = 4.0f;
+                }
+            }
+        }
+    } else {
+        air_ = std::min(airCap, air_ + 4.0f * dt);
+        drownTick_ = 0.0f;
+    }
+
     // Shrine blessings run out.
     for (SaveGame::TimedBuff& b : buffs_) {
         b.remaining -= dt;
@@ -1435,6 +1463,16 @@ void GameplayScene::render(SDL_Renderer* renderer, float alpha) {
     area_.map.render(renderer, cam, true);
     renderWorldObjects(renderer, cam, true);
     renderLighting(renderer, cam);
+    if (air_ < maxAir() - 0.05f || player_.headUnderwater()) {
+        const float frac = std::clamp(air_ / maxAir(), 0.0f, 1.0f);
+        const Vec2 p = lerp(player_.prevPos, player_.box.pos(), alpha);
+        const SDL_FRect back{std::round(p.x + player_.box.w * 0.5f - 17.0f - cam.x), std::round(p.y - 20.0f - cam.y), 34, 5};
+        SDL_SetRenderDrawColor(renderer, 10, 20, 40, 220);
+        SDL_RenderFillRect(renderer, &back);
+        const SDL_FRect fill{back.x + 1, back.y + 1, (back.w - 2) * frac, back.h - 2};
+        SDL_SetRenderDrawColor(renderer, frac > 0.3f ? 120 : 230, frac > 0.3f ? 200 : 90, 255, 255);
+        SDL_RenderFillRect(renderer, &fill);
+    }
 
     if (mode_ == Mode::Play && fadeDirection_ == 0) {
         const Interactable it = findInteractable();

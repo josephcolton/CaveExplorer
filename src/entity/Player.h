@@ -66,11 +66,13 @@ public:
     bool nonSlip = false;  // grip on slippery ground
     const std::vector<Rect>* ladders = nullptr;  // climbable areas in the current area
     bool climbing() const { return climbing_; }
+    bool swimming() const { return inWater_; }
+    bool headUnderwater() const { return headUnder_; }
     // For prompts: -1 = can climb down here, +1 = can climb up here, 0 = no ladder.
     int ladderHint() const { return ladderHint_; }
 
     // Things that happened this tick, for sound effects.
-    enum Event : unsigned { Jumped = 1, Landed = 2, ClimbStep = 4 };
+    enum Event : unsigned { Jumped = 1, Landed = 2, ClimbStep = 4, Splash = 8, SwimStroke = 16 };
     unsigned events = 0;
 
 private:
@@ -89,6 +91,8 @@ private:
     float attackAnimTime_ = 0.0f;
     int attackId_ = 0;
     bool climbing_ = false;
+    bool inWater_ = false;
+    bool headUnder_ = false;
     float climbDistance_ = 0.0f;
     int ladderHint_ = 0;
 
