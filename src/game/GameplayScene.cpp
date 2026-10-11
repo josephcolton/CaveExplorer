@@ -927,7 +927,7 @@ std::string GameplayScene::obstacleHint(const Obstacle& ob) const {
 // ============================================================================ menus
 
 void GameplayScene::openPause() {
-    pauseMenu_.setItems({"Resume", "Restart area (back to the entrance)",
+    pauseMenu_.setItems({"Resume", "Restart area",
                          slot_ == kDevSlot ? "Save game (dev game: off)" : "Save game", "Settings", "Credits",
                          "About", "Save & quit to title", "Save & exit game"});
     pauseMessage_.clear();
@@ -1382,7 +1382,7 @@ void GameplayScene::render(SDL_Renderer* renderer, float alpha) {
     case Mode::Shop: shopScreen_.render(renderer); break;
     case Mode::Pause: {
         ui::dimScreen(renderer, 150);
-        const SDL_FRect panel{200, 60, 240, 210};
+        const SDL_FRect panel{170, 60, 300, 210};
         ui::panel(renderer, panel, "Paused");
         pauseMenu_.render(renderer, panel.x + panel.w * 0.5f, panel.y + 34);
         if (!pauseMessage_.empty()) ui::textCentered(renderer, panel.x + panel.w * 0.5f, panel.y + panel.h - 18, pauseMessage_, ui::kGood);
